@@ -94,19 +94,23 @@
 	)}
 	{@const isAudio = converters
 		.find((c) => c.name === "ffmpeg")
-		?.formatStrings((f) => f.fromSupported)
+		?.supportedFormats.filter((f) => f.isNative)
+		.map((f) => f.name)
 		.includes(file.from)}
 	{@const isVideo = converters
 		.find((c) => c.name === "vertd")
-		?.formatStrings((f) => f.fromSupported)
+		?.supportedFormats.filter((f) => f.isNative)
+		.map((f) => f.name)
 		.includes(file.from)}
 	{@const isImage = converters
 		.find((c) => c.name === "libvips")
-		?.formatStrings((f) => f.fromSupported)
+		?.supportedFormats.filter((f) => f.isNative)
+		.map((f) => f.name)
 		.includes(file.from)}
 	{@const isDocument = converters
 		.find((c) => c.name === "pandoc")
-		?.formatStrings((f) => f.fromSupported)
+		?.supportedFormats.filter((f) => f.isNative)
+		.map((f) => f.name)
 		.includes(file.from)}
 	<Panel class="p-5 flex flex-col min-w-0 gap-4 relative">
 		<div class="flex-shrink-0 h-8 w-full flex items-center gap-2">
