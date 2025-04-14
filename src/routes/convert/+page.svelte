@@ -231,12 +231,21 @@
 									c.supportedFormats.find(
 										(f) => f.name === file.from,
 									)?.isNative
-										? c.formatStrings((f) => f.toSupported)
-										: c.formatStrings(
+										? c.supportedFormats.filter(
+												(f) => f.toSupported,
+											)
+										: c.supportedFormats.filter(
 												(f) =>
 													f.toSupported && f.isNative,
 											),
 								)
+								.sort((a, b) => {
+									// sort native formats first
+									if (a.isNative && !b.isNative) return -1;
+									if (!a.isNative && b.isNative) return 1;
+									return 0;
+								})
+								.map((f) => f.name)
 								.filter(
 									(format) =>
 										format !== ".svg" && format !== ".heif",
