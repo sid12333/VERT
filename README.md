@@ -74,11 +74,14 @@ $ docker run -d \
 	vert-sh/vert
 ```
 
-This will run the image in dettached mode, restart the container unless it is manually stopped, map 3000/tcp (host) to 80/tcp (container), name the container `vert` and use the previously built image.
+This will do the following:
+- Use the previously built image as the container `vert`, in detached mode
+- Continuously restart the container until manually stopped
+- Map `3000/tcp` (host) to `80/tcp` (container)
 
 We also have a [`docker-compose.yml`](./docker-compose.yml) file available. Use `docker compose up` if you want to start the stack, or `docker compose down` to bring it down. You can pass `--build` to `docker compose up` to rebuild the Docker image (useful if you've changed any of the environment variables) as well as `-d` to start it in detached mode. You can read more about Docker Compose in general [here](https://docs.docker.com/compose/intro/compose-application-model/).
 
-While there's an image you can pull instead of having to clone this repository and build the image yourself, you will not be able to update any of the environment variables (e.g. `PUB_PLAUSIBLE_URL`) as they're baked directly into the image and not obtained during runtime. If you're okay with this, you can simply run this command instead:
+While there's an image you can pull instead of cloning the repo and building the image yourself, you will not be able to update any of the environment variables (e.g. `PUB_PLAUSIBLE_URL`) as they're baked directly into the image and not obtained during runtime. If you're okay with this, you can simply run this command instead:
 ```shell
 $ docker run -d \
 	--restart unless-stopped \
