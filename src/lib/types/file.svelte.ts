@@ -34,11 +34,24 @@ export class VertFile {
 	}
 
 	public findConverter() {
-		const converter = this.converters.find(
-			(converter) =>
-				converter.formatStrings().includes(this.from) &&
-				converter.formatStrings().includes(this.to),
-		);
+		const converter = this.converters.find((converter) => {
+			if (
+				!converter.formatStrings().includes(this.from) ||
+				!converter.formatStrings().includes(this.to)
+			) {
+				return false;
+			}
+
+			const theirFrom = converter.supportedFormats.find(
+				(f) => f.name === this.from,
+			);
+			const theirTo = converter.supportedFormats.find(
+				(f) => f.name === this.to,
+			);
+			if (!theirFrom || !theirTo) return false;
+			if (!theirFrom.isNative && !theirTo.isNative) return false;
+			return true;
+		});
 		return converter;
 	}
 

@@ -202,14 +202,14 @@ export class VertdConverter extends Converter {
 	public reportsProgress = true;
 
 	public supportedFormats = [
-		new FormatInfo("mkv", true, true),
-		new FormatInfo("mp4", true, true),
-		new FormatInfo("webm", true, true),
-		new FormatInfo("avi", true, true),
-		new FormatInfo("wmv", true, true),
-		new FormatInfo("mov", true, true),
-		new FormatInfo("gif", true, true),
-		new FormatInfo("mts", true, true),
+		new FormatInfo("mkv"),
+		new FormatInfo("mp4"),
+		new FormatInfo("webm"),
+		new FormatInfo("avi"),
+		new FormatInfo("wmv"),
+		new FormatInfo("mov"),
+		new FormatInfo("gif"),
+		new FormatInfo("mts"),
 	];
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any

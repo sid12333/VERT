@@ -62,18 +62,18 @@ export class PandocConverter extends Converter {
 	}
 
 	public supportedFormats = [
-		new FormatInfo("docx", true, true),
-		new FormatInfo("doc", true, true),
-		new FormatInfo("md", true, true),
-		new FormatInfo("html", true, true),
-		new FormatInfo("rtf", true, true),
-		new FormatInfo("csv", true, true),
-		new FormatInfo("tsv", true, true),
-		new FormatInfo("json", true, true),
-		new FormatInfo("rst", true, true),
-		new FormatInfo("epub", true, true),
-		new FormatInfo("odt", true, true),
-		new FormatInfo("docbook", true, true),
+		new FormatInfo("docx"),
+		new FormatInfo("doc"),
+		new FormatInfo("md"),
+		new FormatInfo("html"),
+		new FormatInfo("rtf"),
+		new FormatInfo("csv"),
+		new FormatInfo("tsv"),
+		new FormatInfo("json"),
+		new FormatInfo("rst"),
+		new FormatInfo("epub"),
+		new FormatInfo("odt"),
+		new FormatInfo("docbook"),
 	];
 }
 

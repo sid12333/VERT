@@ -227,7 +227,15 @@
 						<Dropdown
 							options={availableConverters
 								.flatMap((c) =>
-									c.formatStrings((f) => f.toSupported),
+									// c.formatStrings((f) => f.toSupported),
+									c.supportedFormats.find(
+										(f) => f.name === file.from,
+									)?.isNative
+										? c.formatStrings((f) => f.toSupported)
+										: c.formatStrings(
+												(f) =>
+													f.toSupported && f.isNative,
+											),
 								)
 								.filter(
 									(format) =>
