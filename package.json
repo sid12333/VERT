@@ -37,7 +37,6 @@
 		"@bjorn3/browser_wasi_shim": "^0.4.1",
 		"@ffmpeg/ffmpeg": "^0.12.15",
 		"@ffmpeg/util": "^0.12.2",
-		"@fiahfy/icns": "^0.0.7",
 		"@fontsource/azeret-mono": "^5.1.1",
 		"@fontsource/lexend": "^5.1.2",
 		"@fontsource/radio-canada-big": "^5.1.1",
@@ -49,7 +48,9 @@
 		"music-metadata": "^11.0.0",
 		"p-queue": "^8.1.0",
 		"riff-file": "^1.0.3",
+		"vert-wasm": "^0.0.2",
 		"vite-plugin-static-copy": "^2.2.0",
+		"vite-plugin-wasm": "^3.4.1",
 		"wasm-vips": "^0.0.11"
 	}
 }

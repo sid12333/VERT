@@ -10,7 +10,7 @@ import {
 import { makeZip } from "client-zip";
 import wasm from "@imagemagick/magick-wasm/magick.wasm?url";
 import { parseAni } from "$lib/parse/ani";
-import { Icns } from "@fiahfy/icns/dist";
+import { parseIcns } from "vert-wasm";
 
 const vipsPromise = Vips({
 	dynamicLibraries: [],
@@ -158,8 +158,6 @@ const handleMessage = async (message: any): Promise<any> => {
 					}
 				}
 
-				console.log(message.input.from);
-
 				const img = MagickImage.create(
 					new Uint8Array(buffer),
 					new MagickReadSettings({
@@ -178,11 +176,59 @@ const handleMessage = async (message: any): Promise<any> => {
 			}
 
 			if (message.input.from === ".icns") {
-				const icns = Icns.from(new Uint8Array(buffer));
-				console.log(icns);
+				const icns: Uint8Array[] = parseIcns(new Uint8Array(buffer));
+				// Result<T> in vert-wasm maps to a string in JS
+				if (typeof icns === "string") {
+					return {
+						type: "error",
+						error: `Failed to read ICNS -- ${icns}`,
+					};
+				}
+				const formats = [
+					MagickFormat.Png,
+					MagickFormat.Jpeg,
+					MagickFormat.Rgba,
+					MagickFormat.Rgb,
+				];
+				const outputs: Uint8Array[] = [];
+				for (const file of icns) {
+					for (const format of formats) {
+						try {
+							const img = MagickImage.create(
+								file,
+								new MagickReadSettings({
+									format: format,
+								}),
+							);
+							const converted = await magickConvert(
+								img,
+								message.to,
+							);
+							outputs.push(converted);
+							break;
+							// eslint-disable-next-line @typescript-eslint/no-unused-vars
+						} catch (_) {
+							continue;
+						}
+					}
+				}
+
+				const zip = makeZip(
+					outputs.map(
+						(img, i) =>
+							new File([img], `image${i}.${message.to.slice(1)}`),
+					),
+					"images.zip",
+				);
+				const zipBytes = await readToEnd(zip.getReader());
+				return {
+					type: "finished",
+					output: zipBytes,
+					zip: true,
+				};
 			}
 
-			let image = vips.Image.newFromBuffer(buffer, "");
+			let image = vips.Image.newFromBuffer(buffer);
 
 			// check if animated image & keep it animated when converting
 			if (image.getTypeof("n-pages") > 0) {
