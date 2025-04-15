@@ -6,6 +6,7 @@ import wasm from "vite-plugin-wasm";
 
 export default defineConfig({
 	plugins: [
+		wasm(),
 		sveltekit(),
 		{
 			name: "vips-request-middleware",
@@ -45,7 +46,6 @@ export default defineConfig({
 				},
 			],
 		}),
-		wasm(),
 	],
 	optimizeDeps: {
 		exclude: [
