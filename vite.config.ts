@@ -3,10 +3,10 @@ import { defineConfig } from "vite";
 import { viteStaticCopy } from "vite-plugin-static-copy";
 import svg from "@poppanator/sveltekit-svg";
 import wasm from "vite-plugin-wasm";
+import topLevelAwait from "vite-plugin-top-level-await";
 
 export default defineConfig({
 	plugins: [
-		wasm(),
 		sveltekit(),
 		{
 			name: "vips-request-middleware",
@@ -47,6 +47,10 @@ export default defineConfig({
 			],
 		}),
 	],
+	worker: {
+		plugins: () => [wasm(), topLevelAwait()],
+		format: "es",
+	},
 	optimizeDeps: {
 		exclude: [
 			"wasm-vips",
@@ -61,5 +65,8 @@ export default defineConfig({
 				api: "modern",
 			},
 		},
+	},
+	build: {
+		target: "esnext",
 	},
 });
