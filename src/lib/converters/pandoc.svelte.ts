@@ -1,7 +1,7 @@
 import { VertFile } from "$lib/types";
 import { Converter, FormatInfo } from "./converter.svelte";
 import { browser } from "$app/environment";
-import PandocWorker from "$lib/workers/pandoc?worker";
+import PandocWorker from "$lib/workers/pandoc?worker&url";
 
 export class PandocConverter extends Converter {
 	public name = "pandoc";
@@ -20,7 +20,9 @@ export class PandocConverter extends Converter {
 	}
 
 	public async convert(input: VertFile, to: string): Promise<VertFile> {
-		const worker = new PandocWorker();
+		const worker = new Worker(PandocWorker, {
+			type: "module",
+		});
 		worker.postMessage({ type: "load", wasm: this.wasm });
 		await waitForMessage(worker, "loaded");
 		worker.postMessage({
