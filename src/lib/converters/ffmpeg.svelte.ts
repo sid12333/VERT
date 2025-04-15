@@ -89,16 +89,20 @@ export class FFmpegConverter extends Converter {
 				"copy",
 				"cover.png",
 			]);
-			await ffmpeg.exec([
+			const cmd = [
 				"-i",
 				"input",
 				"-i",
 				"cover.png",
 				"-loop",
 				"1",
+				"-pix_fmt",
+				"yuv420p",
 				...toArgs(to),
 				"output" + to,
-			]);
+			];
+			console.log(cmd);
+			await ffmpeg.exec(cmd);
 		} else {
 			await ffmpeg.exec(["-i", "input", "output" + to]);
 		}
