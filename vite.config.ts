@@ -3,7 +3,6 @@ import { defineConfig } from "vite";
 import { viteStaticCopy } from "vite-plugin-static-copy";
 import svg from "@poppanator/sveltekit-svg";
 import wasm from "vite-plugin-wasm";
-import topLevelAwait from "vite-plugin-top-level-await";
 
 export default defineConfig({
 	plugins: [
@@ -48,7 +47,7 @@ export default defineConfig({
 		}),
 	],
 	worker: {
-		plugins: () => [wasm(), topLevelAwait()],
+		plugins: () => [wasm()],
 		format: "es",
 	},
 	optimizeDeps: {
