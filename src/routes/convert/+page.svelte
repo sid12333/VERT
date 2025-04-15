@@ -5,7 +5,7 @@
 	import Panel from "$lib/components/visual/Panel.svelte";
 	import ProgressBar from "$lib/components/visual/ProgressBar.svelte";
 	import Tooltip from "$lib/components/visual/Tooltip.svelte";
-	import { converters } from "$lib/converters";
+	import { converters, byNative } from "$lib/converters";
 	import {
 		effects,
 		files,
@@ -44,21 +44,30 @@
 	$effect(() => {
 		// Set gradient color depending on the file types
 		// TODO: if more file types added, add a "fileType" property to the file object
-		const allAudio = files.files.every(
-			(file) => file.findConverter()?.name === "ffmpeg",
-		);
-		const allImages = files.files.every(
-			(file) =>
-				file.findConverter()?.name !== "ffmpeg" &&
-				file.findConverter()?.name !== "vertd",
-		);
-		const allVideos = files.files.every(
-			(file) => file.findConverter()?.name === "vertd",
-		);
-
-		const allDocuments = files.files.every(
-			(file) => file.findConverter()?.name === "pandoc",
-		);
+		const allAudio = files.files.every((file) => {
+			const converter = file
+				.findConverters()
+				.sort(byNative(file.from))[0];
+			return converter?.name === "ffmpeg";
+		});
+		const allImages = files.files.every((file) => {
+			const converter = file
+				.findConverters()
+				.sort(byNative(file.from))[0];
+			return converter?.name === "libvips";
+		});
+		const allVideos = files.files.every((file) => {
+			const converter = file
+				.findConverters()
+				.sort(byNative(file.from))[0];
+			return converter?.name === "vertd";
+		});
+		const allDocuments = files.files.every((file) => {
+			const converter = file
+				.findConverters()
+				.sort(byNative(file.from))[0];
+			return converter?.name === "pandoc";
+		});
 
 		if (files.files.length === 1 && files.files[0].blobUrl && !allVideos) {
 			showGradient.set(false);
@@ -68,7 +77,7 @@
 
 		if (
 			files.files.length === 0 ||
-			(!allAudio && !allImages && !allVideos)
+			(!allAudio && !allImages && !allVideos && !allDocuments)
 		) {
 			gradientColor.set("");
 		} else {
