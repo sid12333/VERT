@@ -10,6 +10,7 @@ import {
 import { makeZip } from "client-zip";
 import wasm from "@imagemagick/magick-wasm/magick.wasm?url";
 import { parseAni } from "$lib/parse/ani";
+import { Icns } from "@fiahfy/icns/dist";
 
 const vipsPromise = Vips({
 	dynamicLibraries: [],
@@ -174,6 +175,11 @@ const handleMessage = async (message: any): Promise<any> => {
 					type: "finished",
 					output: converted,
 				};
+			}
+
+			if (message.input.from === ".icns") {
+				const icns = Icns.from(new Uint8Array(buffer));
+				console.log(icns);
 			}
 
 			let image = vips.Image.newFromBuffer(buffer, "");

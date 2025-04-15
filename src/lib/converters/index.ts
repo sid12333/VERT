@@ -1,3 +1,4 @@
+import type { Converter } from "./converter.svelte";
 import { FFmpegConverter } from "./ffmpeg.svelte";
 import { PandocConverter } from "./pandoc.svelte";
 import { VertdConverter } from "./vertd.svelte";

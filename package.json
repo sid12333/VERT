@@ -37,6 +37,7 @@
 		"@bjorn3/browser_wasi_shim": "^0.4.1",
 		"@ffmpeg/ffmpeg": "^0.12.15",
 		"@ffmpeg/util": "^0.12.2",
+		"@fiahfy/icns": "^0.0.7",
 		"@fontsource/azeret-mono": "^5.1.1",
 		"@fontsource/lexend": "^5.1.2",
 		"@fontsource/radio-canada-big": "^5.1.1",
