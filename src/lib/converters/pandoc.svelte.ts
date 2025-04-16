@@ -65,6 +65,7 @@ export class PandocConverter extends Converter {
 
 	public supportedFormats = [
 		new FormatInfo("docx", true, true),
+		new FormatInfo("xml", true, true),
 		new FormatInfo("doc", true, true),
 		new FormatInfo("md", true, true),
 		new FormatInfo("html", true, true),

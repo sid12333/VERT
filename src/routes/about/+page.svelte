@@ -8,6 +8,8 @@
 	import avatarJovannMC from "$lib/assets/avatars/jovannmc.jpg";
 	import { GITHUB_API_URL } from "$lib/consts";
 	import { addToast } from "$lib/store/ToastProvider";
+	import { dev } from "$app/environment";
+	import { page } from "$app/state";
 
 	/* interface Donator {
 		name: string;
@@ -105,6 +107,9 @@
 			error(["general"], `Error fetching GitHub contributors: ${e}`);
 		}
 	});
+
+	// const donationsEnabled = dev || page.url.origin.endsWith("//vert.sh");
+	const donationsEnabled = false;
 </script>
 
 <div class="flex flex-col h-full items-center">
@@ -118,15 +123,22 @@
 	>
 		<!-- Why VERT? & Credits -->
 		<div class="flex flex-col gap-4 flex-1">
+			{#if donationsEnabled}
+				<About.Donate donors={[]} />
+			{/if}
 			<About.Why />
-			<About.Vertd />
+			{#if !donationsEnabled}
+				<About.Vertd />
+			{/if}
 		</div>
 
 		<!-- Resources & Donate to VERT -->
 		<div class="flex flex-col gap-4 flex-1">
 			<About.Resources />
 			<About.Credits {mainContribs} {ghContribs} />
-			<!-- <About.Donate /> -->
+			{#if donationsEnabled}
+				<About.Vertd />
+			{/if}
 		</div>
 	</div>
 </div>

@@ -16,7 +16,7 @@
 		dropping,
 		vertdLoaded,
 	} from "$lib/store/index.svelte";
-	import "../app.scss";
+	import "$lib/css/app.scss";
 	import { browser } from "$app/environment";
 	import { page } from "$app/state";
 
