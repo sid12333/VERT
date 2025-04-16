@@ -44,6 +44,11 @@
 	--accent-green-alt: hsl(140, 66%, 55%);
 	--accent: var(--accent-pink);
 	--accent-alt: var(--accent-pink-alt);
+	--accent-pink-transparent: hsla(303, 100%, 50%, 0);
+	--accent-red-transparent: hsla(348, 100%, 50%, 0);
+	--accent-purple-transparent: hsla(264, 100%, 50%, 0);
+	--accent-blue-transparent: hsla(220, 100%, 50%, 0);
+	--accent-green-transparent: hsla(140, 70%, 30%, 0);
 
 	// foregrounds
 	--fg: hsl(0, 0%, 0%);
@@ -56,65 +61,91 @@
 
 	// backgrounds
 	--bg: hsl(0, 0%, 95%);
+
+	--bg-gradient-from: var(--accent-pink);
+	--bg-gradient-to: hsla(303, 100%, 50%, 0);
+	--bg-gradient-pink-from: var(--accent-pink);
+	--bg-gradient-pink-to: hsla(303, 100%, 50%, 0);
+	--bg-gradient-pink-alt-from: var(--accent-pink);
+	--bg-gradient-pink-alt-to: hsl(303, 100%, 91%);
+	--bg-gradient-red-from: var(--accent-red);
+	--bg-gradient-red-to: hsla(348, 100%, 50%, 0);
+	--bg-gradient-red-alt-from: var(--accent-red);
+	--bg-gradient-red-alt-to: hsl(348, 100%, 91%);
+	--bg-gradient-purple-from: var(--accent-purple);
+	--bg-gradient-purple-to: hsla(264, 100%, 50%, 0);
+	--bg-gradient-purple-alt-from: var(--accent-purple);
+	--bg-gradient-purple-alt-to: hsl(264, 100%, 91%);
+	--bg-gradient-blue-from: var(--accent-blue);
+	--bg-gradient-blue-to: hsla(220, 100%, 50%, 0);
+	--bg-gradient-blue-alt-from: var(--accent-blue);
+	--bg-gradient-blue-alt-to: hsl(220, 100%, 91%);
+	--bg-gradient-green-from: var(--accent-green);
+	--bg-gradient-green-to: hsla(140, 70%, 30%, 0);
+	--bg-gradient-green-alt-from: var(--accent-green-alt);
+	--bg-gradient-green-alt-to: hsl(140, 70%, 91%);
+	--bg-gradient-image-from: hsla(0, 0%, 95%, 0.5);
+	--bg-gradient-image-to: hsla(0, 0%, 95%, 1);
+
 	--bg-gradient: linear-gradient(
 		to bottom,
-		var(--accent-pink),
-		hsla(303, 100%, 50%, 0) 100%
+		var(--bg-gradient-from),
+		var(--bg-gradient-to) 100%
 	);
 	--bg-gradient-pink: linear-gradient(
 		to bottom,
-		var(--accent-pink),
-		hsla(303, 100%, 50%, 0) 25%
+		var(--bg-gradient-pink-from),
+		var(--bg-gradient-pink-to) 25%
 	);
 	--bg-gradient-pink-alt: linear-gradient(
 		to top,
-		var(--accent-pink),
-		hsl(303, 100%, 91%) 100%
+		var(--bg-gradient-pink-alt-from),
+		var(--bg-gradient-pink-alt-to) 100%
 	);
 	--bg-gradient-red: linear-gradient(
 		to bottom,
-		var(--accent-red),
-		hsla(348, 100%, 50%, 0) 25%
+		var(--bg-gradient-red-from),
+		var(--bg-gradient-red-to) 25%
 	);
 	--bg-gradient-red-alt: linear-gradient(
 		to top,
-		var(--accent-red),
-		hsl(348, 100%, 91%) 100%
+		var(--bg-gradient-red-alt-from),
+		var(--bg-gradient-red-alt-to) 100%
 	);
 	--bg-gradient-purple: linear-gradient(
 		to bottom,
-		var(--accent-purple),
-		hsla(264, 100%, 50%, 0) 25%
+		var(--bg-gradient-purple-from),
+		var(--bg-gradient-purple-to) 25%
 	);
 	--bg-gradient-purple-alt: linear-gradient(
 		to top,
-		var(--accent-purple),
-		hsl(264, 100%, 91%) 100%
+		var(--bg-gradient-purple-alt-from),
+		var(--bg-gradient-purple-alt-to) 100%
 	);
 	--bg-gradient-blue: linear-gradient(
 		to bottom,
-		var(--accent-blue),
-		hsla(220, 100%, 50%, 0) 25%
+		var(--bg-gradient-blue-from),
+		var(--bg-gradient-blue-to) 25%
 	);
 	--bg-gradient-blue-alt: linear-gradient(
 		to top,
-		var(--accent-blue),
-		hsl(220, 100%, 91%) 100%
+		var(--bg-gradient-blue-alt-from),
+		var(--bg-gradient-blue-alt-to) 100%
 	);
 	--bg-gradient-green: linear-gradient(
 		to bottom,
-		var(--accent-green),
-		hsla(140, 70%, 30%, 0) 25%
+		var(--bg-gradient-green-from),
+		var(--bg-gradient-green-to) 25%
 	);
 	--bg-gradient-green-alt: linear-gradient(
 		to top,
-		var(--accent-green-alt),
-		hsl(140, 70%, 91%) 100%
+		var(--bg-gradient-green-alt-from),
+		var(--bg-gradient-green-alt-to) 100%
 	);
 	--bg-gradient-image: linear-gradient(
 		to bottom,
-		hsla(0, 0%, 95%, 0.5),
-		hsla(0, 0%, 95%, 1) 100%
+		var(--bg-gradient-image-from),
+		var(--bg-gradient-image-to) 100%
 	);
 	--bg-panel: hsl(0, 0%, 100%);
 	--bg-panel-highlight: hsl(0, 0%, 92%);
@@ -140,6 +171,11 @@
 	--accent-alt: var(--accent-pink-alt);
 	--accent-green: hsl(140, 70%, 74%);
 	--accent-green-alt: hsl(140, 64%, 42%);
+	--accent-pink-transparent: hsla(303, 100%, 50%, 0);
+	--accent-red-transparent: hsla(348, 100%, 50%, 0);
+	--accent-purple-transparent: hsla(264, 100%, 50%, 0);
+	--accent-blue-transparent: hsla(220, 100%, 50%, 0);
+	--accent-green-transparent: hsla(140, 70%, 30%, 0);
 
 	// foregrounds
 	--fg: hsl(0, 0%, 100%);
@@ -151,65 +187,91 @@
 
 	// backgrounds
 	--bg: hsl(220, 5%, 15%);
+
+	--bg-gradient-from: hsla(303, 100%, 50%, 0.1);
+	--bg-gradient-to: hsla(303, 100%, 50%, 0);
+	--bg-gradient-pink-from: hsla(303, 100%, 50%, 0.1);
+	--bg-gradient-pink-to: hsla(303, 100%, 50%, 0);
+	--bg-gradient-pink-alt-from: var(--accent-pink);
+	--bg-gradient-pink-alt-to: hsl(303, 100%, 91%);
+	--bg-gradient-red-from: hsla(348, 100%, 50%, 0.1);
+	--bg-gradient-red-to: hsla(348, 100%, 50%, 0);
+	--bg-gradient-red-alt-from: var(--accent-red);
+	--bg-gradient-red-alt-to: hsl(348, 100%, 91%);
+	--bg-gradient-purple-from: hsla(264, 100%, 50%, 0.1);
+	--bg-gradient-purple-to: hsla(264, 100%, 50%, 0);
+	--bg-gradient-purple-alt-from: var(--accent-purple);
+	--bg-gradient-purple-alt-to: hsl(264, 100%, 91%);
+	--bg-gradient-blue-from: hsla(220, 100%, 50%, 0.1);
+	--bg-gradient-blue-to: hsla(220, 100%, 50%, 0);
+	--bg-gradient-blue-alt-from: var(--accent-blue);
+	--bg-gradient-blue-alt-to: hsl(220, 100%, 91%);
+	--bg-gradient-green-from: hsla(140, 70%, 30%, 0.1);
+	--bg-gradient-green-to: hsla(140, 70%, 30%, 0);
+	--bg-gradient-green-alt-from: var(--accent-green-alt);
+	--bg-gradient-green-alt-to: hsl(140, 70%, 91%);
+	--bg-gradient-image-from: hsla(220, 5%, 12%, 0.5);
+	--bg-gradient-image-to: hsla(220, 5%, 12%, 1);
+
 	--bg-gradient: linear-gradient(
 		to bottom,
-		hsla(303, 100%, 50%, 0.1),
-		hsla(303, 100%, 50%, 0) 100%
+		var(--bg-gradient-from),
+		var(--bg-gradient-to) 100%
 	);
 	--bg-gradient-pink: linear-gradient(
 		to bottom,
-		hsla(303, 100%, 50%, 0.1),
-		hsla(303, 100%, 50%, 0) 25%
+		var(--bg-gradient-pink-from),
+		var(--bg-gradient-pink-to) 25%
 	);
 	--bg-gradient-pink-alt: linear-gradient(
 		to top,
-		var(--accent-pink),
-		hsl(303, 100%, 91%) 100%
+		var(--bg-gradient-pink-alt-from),
+		var(--bg-gradient-pink-alt-to) 100%
 	);
 	--bg-gradient-red: linear-gradient(
 		to bottom,
-		hsla(348, 100%, 50%, 0.1),
-		hsla(348, 100%, 50%, 0) 25%
+		var(--bg-gradient-red-from),
+		var(--bg-gradient-red-to) 25%
 	);
 	--bg-gradient-red-alt: linear-gradient(
 		to top,
-		var(--accent-red),
-		hsl(348, 100%, 91%) 100%
+		var(--bg-gradient-red-alt-from),
+		var(--bg-gradient-red-alt-to) 100%
 	);
 	--bg-gradient-purple: linear-gradient(
 		to bottom,
-		hsla(264, 100%, 50%, 0.1),
-		hsla(264, 100%, 50%, 0) 25%
+		var(--bg-gradient-purple-from),
+		var(--bg-gradient-purple-to) 25%
 	);
 	--bg-gradient-purple-alt: linear-gradient(
 		to top,
-		var(--accent-purple),
-		hsl(264, 100%, 91%) 100%
+		var(--bg-gradient-purple-alt-from),
+		var(--bg-gradient-purple-alt-to) 100%
 	);
 	--bg-gradient-blue: linear-gradient(
 		to bottom,
-		hsla(220, 100%, 50%, 0.1),
-		hsla(220, 100%, 50%, 0) 25%
+		var(--bg-gradient-blue-from),
+		var(--bg-gradient-blue-to) 25%
 	);
 	--bg-gradient-blue-alt: linear-gradient(
 		to top,
-		var(--accent-blue),
-		hsl(220, 100%, 91%) 100%
+		var(--bg-gradient-blue-alt-from),
+		var(--bg-gradient-blue-alt-to) 100%
 	);
 	--bg-gradient-green: linear-gradient(
 		to bottom,
-		hsla(140, 70%, 30%, 0.1),
-		hsla(140, 70%, 30%, 0) 25%
+		var(--bg-gradient-green-from),
+		var(--bg-gradient-green-to) 25%
 	);
 	--bg-gradient-green-alt: linear-gradient(
 		to top,
-		var(--accent-green-alt),
-		hsl(140, 70%, 91%) 100%
+		var(--bg-gradient-green-alt-from),
+		var(--bg-gradient-green-alt-to) 100%
 	);
 	--bg-gradient-image: linear-gradient(
 		to bottom,
-		hsla(220, 5%, 12%, 0.5),
-		hsla(220, 5%, 12%, 1) 100%
+		var(--bg-gradient-image-from),
+		var(--bg-gradient-image-to) 100%
 	);
 	--bg-panel: hsl(220, 4%, 24%);
 	--bg-panel-highlight: hsl(220, 2%, 32%);
