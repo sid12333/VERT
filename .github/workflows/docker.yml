@@ -54,3 +54,4 @@ jobs:
           PUB_ENV=production
           PUB_HOSTNAME=${{ vars.PUB_HOSTNAME || '' }}
           PUB_PLAUSIBLE_URL=${{ vars.PUB_PLAUSIBLE_URL || '' }}
+          PUB_VERTD_URL=https://vertd.vert.sh

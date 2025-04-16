@@ -47,6 +47,7 @@ Before building for production, make sure you create a `.env` file in the root o
 PUB_HOSTNAME=example.com # change to your domain, only gets used for Plausible (for now)
 PUB_PLAUSIBLE_URL=https://plausible.example.com # can be empty if not using Plausible
 PUB_ENV=production # "production", "development" or "nightly"
+PUB_VERTD_URL=https://vertd.vert.sh # default vertd instance
 ```
 
 To build the project for production, run `bun run build`
@@ -62,7 +63,8 @@ Clone the repository, then build a Docker image with:
 $ docker build -t vert-sh/vert \
 	--build-arg PUB_ENV=production \
 	--build-arg PUB_HOSTNAME=vert.sh \
-	--build-arg PUB_PLAUSIBLE_URL=https://plausible.example.com .
+	--build-arg PUB_PLAUSIBLE_URL=https://plausible.example.com \
+	--build-arg PUB_VERTD_URL=https://vertd.vert.sh .
 ```
 
 You can then run it by using:
