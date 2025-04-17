@@ -24,6 +24,7 @@ export class VipsConverter extends Converter {
 		new FormatInfo("gif", true, true),
 		new FormatInfo("heic", true, false),
 		new FormatInfo("ico", true, false),
+		new FormatInfo("bmp", true, false),
 		new FormatInfo("cur", true, false),
 		new FormatInfo("ani", true, false),
 		new FormatInfo("icns", true, false),

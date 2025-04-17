@@ -26,6 +26,7 @@ const magickRequiredFormats = [
 	".ani",
 	".cr2",
 	".nef",
+	".bmp",
 ];
 const unsupportedFrom: string[] = [];
 const unsupportedTo = [...magickRequiredFormats];
