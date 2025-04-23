@@ -167,7 +167,7 @@
 						We can't convert this file.
 					</p>
 					<p class="font-normal">
-						Only image, video, and audio files are supported
+						Only image, video, audio, and document files are supported
 					</p>
 				</div>
 			{/if}
