@@ -46,8 +46,8 @@
 	</h2>
 
 	<p class="-mt-4 -mb-3 font-black text-lg">
-		Please refrain from contacting any individual developers for questions
-		regarding VERT. Instead, use the email in the Resources section.
+		If you would like to contact the development team, please use the email
+		found on the "Resources" card.
 	</p>
 
 	<!-- Main contributors -->
