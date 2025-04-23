@@ -7,7 +7,7 @@
 </script>
 
 <script lang="ts">
-	import { PUB_STRIPE_KEY, PUB_DONATION_API } from "$env/static/public";
+	// import { PUB_STRIPE_KEY, PUB_DONATION_API } from "$env/static/public";
 	import { fade } from "$lib/animation";
 	import FancyInput from "$lib/components/functional/FancyInput.svelte";
 	import Panel from "$lib/components/visual/Panel.svelte";

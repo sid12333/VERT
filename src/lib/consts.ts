@@ -10,3 +10,4 @@ export const VERT_NAME =
 		: PUB_ENV === "nightly"
 			? "VERT Nightly"
 			: "VERT.sh";
+export const CONTACT_EMAIL = "hello@vert.sh";

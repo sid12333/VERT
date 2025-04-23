@@ -123,9 +123,9 @@
 	>
 		<!-- Why VERT? & Credits -->
 		<div class="flex flex-col gap-4 flex-1">
-			{#if donationsEnabled}
+			<!-- {#if donationsEnabled}
 				<About.Donate donors={[]} />
-			{/if}
+			{/if} -->
 			<About.Why />
 			{#if !donationsEnabled}
 				<About.Vertd />

@@ -45,6 +45,11 @@
 		Credits
 	</h2>
 
+	<p class="-mt-4 -mb-3 font-black text-lg">
+		Please refrain from contacting any individual developers for questions
+		regarding VERT. Instead, use the email in the Resources section.
+	</p>
+
 	<!-- Main contributors -->
 	<div class="flex flex-col gap-4">
 		<div class="flex flex-col flex-wrap gap-2">
