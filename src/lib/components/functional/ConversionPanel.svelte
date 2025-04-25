@@ -67,17 +67,16 @@
 		<div class="flex items-center gap-2">
 			<p class="whitespace-nowrap text-xl">Set all to</p>
 			{#if files.requiredConverters.length === 1}
-				<!-- cannot convert to svg or heif -->
-				{@const supported = files.files[0]?.converters
-					.flatMap((c) => c.formatStrings((f) => f.toSupported))
-					?.filter(
-						(format) => format !== ".svg" && format !== ".heif",
-					)}
+				{@const supported = files.files[0]?.converters.flatMap((c) =>
+					c.formatStrings((f) => f.toSupported),
+				)}
 				<Dropdown
 					onselect={(r) =>
 						files.files.forEach((f) => {
-							f.to = r;
-							f.result = null;
+							if (f.from !== r) {
+								f.to = r;
+								f.result = null;
+							}
 						})}
 					options={supported || []}
 				/>

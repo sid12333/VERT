@@ -167,7 +167,8 @@
 						We can't convert this file.
 					</p>
 					<p class="font-normal">
-						Only image, video, audio, and document files are supported
+						Only image, video, audio, and document files are
+						supported
 					</p>
 				</div>
 			{/if}
@@ -229,10 +230,7 @@
 								.flatMap((c) =>
 									c.formatStrings((f) => f.toSupported),
 								)
-								.filter(
-									(format) =>
-										format !== ".svg" && format !== ".heif",
-								) || []}
+								.filter((format) => format !== file.from) || []}
 							bind:selected={file.to}
 							onselect={(option) => handleSelect(option, file)}
 						/>
