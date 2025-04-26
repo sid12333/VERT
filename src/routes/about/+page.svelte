@@ -57,9 +57,9 @@
 			avatar: avatarAzurejelly,
 		},
 		{
-			name: "realmy",
+			name: "Realmy",
 			github: "https://github.com/RealmyTheMan",
-			role: "Former designer & co-founder",
+			role: "Former co-founder & designer",
 			avatar: avatarRealmy,
 		}
 	];
