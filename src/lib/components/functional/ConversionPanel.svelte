@@ -5,7 +5,6 @@
 	import Dropdown from "./Dropdown.svelte";
 	import Tooltip from "../visual/Tooltip.svelte";
 	import ProgressBar from "../visual/ProgressBar.svelte";
-	import { fade } from "$lib/animation";
 
 	const length = $derived(files.files.length);
 	const progress = $derived(files.files.filter((f) => f.result).length);

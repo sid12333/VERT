@@ -6,10 +6,12 @@
 	import avatarNullptr from "$lib/assets/avatars/nullptr.jpg";
 	import avatarLiam from "$lib/assets/avatars/liam.jpg";
 	import avatarJovannMC from "$lib/assets/avatars/jovannmc.jpg";
+	import avatarRealmy from "$lib/assets/avatars/realmy.jpg";
+	import avatarAzurejelly from "$lib/assets/avatars/azurejelly.jpg";
 	import { GITHUB_API_URL } from "$lib/consts";
 	import { addToast } from "$lib/store/ToastProvider";
-	import { dev } from "$app/environment";
-	import { page } from "$app/state";
+	// import { dev } from "$app/environment";
+	// import { page } from "$app/state";
 
 	/* interface Donator {
 		name: string;
@@ -47,6 +49,21 @@
 		},
 	];
 
+	const notableContribs: Contributor[] = [
+		{
+			name: "azurejelly",
+			github: "https://github.com/azurejelly",
+			role: "Maintaining Docker & CI support",
+			avatar: avatarAzurejelly,
+		},
+		{
+			name: "realmy",
+			github: "https://github.com/RealmyTheMan",
+			role: "Former designer & co-founder",
+			avatar: avatarRealmy,
+		}
+	];
+
 	let ghContribs: Contributor[] = [];
 
 	onMount(async () => {
@@ -66,13 +83,15 @@
 			}
 			const allContribs = await response.json();
 
-			// Filter out main contributors
-			const mainContribNames = mainContribs.map((contrib) =>
-				contrib.github.split("/").pop(),
-			);
+			// Filter out main and notable contributors
+			const excludedNames = new Set([
+				...mainContribs.map((c) => c.github.split("/").pop()),
+				...notableContribs.map((c) => c.github.split("/").pop()),
+			]);
+
 			const filteredContribs = allContribs.filter(
 				(contrib: { login: string }) =>
-					!mainContribNames.includes(contrib.login),
+					!excludedNames.has(contrib.login),
 			);
 
 			// Fetch and cache avatar images as Base64
@@ -135,7 +154,7 @@
 		<!-- Resources & Donate to VERT -->
 		<div class="flex flex-col gap-4 flex-1">
 			<About.Resources />
-			<About.Credits {mainContribs} {ghContribs} />
+			<About.Credits {mainContribs} {notableContribs} {ghContribs} />
 			{#if donationsEnabled}
 				<About.Vertd />
 			{/if}
