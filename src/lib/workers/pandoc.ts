@@ -246,7 +246,7 @@ const zipFiles = async (
 	output: File,
 	entries: PandocEntries,
 ): Promise<Uint8Array> => {
-	const zipFormatted = pandocToFiles(entries, "media");
+	const zipFormatted = pandocToFiles(entries);
 	const zipped = zip.makeZip([...zipFormatted, output]);
 	// read the ReadableStream to the end
 	const reader = zipped.getReader();
