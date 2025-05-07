@@ -210,6 +210,8 @@ export class VertdConverter extends Converter {
 		new FormatInfo("mov", true, true),
 		new FormatInfo("gif", true, true),
 		new FormatInfo("mts", true, true),
+		new FormatInfo("ts", true, true),
+		new FormatInfo("m2ts", true, true),
 	];
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
