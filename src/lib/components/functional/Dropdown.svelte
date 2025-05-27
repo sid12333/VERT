@@ -1,11 +1,13 @@
 <script lang="ts">
 	import { duration, fade, transition } from "$lib/animation";
-	import { ChevronDown } from "lucide-svelte";
+	import type { Categories } from "$lib/types";
+	import { ChevronDown, SearchIcon } from "lucide-svelte";
 	import { onMount } from "svelte";
 	import { quintOut } from "svelte/easing";
 
 	type Props = {
 		options: string[];
+		categories: Categories;
 		selected?: string;
 		onselect?: (option: string) => void;
 		disabled?: boolean;
@@ -48,6 +50,12 @@
 		window.addEventListener("click", click);
 		return () => window.removeEventListener("click", click);
 	});
+
+	function search(event: Event) {
+		const query = (event.target as HTMLInputElement).value;
+		// TODO: search logic
+		console.log(`Searching for: ${query}`);
+	}
 </script>
 
 <div
@@ -108,22 +116,43 @@
 		/>
 	</button>
 	{#if open}
+		<!-- TODO: fix positioning for mobile -->
 		<div
 			style={hover ? "will-change: opacity, fade, transform" : ""}
 			transition:fade={{
 				duration,
 				easing: quintOut,
 			}}
-			class="w-full shadow-xl bg-panel-alt shadow-black/25 absolute overflow-hidden top-full mt-1 left-0 z-50 bg-background rounded-xl max-h-[30vh] overflow-y-auto"
+			class="w-[250%] min-w-full shadow-xl bg-panel-alt shadow-black/25 absolute left-1/2 -translate-x-1/2 top-full mt-1 z-50 rounded-xl overflow-hidden"
 		>
-			{#each options as option}
-				<button
-					class="w-full p-2 px-4 text-left hover:bg-panel"
-					onclick={() => select(option)}
-				>
-					{option}
-				</button>
-			{/each}
+			<!-- search box -->
+			<div class="p-3">
+				<div class="flex w-full items-center">
+					<div
+						class="flex-shrink-0 flex-grow-0 basis-1/6 flex justify-center"
+					>
+						<SearchIcon class="w-4 h-4 text-text-secondary" />
+					</div>
+					<input
+						type="text"
+						placeholder="Search format"
+						class="flex-grow basis-5/6 rounded-lg bg-panel text-foreground"
+						oninput={search}
+					/>
+				</div>
+			</div>
+
+			<!-- categories and formats -->
+			<div class="max-h-80 overflow-y-auto">
+				{#each options as option}
+					<button
+						class="w-full p-2 px-4 text-left hover:bg-panel"
+						onclick={() => select(option)}
+					>
+						{option}
+					</button>
+				{/each}
+			</div>
 		</div>
 	{/if}
 </div>
