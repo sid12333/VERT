@@ -24,11 +24,17 @@
 					<p class="text-sm text-muted font-normal">
 						We use <a
 							href="https://plausible.io/privacy-focused-web-analytics"
-							>Plausible</a
+							target="_blank"
+							rel="noopener noreferrer">Plausible</a
 						>, a privacy-focused analytics tool, to gather
 						completely anonymous statistics. All data is anonymized
 						and aggregated, and no identifiable information is ever
-						sent or stored. You can choose to opt-out below.
+						sent or stored. You can view the analytics
+						<a
+							href="https://ats.vert.sh/vert.sh"
+							target="_blank"
+							rel="noopener noreferrer">here</a
+						> and choose to opt out below.
 					</p>
 				</div>
 				<div class="flex flex-col gap-3 w-full">
