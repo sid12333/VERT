@@ -126,7 +126,7 @@
 							<p
 								class="flex items-center justify-center gap-2 h-full"
 							>
-								<Check size="20" /> Fully supported
+								<Check size="20" /> Local fully supported
 							</p>
 						{/if}
 						<p>
