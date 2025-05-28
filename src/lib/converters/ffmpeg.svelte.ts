@@ -21,9 +21,8 @@ export class FFmpegConverter extends Converter {
 		new FormatInfo("m4a"),
 		...videoFormats.map((f) => new FormatInfo(f, true, true, false)),
 		new FormatInfo("wma"),
-		new FormatInfo("amr"),
+		new FormatInfo("amr", true, false),
 		new FormatInfo("ac3"),
-		new FormatInfo("alac"),
 		new FormatInfo("aiff"),
 	];
 
