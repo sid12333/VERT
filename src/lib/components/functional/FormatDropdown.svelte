@@ -233,6 +233,15 @@
 		}
 	};
 
+	const onEnter = (event: KeyboardEvent) => {
+		if (event.key === "Enter") {
+			event.preventDefault();
+			if (filteredData.formats.length > 0) {
+				selectOption(filteredData.formats[0]);
+			}
+		}
+	};
+
 	onMount(() => {
 		const handleClickOutside = (e: MouseEvent) => {
 			if (dropdown && !dropdown.contains(e.target as Node)) {
@@ -326,6 +335,7 @@
 						class="flex-grow w-full !pl-11 !pr-3 rounded-lg bg-panel text-foreground"
 						bind:value={searchQuery}
 						oninput={handleSearch}
+						onkeydown={onEnter}
 						onfocus={() => {}}
 						id="format-search"
 						autocomplete="off"
