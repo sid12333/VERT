@@ -11,7 +11,6 @@
 		selected?: string;
 		onselect?: (option: string) => void;
 		disabled?: boolean;
-		settingsStyle?: boolean;
 	};
 
 	let {
@@ -19,7 +18,6 @@
 		selected = $bindable(""),
 		onselect,
 		disabled,
-		settingsStyle,
 	}: Props = $props();
 	let open = $state(false);
 	let hover = $state(false);
@@ -60,7 +58,6 @@
 				categories[cat].canConvertTo?.includes(currentCategory || ""),
 		);
 	});
-
 	const filteredData = $derived.by(() => {
 		if (!searchQuery) {
 			return {
@@ -71,13 +68,6 @@
 			};
 		}
 
-		// filter formats across all available categories
-		const allFormats = availableCategories.flatMap((cat) =>
-			categories[cat].formats.filter((format) =>
-				format.toLowerCase().includes(searchQuery.toLowerCase()),
-			),
-		);
-
 		// filter categories that have matching formats
 		const matchingCategories = availableCategories.filter((cat) =>
 			categories[cat].formats.some((format) =>
@@ -85,9 +75,19 @@
 			),
 		);
 
+		// only show formats from the current category that match the search
+		const filteredFormats =
+			currentCategory && categories[currentCategory]
+				? categories[currentCategory].formats.filter((format) =>
+						format
+							.toLowerCase()
+							.includes(searchQuery.toLowerCase()),
+					)
+				: [];
+
 		return {
 			categories: matchingCategories,
-			formats: allFormats,
+			formats: filteredFormats,
 		};
 	});
 
@@ -98,11 +98,8 @@
 	};
 
 	const selectCategory = (category: string) => {
-		if (categories[category]) {
-			currentCategory = category;
-			// clear search when switching categories
-			searchQuery = "";
-		}
+		if (!categories[category]) return;
+		currentCategory = category;
 	};
 
 	const handleSearch = (event: Event) => {
@@ -137,21 +134,13 @@
 </script>
 
 <div
-	class="relative w-full min-w-fit {settingsStyle
-		? 'font-normal'
-		: 'text-xl font-medium'} text-center"
+	class="relative w-full min-w-fit text-xl font-medium text-center"
 	bind:this={dropdown}
 >
 	<button
-		class="font-display w-full {settingsStyle
-			? 'justify-between'
-			: 'justify-center'} overflow-hidden relative cursor-pointer {settingsStyle
-			? 'px-4'
-			: 'px-3'} py-3.5 bg-button {disabled
+		class="font-display w-full justify-center overflow-hidden relative cursor-pointer px-3 py-3.5 bg-button {disabled
 			? 'opacity-50 cursor-auto'
-			: 'cursor-pointer'} flex items-center {settingsStyle
-			? 'rounded-xl'
-			: 'rounded-full'} focus:!outline-none"
+			: 'cursor-pointer'} flex items-center rounded-full focus:!outline-none"
 		onclick={() => (open = !open)}
 		onmouseenter={() => (hover = true)}
 		onmouseleave={() => (hover = false)}
@@ -169,11 +158,7 @@
 						duration,
 						easing: quintOut,
 					}}
-					class="col-start-1 row-start-1 {settingsStyle
-						? 'text-left'
-						: 'text-center'} font-body {settingsStyle
-						? 'font-normal'
-						: 'font-medium'}"
+					class="col-start-1 row-start-1 text-center font-body font-medium"
 				>
 					{selected}
 				</p>
@@ -195,6 +180,7 @@
 				: 0}deg); transition: transform {duration}ms {transition};"
 		/>
 	</button>
+
 	{#if open}
 		<!-- TODO: fix positioning for mobile -->
 		<div
