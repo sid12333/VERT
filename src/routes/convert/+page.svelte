@@ -153,6 +153,7 @@
 				{:else}
 					<h2
 						class="text-xl font-body overflow-hidden text-ellipsis whitespace-nowrap"
+						title={file.name}
 					>
 						{file.name}
 					</h2>
