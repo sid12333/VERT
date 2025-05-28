@@ -119,3 +119,10 @@ export class VertFile {
 		a.remove();
 	}
 }
+
+export interface Categories {
+	[key: string]: {
+		formats: string[];
+		canConvertTo?: string[];
+	};
+}

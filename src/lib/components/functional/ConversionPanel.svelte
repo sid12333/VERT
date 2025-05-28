@@ -5,6 +5,8 @@
 	import Dropdown from "./Dropdown.svelte";
 	import Tooltip from "../visual/Tooltip.svelte";
 	import ProgressBar from "../visual/ProgressBar.svelte";
+	import FormatDropdown from "./FormatDropdown.svelte";
+	import { categories } from "$lib/converters";
 
 	const length = $derived(files.files.length);
 	const progress = $derived(files.files.filter((f) => f.result).length);
@@ -66,10 +68,7 @@
 		<div class="flex items-center gap-2">
 			<p class="whitespace-nowrap text-xl">Set all to</p>
 			{#if files.requiredConverters.length === 1}
-				{@const supported = files.files[0]?.converters.flatMap((c) =>
-					c.formatStrings((f) => f.toSupported),
-				)}
-				<Dropdown
+				<FormatDropdown
 					onselect={(r) =>
 						files.files.forEach((f) => {
 							if (f.from !== r) {
@@ -77,7 +76,7 @@
 								f.result = null;
 							}
 						})}
-					options={supported || []}
+					{categories}
 				/>
 			{:else}
 				<Dropdown options={["N/A"]} disabled />

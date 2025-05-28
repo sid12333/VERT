@@ -1,11 +1,11 @@
 <script lang="ts">
 	import ConversionPanel from "$lib/components/functional/ConversionPanel.svelte";
-	import Dropdown from "$lib/components/functional/Dropdown.svelte";
+	import FormatDropdown from "$lib/components/functional/FormatDropdown.svelte";
 	import Uploader from "$lib/components/functional/Uploader.svelte";
 	import Panel from "$lib/components/visual/Panel.svelte";
 	import ProgressBar from "$lib/components/visual/ProgressBar.svelte";
 	import Tooltip from "$lib/components/visual/Tooltip.svelte";
-	import { converters } from "$lib/converters";
+	import { categories, converters } from "$lib/converters";
 	import {
 		effects,
 		files,
@@ -14,7 +14,7 @@
 		vertdLoaded,
 	} from "$lib/store/index.svelte";
 	import { addToast } from "$lib/store/ToastProvider";
-	import { VertFile } from "$lib/types";
+	import { VertFile, type Categories } from "$lib/types";
 	import {
 		AudioLines,
 		BookText,
@@ -28,6 +28,22 @@
 		RotateCwIcon,
 		XIcon,
 	} from "lucide-svelte";
+	import { onMount } from "svelte";
+
+	onMount(() => {
+		// depending on format, select right category and format
+		files.files.forEach((file) => {
+			const converter = file.findConverter();
+			if (converter) {
+				const category = Object.keys(categories).find((cat) =>
+					categories[cat].formats.includes(file.to),
+				);
+				if (category) {
+					file.to = file.to || categories[category].formats[0];
+				}
+			}
+		});
+	});
 
 	const handleSelect = (option: string, file: VertFile) => {
 		file.result = null;
@@ -82,6 +98,8 @@
 							: "blue",
 			);
 		}
+
+		// TODO: filter out categories that cant be converted between
 	});
 </script>
 
@@ -224,13 +242,8 @@
 					<div
 						class="w-[122px] h-fit flex flex-col gap-2 items-center justify-center"
 					>
-						<!-- cannot convert to svg or heif -->
-						<Dropdown
-							options={availableConverters
-								.flatMap((c) =>
-									c.formatStrings((f) => f.toSupported),
-								)
-								.filter((format) => format !== file.from) || []}
+						<FormatDropdown
+							{categories}
 							bind:selected={file.to}
 							onselect={(option) => handleSelect(option, file)}
 						/>
