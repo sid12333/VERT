@@ -107,6 +107,23 @@
 		searchQuery = (event.target as HTMLInputElement).value;
 	};
 
+	const clickDropdown = () => {
+		open = !open;
+		if (open) {
+			setTimeout(() => {
+				if (dropdownMenu) {
+					const searchInput = dropdownMenu.querySelector(
+						"#format-search",
+					) as HTMLInputElement;
+					if (searchInput) {
+						searchInput.focus();
+						searchInput.select();
+					}
+				}
+			}, 0); // let dropdown open first
+		}
+	};
+
 	onMount(() => {
 		const handleClickOutside = (e: MouseEvent) => {
 			if (dropdown && !dropdown.contains(e.target as Node)) {
@@ -139,10 +156,9 @@
 	bind:this={dropdown}
 >
 	<button
-		class="font-display w-full justify-center overflow-hidden relative cursor-pointer px-3 py-3.5 bg-button {disabled
-			? 'opacity-50 cursor-auto'
-			: 'cursor-pointer'} flex items-center rounded-full focus:!outline-none"
-		onclick={() => (open = !open)}
+		class="relative flex items-center justify-center w-full font-display  px-3 py-3.5 bg-button rounded-full overflow-hidden cursor-pointer focus:!outline-none
+		{disabled ? 'opacity-50 cursor-auto' : 'cursor-pointer'}"
+		onclick={() => clickDropdown()}
 		onmouseenter={() => (hover = true)}
 		onmouseleave={() => (hover = false)}
 		{disabled}
@@ -202,6 +218,9 @@
 						class="flex-grow w-full !pl-11 !pr-3 rounded-lg bg-panel text-foreground"
 						bind:value={searchQuery}
 						oninput={handleSearch}
+						onfocus={() => {}}
+						id="format-search"
+						autocomplete="off"
 					/>
 					<span
 						class="absolute left-4 top-1/2 -translate-y-1/2 flex items-center"
