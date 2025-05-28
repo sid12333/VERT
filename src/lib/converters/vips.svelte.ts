@@ -17,11 +17,11 @@ export class VipsConverter extends Converter {
 	public ready = $state(false);
 
 	public supportedFormats = [
-		new FormatInfo("png", true, true),
-		new FormatInfo("jpeg", true, true),
-		new FormatInfo("jpg", true, true),
-		new FormatInfo("webp", true, true),
-		new FormatInfo("gif", true, true),
+		new FormatInfo("png"),
+		new FormatInfo("jpeg"),
+		new FormatInfo("jpg"),
+		new FormatInfo("webp"),
+		new FormatInfo("gif"),
 		new FormatInfo("heic", true, false),
 		new FormatInfo("ico", true, false),
 		new FormatInfo("bmp", true, false),
@@ -30,8 +30,8 @@ export class VipsConverter extends Converter {
 		new FormatInfo("icns", true, false),
 		new FormatInfo("nef", true, false),
 		new FormatInfo("cr2", true, false),
-		new FormatInfo("hdr", true, true),
-		new FormatInfo("jpe", true, true),
+		new FormatInfo("hdr"),
+		new FormatInfo("jpe"),
 		new FormatInfo("dng", true, false),
 		new FormatInfo("mat", true, true),
 		new FormatInfo("pbm", true, true),
@@ -40,10 +40,10 @@ export class VipsConverter extends Converter {
 		new FormatInfo("pnm", true, true),
 		new FormatInfo("ppm", false, true),
 		new FormatInfo("raw", false, true),
-		new FormatInfo("tif", true, true),
-		new FormatInfo("tiff", true, true),
-		new FormatInfo("jfif", true, true),
-		new FormatInfo("avif", true, true),
+		new FormatInfo("tif"),
+		new FormatInfo("tiff"),
+		new FormatInfo("jfif"),
+		new FormatInfo("avif"),
 	];
 
 	public readonly reportsProgress = false;

@@ -5,8 +5,9 @@ export class FormatInfo {
 
 	constructor(
 		name: string,
-		public fromSupported: boolean,
-		public toSupported: boolean,
+		public fromSupported = true,
+		public toSupported = true,
+		public isNative = true,
 	) {
 		this.name = name;
 		if (!this.name.startsWith(".")) {

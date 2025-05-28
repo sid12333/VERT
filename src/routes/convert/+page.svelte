@@ -5,7 +5,7 @@
 	import Panel from "$lib/components/visual/Panel.svelte";
 	import ProgressBar from "$lib/components/visual/ProgressBar.svelte";
 	import Tooltip from "$lib/components/visual/Tooltip.svelte";
-	import { categories, converters } from "$lib/converters";
+	import { categories, converters, byNative } from "$lib/converters";
 	import {
 		effects,
 		files,
@@ -60,21 +60,30 @@
 	$effect(() => {
 		// Set gradient color depending on the file types
 		// TODO: if more file types added, add a "fileType" property to the file object
-		const allAudio = files.files.every(
-			(file) => file.findConverter()?.name === "ffmpeg",
-		);
-		const allImages = files.files.every(
-			(file) =>
-				file.findConverter()?.name !== "ffmpeg" &&
-				file.findConverter()?.name !== "vertd",
-		);
-		const allVideos = files.files.every(
-			(file) => file.findConverter()?.name === "vertd",
-		);
-
-		const allDocuments = files.files.every(
-			(file) => file.findConverter()?.name === "pandoc",
-		);
+		const allAudio = files.files.every((file) => {
+			const converter = file
+				.findConverters()
+				.sort(byNative(file.from))[0];
+			return converter?.name === "ffmpeg";
+		});
+		const allImages = files.files.every((file) => {
+			const converter = file
+				.findConverters()
+				.sort(byNative(file.from))[0];
+			return converter?.name === "libvips";
+		});
+		const allVideos = files.files.every((file) => {
+			const converter = file
+				.findConverters()
+				.sort(byNative(file.from))[0];
+			return converter?.name === "vertd";
+		});
+		const allDocuments = files.files.every((file) => {
+			const converter = file
+				.findConverters()
+				.sort(byNative(file.from))[0];
+			return converter?.name === "pandoc";
+		});
 
 		if (files.files.length === 1 && files.files[0].blobUrl && !allVideos) {
 			showGradient.set(false);
@@ -84,7 +93,7 @@
 
 		if (
 			files.files.length === 0 ||
-			(!allAudio && !allImages && !allVideos)
+			(!allAudio && !allImages && !allVideos && !allDocuments)
 		) {
 			gradientColor.set("");
 		} else {
@@ -112,19 +121,23 @@
 	)}
 	{@const isAudio = converters
 		.find((c) => c.name === "ffmpeg")
-		?.formatStrings((f) => f.fromSupported)
+		?.supportedFormats.filter((f) => f.isNative)
+		.map((f) => f.name)
 		.includes(file.from)}
 	{@const isVideo = converters
 		.find((c) => c.name === "vertd")
-		?.formatStrings((f) => f.fromSupported)
+		?.supportedFormats.filter((f) => f.isNative)
+		.map((f) => f.name)
 		.includes(file.from)}
 	{@const isImage = converters
 		.find((c) => c.name === "libvips")
-		?.formatStrings((f) => f.fromSupported)
+		?.supportedFormats.filter((f) => f.isNative)
+		.map((f) => f.name)
 		.includes(file.from)}
 	{@const isDocument = converters
 		.find((c) => c.name === "pandoc")
-		?.formatStrings((f) => f.fromSupported)
+		?.supportedFormats.filter((f) => f.isNative)
+		.map((f) => f.name)
 		.includes(file.from)}
 	<Panel class="p-5 flex flex-col min-w-0 gap-4 relative">
 		<div class="flex-shrink-0 h-8 w-full flex items-center gap-2">

@@ -1,4 +1,5 @@
 import type { Categories } from "$lib/types";
+import type { Converter } from "./converter.svelte";
 import { FFmpegConverter } from "./ffmpeg.svelte";
 import { PandocConverter } from "./pandoc.svelte";
 import { VertdConverter } from "./vertd.svelte";
@@ -47,3 +48,14 @@ categories.docs.formats =
 		.find((c) => c.name === "pandoc")
 		?.formatStrings((f) => f.toSupported)
 		.filter((f) => f !== ".pdf") || [];
+export const byNative = (format: string) => {
+	return (a: Converter, b: Converter) => {
+		const aFormat = a.supportedFormats.find((f) => f.name === format);
+		const bFormat = b.supportedFormats.find((f) => f.name === format);
+
+		if (aFormat && bFormat) {
+			return aFormat.isNative ? -1 : 1;
+		}
+		return 0;
+	};
+};
