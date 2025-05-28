@@ -1,11 +1,10 @@
 <script lang="ts">
 	import Uploader from "$lib/components/functional/Uploader.svelte";
+	import Tooltip from "$lib/components/visual/Tooltip.svelte";
 	import { converters } from "$lib/converters";
 	import { vertdLoaded } from "$lib/store/index.svelte";
 	import clsx from "clsx";
 	import { AudioLines, BookText, Check, Film, Image } from "lucide-svelte";
-
-	const { data } = $props();
 
 	const getSupportedFormats = (name: string) =>
 		converters
@@ -46,6 +45,23 @@
 			icon: Film,
 		},
 	});
+
+	const getTooltip = (format: string) => {
+		const converter = converters.find((c) =>
+			c.supportedFormats.some((sf) => sf.name === format),
+		);
+
+		const formatInfo = converter?.supportedFormats.find(
+			(sf) => sf.name === format,
+		);
+
+		if (formatInfo) {
+			return `This format can only be converted as ${
+				formatInfo.fromSupported ? "input (from)" : "output (to)"
+			}.`;
+		}
+		return "";
+	};
 </script>
 
 <div class="max-w-6xl w-full mx-auto px-6 md:px-8">
@@ -62,9 +78,9 @@
 				<p
 					class="font-normal px-5 md:p-0 text-lg md:text-xl text-black text-muted dynadark:text-muted"
 				>
-					All image, audio, and document processing is done on your device.
-					Videos are converted on our lightning-fast servers. No file
-					size limit, no ads, and completely open source.
+					All image, audio, and document processing is done on your
+					device. Videos are converted on our lightning-fast servers.
+					No file size limit, no ads, and completely open source.
 				</p>
 			</div>
 			<div class="flex-grow w-full h-72">
@@ -119,7 +135,31 @@
 						</p>
 						<p>
 							<b>Supported formats:</b>
-							{s.formats}
+							{#each s.formats.split(", ") as format, index}
+								{@const isPartial = format.endsWith("*")}
+								{@const formatName = isPartial
+									? format.slice(0, -1)
+									: format}
+								{#if isPartial}
+									<Tooltip text={getTooltip(formatName)}>
+										<span class="whitespace-pre-wrap">
+											{formatName}<span
+												class="text-red-500">*</span
+											>{index <
+											s.formats.split(", ").length - 1
+												? ", "
+												: ""}
+										</span>
+									</Tooltip>
+								{:else}
+									<span class="whitespace-pre-wrap">
+										{formatName}{index <
+										s.formats.split(", ").length - 1
+											? ", "
+											: ""}
+									</span>
+								{/if}
+							{/each}
 						</p>
 					</div>
 				</div>
