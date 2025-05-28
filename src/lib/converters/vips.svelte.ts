@@ -38,7 +38,7 @@ export class VipsConverter extends Converter {
 		new FormatInfo("pfm", true, true),
 		new FormatInfo("pgm", true, true),
 		new FormatInfo("pnm", true, true),
-		new FormatInfo("ppm", true, true),
+		new FormatInfo("ppm", false, true),
 		new FormatInfo("raw", false, true),
 		new FormatInfo("tif", true, true),
 		new FormatInfo("tiff", true, true),
