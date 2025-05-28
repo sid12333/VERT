@@ -21,6 +21,7 @@
 	import Panel from "../../visual/Panel.svelte";
 	import Logo from "../../visual/svg/Logo.svelte";
 	import { beforeNavigate } from "$app/navigation";
+	import Tooltip from "$lib/components/visual/Tooltip.svelte";
 
 	const items = $derived<
 		{
@@ -182,16 +183,18 @@
 			{@render link(item, i)}
 		{/each}
 		<div class="w-0.5 bg-separator h-full hidden md:flex"></div>
-		<button
-			onclick={() => {
-				const isDark =
-					document.documentElement.classList.contains("dark");
-				setTheme(isDark ? "light" : "dark");
-			}}
-			class="w-14 h-full items-center justify-center hidden md:flex"
-		>
-			<SunIcon class="dynadark:hidden block" />
-			<MoonIcon class="dynadark:block hidden" />
-		</button>
+		<Tooltip text="Toggle theme" position="right">
+			<button
+				onclick={() => {
+					const isDark =
+						document.documentElement.classList.contains("dark");
+					setTheme(isDark ? "light" : "dark");
+				}}
+				class="w-14 h-full items-center justify-center hidden md:flex"
+			>
+				<SunIcon class="dynadark:hidden block" />
+				<MoonIcon class="dynadark:block hidden" />
+			</button>
+		</Tooltip>
 	</Panel>
 </div>

@@ -14,7 +14,7 @@
 		vertdLoaded,
 	} from "$lib/store/index.svelte";
 	import { addToast } from "$lib/store/ToastProvider";
-	import { VertFile, type Categories } from "$lib/types";
+	import { VertFile } from "$lib/types";
 	import {
 		AudioLines,
 		BookText,
@@ -129,15 +129,25 @@
 	<Panel class="p-5 flex flex-col min-w-0 gap-4 relative">
 		<div class="flex-shrink-0 h-8 w-full flex items-center gap-2">
 			{#if !converters.length}
-				<FileQuestionIcon size="24" class="flex-shrink-0" />
+				<Tooltip text="Unknown file type" position="bottom">
+					<FileQuestionIcon size="24" class="flex-shrink-0" />
+				</Tooltip>
 			{:else if isAudio}
-				<AudioLines size="24" class="flex-shrink-0" />
+				<Tooltip text="Audio file" position="bottom">
+					<AudioLines size="24" class="flex-shrink-0" />
+				</Tooltip>
 			{:else if isVideo}
-				<FilmIcon size="24" class="flex-shrink-0" />
+				<Tooltip text="Video file" position="bottom">
+					<FilmIcon size="24" class="flex-shrink-0" />
+				</Tooltip>
 			{:else if isDocument}
-				<BookText size="24" class="flex-shrink-0" />
+				<Tooltip text="Document file" position="bottom">
+					<BookText size="24" class="flex-shrink-0" />
+				</Tooltip>
 			{:else}
-				<ImageIcon size="24" class="flex-shrink-0" />
+				<Tooltip text="Image file" position="bottom">
+					<ImageIcon size="24" class="flex-shrink-0" />
+				</Tooltip>
 			{/if}
 			<div class="flex-grow overflow-hidden">
 				{#if file.processing}

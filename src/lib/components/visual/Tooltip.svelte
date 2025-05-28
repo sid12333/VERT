@@ -57,7 +57,13 @@
 	}
 
 	.tooltip-top::after {
-		@apply content-[""] absolute top-full left-1/2 -ml-2 border-x-transparent border-b-transparent border-t-inherit;
+		@apply content-[""] absolute top-full left-1/2 -translate-x-1/2 border-8 border-x-transparent border-b-transparent;
+	}
+
+	.tooltip-top::before {
+		border-width: calc(var(--border-size) + 8px);
+		margin-left: calc(-1 * (var(--border-size) + 8px));
+		@apply content-[""] absolute top-full left-1/2 border-x-transparent border-b-transparent border-t-inherit;
 	}
 
 	.tooltip-bottom {
