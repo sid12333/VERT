@@ -23,8 +23,8 @@ export function getConverterByFormat(format: string) {
 
 export const categories: Categories = {
 	image: { formats: [""], canConvertTo: [] },
-	video: { formats: [""], canConvertTo: [] }, // add "audio" when "nullptr/experimental-audio-to-video" is implemented
-	audio: { formats: [""], canConvertTo: [] }, // add "video" when "nullptr/experimental-audio-to-video" is implemented
+	video: { formats: [""], canConvertTo: ["audio"] },
+	audio: { formats: [""], canConvertTo: ["video"] },
 	docs: { formats: [""], canConvertTo: [] },
 };
 
@@ -48,6 +48,7 @@ categories.docs.formats =
 		.find((c) => c.name === "pandoc")
 		?.formatStrings((f) => f.toSupported)
 		.filter((f) => f !== ".pdf") || [];
+
 export const byNative = (format: string) => {
 	return (a: Converter, b: Converter) => {
 		const aFormat = a.supportedFormats.find((f) => f.name === format);

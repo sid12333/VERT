@@ -113,7 +113,6 @@
 </script>
 
 {#snippet fileItem(file: VertFile, index: number)}
-	{@const availableConverters = file.findConverters()}
 	{@const currentConverter = converters.find(
 		(c) =>
 			c.formatStrings((f) => f.fromSupported).includes(file.from) &&
