@@ -65,7 +65,7 @@ export class VipsConverter extends Converter {
 				);
 				addToast(
 					"error",
-					`Error in VIPS worker, some features may not work.`,
+					`Error in VIPS worker, image conversion may not work as expected.`,
 				);
 				throw new Error(message.error);
 			}
