@@ -19,7 +19,6 @@ export class FFmpegConverter extends Converter {
 		new FormatInfo("ogg"),
 		new FormatInfo("aac"),
 		new FormatInfo("m4a"),
-		// TODO: audio to video where it uses the album cover
 		...videoFormats.map((f) => new FormatInfo(f, true, true, false)),
 		new FormatInfo("wma"),
 		new FormatInfo("amr"),
@@ -63,6 +62,14 @@ export class FFmpegConverter extends Converter {
 		});
 		ffmpeg.on("log", (l) => {
 			log(["converters", this.name], l.message);
+
+			if (l.message.includes("Stream map '0:a:0' matches no streams.")) {
+				error(
+					["converters", this.name],
+					`No audio stream found in ${input.name}.`,
+				);
+				addToast("error", `No audio stream found in ${input.name}.`);
+			}
 		});
 		const baseURL =
 			"https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/esm";
