@@ -92,6 +92,8 @@
 	};
 
 	const filteredData = $derived.by(() => {
+		const normalize = (str: string) => str.replace(/^\./, "").toLowerCase();
+
 		// if no query, return formats for current category
 		if (!searchQuery) {
 			return {
@@ -103,13 +105,13 @@
 					: [],
 			};
 		}
-		const searchLower = searchQuery.toLowerCase();
+		const searchLower = normalize(searchQuery);
 
 		// find all categories that have formats matching the search query
 		const matchingCategories = availableCategories.filter((cat) =>
 			categories[cat].formats.some(
 				(format) =>
-					format.toLowerCase().includes(searchLower) &&
+					normalize(format).includes(searchLower) &&
 					shouldShowFormat(format, cat),
 			),
 		);
@@ -125,7 +127,7 @@
 			return categories[cat].formats
 				.filter(
 					(format) =>
-						format.toLowerCase().includes(searchLower) &&
+						normalize(format).includes(searchLower) &&
 						shouldShowFormat(format, cat),
 				)
 				.map((format) => ({ format, category: cat }));
@@ -143,13 +145,23 @@
 		}
 
 		// return formats only from the current category that match the search
-		const filteredFormats = currentCategory
+		let filteredFormats = currentCategory
 			? categories[currentCategory].formats.filter(
 					(format) =>
-						format.toLowerCase().includes(searchLower) &&
+						normalize(format).includes(searchLower) &&
 						shouldShowFormat(format, currentCategory || ""),
 				)
 			: [];
+
+		// sorting exact match first, then others
+		filteredFormats = filteredFormats.sort((a, b) => {
+			const aExact = normalize(a) === searchLower;
+			const bExact = normalize(b) === searchLower;
+			if (aExact && !bExact) return -1;
+			if (!aExact && bExact) return 1;
+			return 0;
+		});
+
 		return {
 			categories:
 				matchingCategories.length > 0
@@ -274,7 +286,7 @@
 	bind:this={dropdown}
 >
 	<button
-		class="relative flex items-center justify-center w-full font-display  px-3 py-3.5 bg-button rounded-full overflow-hidden cursor-pointer focus:!outline-none
+		class="relative flex items-center justify-center w-full font-display px-3 py-3.5 bg-button rounded-full overflow-hidden cursor-pointer focus:!outline-none
 		{disabled ? 'opacity-50 cursor-auto' : 'cursor-pointer'}"
 		onclick={() => clickDropdown()}
 		onmouseenter={() => (hover = true)}
