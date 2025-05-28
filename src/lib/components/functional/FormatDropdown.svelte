@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { duration, fade, transition } from "$lib/animation";
-	import { files } from "$lib/store/index.svelte";
+	import { isMobile, files } from "$lib/store/index.svelte";
 	import type { Categories } from "$lib/types";
 	import { ChevronDown, SearchIcon } from "lucide-svelte";
 	import { onMount } from "svelte";
@@ -24,6 +24,7 @@
 	let dropdown = $state<HTMLDivElement>();
 	let currentCategory = $state<string | null>();
 	let searchQuery = $state("");
+	let dropdownMenu: HTMLElement | undefined = $state();
 
 	// initialize current category
 	$effect(() => {
@@ -180,16 +181,17 @@
 				: 0}deg); transition: transform {duration}ms {transition};"
 		/>
 	</button>
-
 	{#if open}
-		<!-- TODO: fix positioning for mobile -->
 		<div
+			bind:this={dropdownMenu}
 			style={hover ? "will-change: opacity, fade, transform" : ""}
 			transition:fade={{
 				duration,
 				easing: quintOut,
 			}}
-			class="w-[250%] min-w-full shadow-xl bg-panel-alt shadow-black/25 absolute left-1/2 -translate-x-1/2 top-full mt-1 z-50 rounded-2xl overflow-hidden"
+			class={$isMobile
+				? "fixed inset-x-0 bottom-0 w-full z-[200] shadow-xl bg-panel-alt shadow-black/25 rounded-t-2xl overflow-hidden"
+				: "w-[250%] min-w-full shadow-xl bg-panel-alt shadow-black/25 absolute -translate-x-1/2 top-full mt-2 z-50 rounded-2xl overflow-hidden"}
 		>
 			<!-- search box -->
 			<div class="p-3 w-full">
