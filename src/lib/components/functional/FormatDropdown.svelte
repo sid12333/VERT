@@ -21,22 +21,77 @@
 		disabled,
 		settingsStyle,
 	}: Props = $props();
-
 	let open = $state(false);
 	let hover = $state(false);
-	let isUp = $state(false);
 	let dropdown = $state<HTMLDivElement>();
 	let currentCategory = $state<string | null>();
-	let shownCategories = $state<string[]>(Object.keys(categories));
+	let searchQuery = $state("");
+
+	// initialize current category
+	$effect(() => {
+		if (!currentCategory) {
+			if (selected) {
+				const foundCat = Object.keys(categories).find((cat) =>
+					categories[cat].formats.includes(selected),
+				);
+				currentCategory =
+					foundCat || Object.keys(categories)[0] || null;
+			} else {
+				// find category based on file types
+				const fileFormats = files.files.map((f) => f.from);
+				const foundCat = Object.keys(categories).find((cat) =>
+					fileFormats.some((format) =>
+						categories[cat].formats.includes(format),
+					),
+				);
+				currentCategory =
+					foundCat || Object.keys(categories)[0] || null;
+			}
+		}
+	});
+
+	// other available categories based on current category (e.g. converting between video and audio)
+	const availableCategories = $derived.by(() => {
+		if (!currentCategory) return Object.keys(categories);
+
+		return Object.keys(categories).filter(
+			(cat) =>
+				cat === currentCategory ||
+				categories[cat].canConvertTo?.includes(currentCategory || ""),
+		);
+	});
+
+	const filteredData = $derived.by(() => {
+		if (!searchQuery) {
+			return {
+				categories: availableCategories,
+				formats: currentCategory
+					? categories[currentCategory].formats
+					: [],
+			};
+		}
+
+		// filter formats across all available categories
+		const allFormats = availableCategories.flatMap((cat) =>
+			categories[cat].formats.filter((format) =>
+				format.toLowerCase().includes(searchQuery.toLowerCase()),
+			),
+		);
+
+		// filter categories that have matching formats
+		const matchingCategories = availableCategories.filter((cat) =>
+			categories[cat].formats.some((format) =>
+				format.toLowerCase().includes(searchQuery.toLowerCase()),
+			),
+		);
+
+		return {
+			categories: matchingCategories,
+			formats: allFormats,
+		};
+	});
 
 	const selectOption = (option: string) => {
-		const oldIndex =
-			currentCategory &&
-			categories[currentCategory]?.formats.indexOf(selected || "");
-		const newIndex =
-			currentCategory &&
-			categories[currentCategory]?.formats.indexOf(option);
-		isUp = (oldIndex ?? 0) > (newIndex ?? 0);
 		selected = option;
 		open = false;
 		onselect?.(option);
@@ -45,74 +100,39 @@
 	const selectCategory = (category: string) => {
 		if (categories[category]) {
 			currentCategory = category;
-			console.log(`Selected category: ${category}`);
-			console.log(`Formats: ${categories[category].formats.join(", ")}`);
+			// clear search when switching categories
+			searchQuery = "";
 		}
 	};
 
-	const search = (event: Event) => {
-		const query = (event.target as HTMLInputElement).value;
-		console.log(`Searching for: ${query}`);
-		// TODO: search logic
+	const handleSearch = (event: Event) => {
+		searchQuery = (event.target as HTMLInputElement).value;
 	};
 
 	onMount(() => {
-		const click = (e: MouseEvent) => {
+		const handleClickOutside = (e: MouseEvent) => {
 			if (dropdown && !dropdown.contains(e.target as Node)) {
 				open = false;
 			}
 		};
 
-		window.addEventListener("click", click);
+		window.addEventListener("click", handleClickOutside);
+		return () => window.removeEventListener("click", handleClickOutside);
+	});
 
-		// depending on selected, find category
-		if (selected) {
-			currentCategory = Object.keys(categories).find((cat) =>
-				categories[cat].formats.includes(selected),
+	// initialize selected format if none chosen
+	$effect(() => {
+		if (
+			!selected &&
+			currentCategory &&
+			categories[currentCategory]?.formats?.length > 0
+		) {
+			const from = files.files[0]?.from;
+			const firstDiff = categories[currentCategory].formats.find(
+				(f) => f !== from,
 			);
-			if (!currentCategory) {
-				currentCategory = Object.keys(categories)[0] || null;
-			}
-
-			shownCategories = Object.keys(categories).filter(
-				(cat) =>
-					cat === currentCategory ||
-					categories[cat].canConvertTo?.includes(
-						currentCategory || "",
-					),
-			);
-		} else {
-			// find current category based on files
-			const fileCategories = [
-				...new Set(
-					files.files
-						.map(f =>
-							Object.keys(categories).find(cat =>
-								categories[cat].formats.includes(f.from),
-							),
-						)
-						.filter(Boolean),
-				),
-			];
-			currentCategory = fileCategories[0] || Object.keys(categories)[0] || null;
-
-			// only show categories that can convert to current category / itself
-			shownCategories = Object.keys(categories).filter(
-				cat =>
-					cat === currentCategory ||
-					categories[cat].canConvertTo?.includes(currentCategory || ""),
-			);
-
-			// if no selected format, select first format of current category
-			if (
-				!selected &&
-				currentCategory &&
-				categories[currentCategory].formats.length > 0
-			)
-				selected = categories[currentCategory].formats[0];
+			selected = firstDiff || categories[currentCategory].formats[0];
 		}
-
-		return () => window.removeEventListener("click", click);
 	});
 </script>
 
@@ -192,7 +212,8 @@
 						type="text"
 						placeholder="Search format"
 						class="flex-grow w-full !pl-11 !pr-3 rounded-lg bg-panel text-foreground"
-						oninput={search}
+						bind:value={searchQuery}
+						oninput={handleSearch}
 					/>
 					<span
 						class="absolute left-4 top-1/2 -translate-y-1/2 flex items-center"
@@ -202,9 +223,9 @@
 				</div>
 			</div>
 
-			<!-- categories and formats -->
+			<!-- available categories -->
 			<div class="flex items-center justify-between">
-				{#each shownCategories as category}
+				{#each filteredData.categories as category}
 					<button
 						class="flex-grow text-lg text-muted hover:text-muted/20 border-b-[1px] pb-2 capitalize
                         {currentCategory === category
@@ -217,20 +238,19 @@
 				{/each}
 			</div>
 
+			<!-- available formats -->
 			<div class="max-h-80 overflow-y-auto grid grid-cols-3 gap-2 p-2">
-				{#if currentCategory}
-					{#each categories[currentCategory].formats as option}
-						<button
-							class="w-full p-2 text-center rounded-xl
-                            {option === selected
-								? 'bg-accent text-black'
-								: 'hover:bg-panel'}"
-							onclick={() => selectOption(option)}
-						>
-							{option}
-						</button>
-					{/each}
-				{/if}
+				{#each filteredData.formats as format}
+					<button
+						class="w-full p-2 text-center rounded-xl
+                        {format === selected
+							? 'bg-accent text-black'
+							: 'hover:bg-panel'}"
+						onclick={() => selectOption(format)}
+					>
+						{format}
+					</button>
+				{/each}
 			</div>
 		</div>
 	{/if}
