@@ -8,6 +8,7 @@
 
 	type Props = {
 		categories: Categories;
+		from?: string;
 		selected?: string;
 		onselect?: (option: string) => void;
 		disabled?: boolean;
@@ -15,6 +16,7 @@
 
 	let {
 		categories,
+		from,
 		selected = $bindable(""),
 		onselect,
 		disabled,
@@ -59,6 +61,15 @@
 		);
 	});
 
+	const shouldInclude = (format: string, category: string): boolean => {
+		// if converting from audio to video, dont show gifs
+		if (categories["audio"]?.formats.includes(from ?? "") && format === ".gif") {
+			return false;
+		}
+
+		return true;
+	};
+
 	const filteredData = $derived.by(() => {
 		const normalize = (str: string) => str.replace(/^\./, "").toLowerCase();
 
@@ -67,7 +78,9 @@
 			return {
 				categories: availableCategories,
 				formats: currentCategory
-					? categories[currentCategory].formats
+					? categories[currentCategory].formats.filter((format) =>
+							shouldInclude(format, currentCategory!),
+						)
 					: [],
 			};
 		}
@@ -75,8 +88,10 @@
 
 		// find all categories that have formats matching the search query
 		const matchingCategories = availableCategories.filter((cat) =>
-			categories[cat].formats.some((format) =>
-				normalize(format).includes(searchLower),
+			categories[cat].formats.some(
+				(format) =>
+					normalize(format).includes(searchLower) &&
+					shouldInclude(format, cat),
 			),
 		);
 		if (matchingCategories.length === 0) {
@@ -89,9 +104,7 @@
 		// if current category has no matches, switch to first category that does
 		const currentCategoryHasMatches =
 			currentCategory &&
-			matchingCategories.some(
-				(cat) => cat === currentCategory,
-			);
+			matchingCategories.some((cat) => cat === currentCategory);
 		if (!currentCategoryHasMatches && matchingCategories.length > 0) {
 			const newCategory = matchingCategories[0];
 			currentCategory = newCategory;
@@ -99,8 +112,10 @@
 
 		// return formats only from the current category that match the search
 		let filteredFormats = currentCategory
-			? categories[currentCategory].formats.filter((format) =>
-					normalize(format).includes(searchLower),
+			? categories[currentCategory].formats.filter(
+					(format) =>
+						normalize(format).includes(searchLower) &&
+						shouldInclude(format, currentCategory!),
 				)
 			: [];
 

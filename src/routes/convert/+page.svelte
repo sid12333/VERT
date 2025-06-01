@@ -267,6 +267,7 @@
 					>
 						<FormatDropdown
 							{categories}
+							from={file.from}
 							bind:selected={file.to}
 							onselect={(option) => handleSelect(option, file)}
 						/>
