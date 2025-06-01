@@ -20,9 +20,7 @@
 		disabled,
 	}: Props = $props();
 	let open = $state(false);
-	let hover = $state(false);
 	let dropdown = $state<HTMLDivElement>();
-	let initialCategory = $state<string | null>();
 	let currentCategory = $state<string | null>();
 	let searchQuery = $state("");
 	let dropdownMenu: HTMLElement | undefined = $state();
@@ -36,7 +34,6 @@
 				);
 				currentCategory =
 					foundCat || Object.keys(categories)[0] || null;
-				initialCategory = currentCategory;
 			} else {
 				// find category based on file types
 				const fileFormats = files.files.map((f) => f.from);
@@ -47,7 +44,6 @@
 				);
 				currentCategory =
 					foundCat || Object.keys(categories)[0] || null;
-				initialCategory = currentCategory;
 			}
 		}
 	});
@@ -63,34 +59,6 @@
 		);
 	});
 
-	const shouldShowFormat = (format: string, category: string): boolean => {
-		const currentFileExt = files.files[0]?.from;
-		if (!currentFileExt) return true;
-
-		if (category === initialCategory) {
-			return true;
-		} else if (
-			initialCategory &&
-			categories[initialCategory].formats.includes(format)
-		) {
-			return false;
-		}
-
-		const formatInOtherCategories = Object.keys(categories)
-			.filter((cat) => cat !== category)
-			.some((cat) => categories[cat].formats.includes(format));
-
-		if (formatInOtherCategories) {
-			const nativeCategory = Object.keys(categories).find((cat) =>
-				cat.toLowerCase().includes(format.slice(1)),
-			);
-
-			return category === nativeCategory;
-		}
-
-		return true;
-	};
-
 	const filteredData = $derived.by(() => {
 		const normalize = (str: string) => str.replace(/^\./, "").toLowerCase();
 
@@ -99,9 +67,7 @@
 			return {
 				categories: availableCategories,
 				formats: currentCategory
-					? categories[currentCategory].formats.filter((format) =>
-							shouldShowFormat(format, currentCategory || ""),
-						)
+					? categories[currentCategory].formats
 					: [],
 			};
 		}
@@ -109,10 +75,8 @@
 
 		// find all categories that have formats matching the search query
 		const matchingCategories = availableCategories.filter((cat) =>
-			categories[cat].formats.some(
-				(format) =>
-					normalize(format).includes(searchLower) &&
-					shouldShowFormat(format, cat),
+			categories[cat].formats.some((format) =>
+				normalize(format).includes(searchLower),
 			),
 		);
 		if (matchingCategories.length === 0) {
@@ -122,22 +86,11 @@
 			};
 		}
 
-		// find all matching formats across all categories
-		const allMatchingFormats = matchingCategories.flatMap((cat) => {
-			return categories[cat].formats
-				.filter(
-					(format) =>
-						normalize(format).includes(searchLower) &&
-						shouldShowFormat(format, cat),
-				)
-				.map((format) => ({ format, category: cat }));
-		});
-
 		// if current category has no matches, switch to first category that does
 		const currentCategoryHasMatches =
 			currentCategory &&
-			allMatchingFormats.some(
-				(item) => item.category === currentCategory,
+			matchingCategories.some(
+				(cat) => cat === currentCategory,
 			);
 		if (!currentCategoryHasMatches && matchingCategories.length > 0) {
 			const newCategory = matchingCategories[0];
@@ -146,10 +99,8 @@
 
 		// return formats only from the current category that match the search
 		let filteredFormats = currentCategory
-			? categories[currentCategory].formats.filter(
-					(format) =>
-						normalize(format).includes(searchLower) &&
-						shouldShowFormat(format, currentCategory || ""),
+			? categories[currentCategory].formats.filter((format) =>
+					normalize(format).includes(searchLower),
 				)
 			: [];
 
@@ -205,20 +156,16 @@
 		if (query) {
 			const queryLower = query.toLowerCase();
 			const categoriesWithMatches = availableCategories.filter((cat) =>
-				categories[cat].formats.some(
-					(format) =>
-						format.toLowerCase().includes(queryLower) &&
-						shouldShowFormat(format, cat),
+				categories[cat].formats.some((format) =>
+					format.toLowerCase().includes(queryLower),
 				),
 			);
 
 			if (categoriesWithMatches.length > 0) {
 				const currentHasMatches =
 					currentCategory &&
-					categories[currentCategory].formats.some(
-						(format) =>
-							format.toLowerCase().includes(queryLower) &&
-							shouldShowFormat(format, currentCategory || ""),
+					categories[currentCategory].formats.some((format) =>
+						format.toLowerCase().includes(queryLower),
 					);
 
 				if (!currentHasMatches) {
@@ -289,8 +236,6 @@
 		class="relative flex items-center justify-center w-full font-display px-3 py-3.5 bg-button rounded-full overflow-hidden cursor-pointer focus:!outline-none
 		{disabled ? 'opacity-50 cursor-auto' : 'cursor-pointer'}"
 		onclick={() => clickDropdown()}
-		onmouseenter={() => (hover = true)}
-		onmouseleave={() => (hover = false)}
 		{disabled}
 	>
 		<!-- <p>{selected}</p> -->
@@ -348,7 +293,6 @@
 						bind:value={searchQuery}
 						oninput={handleSearch}
 						onkeydown={onEnter}
-						onfocus={() => {}}
 						id="format-search"
 						autocomplete="off"
 					/>

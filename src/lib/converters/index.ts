@@ -31,19 +31,23 @@ export const categories: Categories = {
 categories.audio.formats =
 	converters
 		.find((c) => c.name === "ffmpeg")
-		?.formatStrings((f) => f.toSupported) || [];
+		?.supportedFormats.filter((f) => f.toSupported && f.isNative)
+		.map((f) => f.name) || [];
 categories.video.formats =
 	converters
 		.find((c) => c.name === "vertd")
-		?.formatStrings((f) => f.toSupported) || [];
+		?.supportedFormats.filter((f) => f.toSupported && f.isNative)
+		.map((f) => f.name) || [];
 categories.image.formats =
 	converters
 		.find((c) => c.name === "libvips")
-		?.formatStrings((f) => f.toSupported) || [];
+		?.supportedFormats.filter((f) => f.toSupported && f.isNative)
+		.map((f) => f.name) || [];
 categories.docs.formats =
 	converters
 		.find((c) => c.name === "pandoc")
-		?.formatStrings((f) => f.toSupported) || [];
+		?.supportedFormats.filter((f) => f.toSupported && f.isNative)
+		.map((f) => f.name) || [];
 
 export const byNative = (format: string) => {
 	return (a: Converter, b: Converter) => {
