@@ -5,7 +5,7 @@ import { browser } from "$app/environment";
 import { error, log } from "$lib/logger";
 import { addToast } from "$lib/store/ToastProvider";
 
-const videoFormats = ["mp4", "mkv", "avi", "mov", "webm"];
+const videoFormats = [".mkv", ".mp4", ".avi", ".mov", ".webm", ".ts", ".mts", ".m2ts", ".wmv"];
 
 export class FFmpegConverter extends Converter {
 	private ffmpeg: FFmpeg = null!;
@@ -19,12 +19,12 @@ export class FFmpegConverter extends Converter {
 		new FormatInfo("ogg", true, true),
 		new FormatInfo("aac", true, true),
 		new FormatInfo("m4a", true, true),
-		...videoFormats.map((f) => new FormatInfo(f, true, true, false)),
 		new FormatInfo("wma", true, true),
 		new FormatInfo("amr", true, true),
 		new FormatInfo("ac3", true, true),
 		new FormatInfo("alac", true, true),
 		new FormatInfo("aiff", true, true),
+		...videoFormats.map((f) => new FormatInfo(f, true, true, false)),
 	];
 
 	public readonly reportsProgress = true;
