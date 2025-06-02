@@ -36,7 +36,7 @@ export class FFmpegConverter extends Converter {
 			this.ffmpeg = new FFmpeg();
 			(async () => {
 				const baseURL =
-					"https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/esm";
+					"https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.10/dist/esm";
 				await this.ffmpeg.load({
 					coreURL: `${baseURL}/ffmpeg-core.js`,
 					wasmURL: `${baseURL}/ffmpeg-core.wasm`,
