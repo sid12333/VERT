@@ -22,6 +22,7 @@ export class FFmpegConverter extends Converter {
 		new FormatInfo("ac3", true, true),
 		new FormatInfo("alac", true, false),
 		new FormatInfo("aiff", true, true),
+		new FormatInfo("aif", true, true),
 	];
 
 	public readonly reportsProgress = true;
