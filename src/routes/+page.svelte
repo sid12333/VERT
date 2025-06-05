@@ -134,32 +134,33 @@
 							{s.ready ? "ready" : "not ready"}
 						</p>
 						<p>
-							<b>Supported formats:</b>
-							{#each s.formats.split(", ") as format, index}
-								{@const isPartial = format.endsWith("*")}
-								{@const formatName = isPartial
-									? format.slice(0, -1)
-									: format}
-								{#if isPartial}
-									<Tooltip text={getTooltip(formatName)}>
-										<span class="whitespace-pre-wrap">
-											{formatName}<span
-												class="text-red-500">*</span
-											>{index <
-											s.formats.split(", ").length - 1
-												? ", "
-												: ""}
-										</span>
-									</Tooltip>
-								{:else}
-									<span class="whitespace-pre-wrap">
-										{formatName}{index <
-										s.formats.split(", ").length - 1
-											? ", "
-											: ""}
+							<span class="flex flex-wrap justify-center">
+								<b>Supported formats:&nbsp;</b>
+								{#each s.formats.split(", ") as format, index}
+									{@const isPartial = format.endsWith("*")}
+									{@const formatName = isPartial
+										? format.slice(0, -1)
+										: format}
+									<span
+										class="text-sm font-normal flex items-center"
+									>
+										{#if isPartial}
+											<Tooltip
+												text={getTooltip(formatName)}
+											>
+												{formatName}<span
+													class="text-red-500">*</span
+												>
+											</Tooltip>
+										{:else}
+											{formatName}
+										{/if}
+										{#if index < s.formats.split(", ").length - 1}
+											<span>,&nbsp;</span>
+										{/if}
 									</span>
-								{/if}
-							{/each}
+								{/each}
+							</span>
 						</p>
 					</div>
 				</div>
