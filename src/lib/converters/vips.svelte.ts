@@ -43,7 +43,6 @@ export class VipsConverter extends Converter {
 		new FormatInfo("tif", true, true),
 		new FormatInfo("tiff", true, true),
 		new FormatInfo("jfif", true, true),
-		new FormatInfo("avif", true, true),
 	];
 
 	public readonly reportsProgress = false;
