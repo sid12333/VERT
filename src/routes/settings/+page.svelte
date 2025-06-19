@@ -43,6 +43,7 @@
 				...Settings.Settings.instance.settings,
 				...parsedSettings,
 			};
+			settings = Settings.Settings.instance.settings;
 		}
 	});
 </script>
