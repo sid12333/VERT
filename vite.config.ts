@@ -1,6 +1,5 @@
 import { sveltekit } from "@sveltejs/kit/vite";
 import { defineConfig, type PluginOption } from "vite";
-import { viteStaticCopy } from "vite-plugin-static-copy";
 import svg from "@poppanator/sveltekit-svg";
 import wasm from "vite-plugin-wasm";
 
@@ -19,14 +18,6 @@ export default defineConfig(({ command }) => {
 					{ name: "removeAttrs", params: { attrs: "(fill|stroke)" } },
 				],
 			},
-		}),
-		viteStaticCopy({
-			targets: [
-				{
-					src: "_headers",
-					dest: "",
-				},
-			],
 		}),
 	];
 

@@ -52,7 +52,6 @@
 		"riff-file": "^1.0.3",
 		"svelte-stripe": "^1.4.0",
 		"vert-wasm": "^0.0.2",
-		"vite-plugin-static-copy": "^2.2.0",
 		"vite-plugin-wasm": "^3.4.1"
 	}
 }
