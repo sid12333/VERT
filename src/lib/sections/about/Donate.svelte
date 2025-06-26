@@ -100,7 +100,7 @@
 		if (submitResult.error) {
 			addToast(
 				"error",
-				`Payment failed: ${submitResult.error.message}. You have not been charged.`,
+				`Payment failed: ${submitResult.error.message}${submitResult.error.message?.endsWith(".") ? "" : "."} You have not been charged.`,
 			);
 			enablePay = true;
 			return;
@@ -118,7 +118,7 @@
 		if (res.error) {
 			addToast(
 				"error",
-				`Payment failed: ${res.error.message}. You have not been charged.`,
+				`Payment failed: ${res.error.message}${res.error.message?.endsWith(".") ? "" : "."} You have not been charged.`,
 			);
 		} else {
 			addToast("success", "Thank you for your donation!");
@@ -287,7 +287,7 @@
 								class="btn w-full h-12 bg-accent-red text-black rounded-full mt-4"
 								onclick={donate}
 							>
-								Donate ${amount} USD
+								Donate ${amount.toFixed(2)} USD
 							</button>
 						</div>
 					</div>
