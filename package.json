@@ -42,6 +42,7 @@
 		"@fontsource/lexend": "^5.1.2",
 		"@fontsource/radio-canada-big": "^5.1.1",
 		"@imagemagick/magick-wasm": "^0.0.34",
+		"@stripe/stripe-js": "^7.4.0",
 		"byte-data": "^19.0.1",
 		"client-zip": "^2.4.6",
 		"clsx": "^2.1.1",
@@ -49,9 +50,9 @@
 		"music-metadata": "^11.0.0",
 		"p-queue": "^8.1.0",
 		"riff-file": "^1.0.3",
+		"svelte-stripe": "^1.4.0",
 		"vert-wasm": "^0.0.2",
 		"vite-plugin-static-copy": "^2.2.0",
-		"vite-plugin-wasm": "^3.4.1",
-		"wasm-vips": "^0.0.11"
+		"vite-plugin-wasm": "^3.4.1"
 	}
 }

@@ -133,7 +133,7 @@
 
 			<h2 class="mt-2 -mb-2">Libraries</h2>
 			<p class="font-normal">
-				A big thanks to FFmpeg (audio, video), libvips (images) and
+				A big thanks to FFmpeg (audio, video), Imagemagick (images) and
 				Pandoc (documents) for maintaining such excellent libraries for
 				so many years. VERT relies on them to provide you with your
 				conversions.

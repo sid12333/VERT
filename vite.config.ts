@@ -7,19 +7,6 @@ import wasm from "vite-plugin-wasm";
 export default defineConfig(({ command }) => {
 	const plugins: PluginOption[] = [
 		sveltekit(),
-		{
-			name: "vips-request-middleware",
-			configureServer(server) {
-				server.middlewares.use((_req, res, next) => {
-					res.setHeader(
-						"Cross-Origin-Embedder-Policy",
-						"require-corp",
-					);
-					res.setHeader("Cross-Origin-Opener-Policy", "same-origin");
-					next();
-				});
-			},
-		},
 		svg({
 			includePaths: ["./src/lib/assets"],
 			svgoOptions: {
@@ -39,10 +26,6 @@ export default defineConfig(({ command }) => {
 					src: "_headers",
 					dest: "",
 				},
-				{
-					src: "node_modules/wasm-vips/lib/vips-*.wasm",
-					dest: "_app/immutable/workers",
-				},
 			],
 		}),
 	];
@@ -58,12 +41,7 @@ export default defineConfig(({ command }) => {
 			format: "es",
 		},
 		optimizeDeps: {
-			exclude: [
-				"wasm-vips",
-				"@ffmpeg/core-mt",
-				"@ffmpeg/ffmpeg",
-				"@ffmpeg/util",
-			],
+			exclude: ["@ffmpeg/core-mt", "@ffmpeg/ffmpeg", "@ffmpeg/util"],
 		},
 		css: {
 			preprocessorOptions: {

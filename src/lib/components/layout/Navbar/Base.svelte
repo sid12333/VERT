@@ -63,9 +63,6 @@
 	let links = $state<HTMLAnchorElement[]>([]);
 	let container = $state<HTMLDivElement>();
 	let containerRect = $derived(container?.getBoundingClientRect());
-	$effect(() => {
-		$inspect(containerRect);
-	});
 
 	const linkRects = $derived(links.map((l) => l.getBoundingClientRect()));
 

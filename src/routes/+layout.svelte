@@ -2,7 +2,11 @@
 	import { onMount } from "svelte";
 	import { goto, beforeNavigate, afterNavigate } from "$app/navigation";
 
-	import { PUB_PLAUSIBLE_URL, PUB_HOSTNAME } from "$env/static/public";
+	import {
+		PUB_PLAUSIBLE_URL,
+		PUB_HOSTNAME,
+		PUB_DONATION_URL,
+	} from "$env/static/public";
 	import { VERT_NAME } from "$lib/consts";
 	import * as Layout from "$lib/components/layout";
 	import * as Navbar from "$lib/components/layout/Navbar";

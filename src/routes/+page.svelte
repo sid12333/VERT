@@ -23,8 +23,10 @@
 		};
 	} = $derived({
 		Images: {
-			ready: converters.find((c) => c.name === "libvips")?.ready || false,
-			formats: getSupportedFormats("libvips"),
+			ready:
+				converters.find((c) => c.name === "imagemagick")?.ready ||
+				false,
+			formats: getSupportedFormats("imagemagick"),
 			icon: Image,
 		},
 		Audio: {
@@ -133,7 +135,7 @@
 							<b>Status: </b>
 							{s.ready ? "ready" : "not ready"}
 						</p>
-						<p>
+						<div>
 							<span class="flex flex-wrap justify-center">
 								<b>Supported formats:&nbsp;</b>
 								{#each s.formats.split(", ") as format, index}
@@ -161,7 +163,7 @@
 									</span>
 								{/each}
 							</span>
-						</p>
+						</div>
 					</div>
 				</div>
 			{/each}

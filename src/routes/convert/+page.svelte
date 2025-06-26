@@ -47,14 +47,6 @@
 
 	const handleSelect = (option: string, file: VertFile) => {
 		file.result = null;
-		switch (option) {
-			case ".webp":
-			case ".gif":
-				addToast(
-					"warning",
-					`Converting this file to "${option}" may take some time if animated.`,
-				);
-		}
 	};
 
 	$effect(() => {
@@ -119,7 +111,7 @@
 		?.formatStrings((f) => f.fromSupported)
 		.includes(file.from)}
 	{@const isImage = converters
-		.find((c) => c.name === "libvips")
+		.find((c) => c.name === "imagemagick")
 		?.formatStrings((f) => f.fromSupported)
 		.includes(file.from)}
 	{@const isDocument = converters

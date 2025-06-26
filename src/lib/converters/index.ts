@@ -2,10 +2,10 @@ import type { Categories } from "$lib/types";
 import { FFmpegConverter } from "./ffmpeg.svelte";
 import { PandocConverter } from "./pandoc.svelte";
 import { VertdConverter } from "./vertd.svelte";
-import { VipsConverter } from "./vips.svelte";
+import { MagickConverter } from "./magick.svelte";
 
 export const converters = [
-	new VipsConverter(),
+	new MagickConverter(),
 	new FFmpegConverter(),
 	new VertdConverter(),
 	new PandocConverter(),
@@ -37,7 +37,7 @@ categories.video.formats =
 		?.formatStrings((f) => f.toSupported) || [];
 categories.image.formats =
 	converters
-		.find((c) => c.name === "libvips")
+		.find((c) => c.name === "imagemagick")
 		?.formatStrings((f) => f.toSupported) || [];
 categories.docs.formats =
 	converters

@@ -8,7 +8,7 @@
 
 	const images = $derived(
 		files.files.filter((f) =>
-			f.converters.map((c) => c.name).includes("libvips"),
+			f.converters.map((c) => c.name).includes("imagemagick"),
 		),
 	);
 

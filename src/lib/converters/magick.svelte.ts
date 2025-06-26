@@ -3,17 +3,17 @@ import { error, log } from "$lib/logger";
 import { addToast } from "$lib/store/ToastProvider";
 import type { OmitBetterStrict, WorkerMessage } from "$lib/types";
 import { VertFile } from "$lib/types";
-import VipsWorker from "$lib/workers/vips?worker&url";
+import MagickWorker from "$lib/workers/magick?worker&url";
 import { Converter, FormatInfo } from "./converter.svelte";
 
-export class VipsConverter extends Converter {
+export class MagickConverter extends Converter {
 	private worker: Worker = browser
-		? new Worker(VipsWorker, {
+		? new Worker(MagickWorker, {
 				type: "module",
 			})
 		: null!;
 	private id = 0;
-	public name = "libvips";
+	public name = "imagemagick";
 	public ready = $state(false);
 
 	public supportedFormats = [
@@ -39,7 +39,6 @@ export class VipsConverter extends Converter {
 		new FormatInfo("pgm", true, true),
 		new FormatInfo("pnm", true, true),
 		new FormatInfo("ppm", false, true),
-		new FormatInfo("raw", false, true),
 		new FormatInfo("tif", true, true),
 		new FormatInfo("tiff", true, true),
 		new FormatInfo("jfif", true, true),
@@ -51,7 +50,7 @@ export class VipsConverter extends Converter {
 		super();
 		log(["converters", this.name], `created converter`);
 		if (!browser) return;
-		log(["converters", this.name], `loading worker @ ${VipsWorker}`);
+		log(["converters", this.name], `loading worker @ ${MagickWorker}`);
 		this.worker.onmessage = (e) => {
 			const message: WorkerMessage = e.data;
 			log(["converters", this.name], `received message ${message.type}`);
@@ -64,7 +63,7 @@ export class VipsConverter extends Converter {
 				);
 				addToast(
 					"error",
-					`Error in VIPS worker, image conversion may not work as expected.`,
+					`Error in Magick worker, image conversion may not work as expected.`,
 				);
 				throw new Error(message.error);
 			}

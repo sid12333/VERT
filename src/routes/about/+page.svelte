@@ -10,6 +10,8 @@
 	import avatarAzurejelly from "$lib/assets/avatars/azurejelly.jpg";
 	import { GITHUB_API_URL } from "$lib/consts";
 	import { addToast } from "$lib/store/ToastProvider";
+	import { dev } from "$app/environment";
+	import { page } from "$app/state";
 	// import { dev } from "$app/environment";
 	// import { page } from "$app/state";
 
@@ -61,7 +63,7 @@
 			github: "https://github.com/RealmyTheMan",
 			role: "Former co-founder & designer",
 			avatar: avatarRealmy,
-		}
+		},
 	];
 
 	let ghContribs: Contributor[] = [];
@@ -127,8 +129,7 @@
 		}
 	});
 
-	// const donationsEnabled = dev || page.url.origin.endsWith("//vert.sh");
-	const donationsEnabled = false;
+	const donationsEnabled = dev || page.url.origin.endsWith("//vert.sh");
 </script>
 
 <div class="flex flex-col h-full items-center">
@@ -142,22 +143,17 @@
 	>
 		<!-- Why VERT? & Credits -->
 		<div class="flex flex-col gap-4 flex-1">
-			<!-- {#if donationsEnabled}
-				<About.Donate donors={[]} />
-			{/if} -->
-			<About.Why />
-			{#if !donationsEnabled}
-				<About.Vertd />
+			{#if donationsEnabled}
+				<About.Donate />
 			{/if}
+			<About.Why />
+			<About.Sponsors />
 		</div>
 
 		<!-- Resources & Donate to VERT -->
 		<div class="flex flex-col gap-4 flex-1">
 			<About.Resources />
 			<About.Credits {mainContribs} {notableContribs} {ghContribs} />
-			{#if donationsEnabled}
-				<About.Vertd />
-			{/if}
 		</div>
 	</div>
 </div>

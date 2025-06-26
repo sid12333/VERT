@@ -64,8 +64,6 @@
 	const maskImage = $derived(
 		`linear-gradient(to top, transparent ${100 - at.current}%, black 100%)`,
 	);
-
-	$inspect(colors);
 </script>
 
 {#if page.url.pathname === "/"}
