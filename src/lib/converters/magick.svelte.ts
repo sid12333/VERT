@@ -23,7 +23,9 @@ export class MagickConverter extends Converter {
 		new FormatInfo("webp", true, true),
 		new FormatInfo("gif", true, true),
 		new FormatInfo("heic", true, false),
-		new FormatInfo("ico", true, false),
+		// TODO: .ico files can encode multiple images at various
+		// sizes, bitdepths, etc. we should support that in future
+		new FormatInfo("ico", true, true),
 		new FormatInfo("bmp", true, false),
 		new FormatInfo("cur", true, false),
 		new FormatInfo("ani", true, false),
