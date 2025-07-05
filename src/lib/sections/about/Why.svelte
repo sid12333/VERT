@@ -24,8 +24,8 @@
 		<br />
 		<br />
 		Video files get uploaded to our lightning-fast RTX 4000 Ada server. Your
-		videos stay on there for an hour, or after they're converted (in the case
-		of the input which you upload) or downloaded (in the case of the output which
-		is to be downloaded), whichever comes first.
+		videos stay on there for an hour if you do not convert them. If you do convert
+		the file, the video will stay on the server for an hour, or until it is downloaded.
+		The file will then be deleted from our server.
 	</p>
 </Panel>
