@@ -146,40 +146,44 @@
 </svelte:head>
 
 <!-- FIXME: if user resizes between desktop/mobile, highlight of page disappears (only shows on original size) -->
-<div
-	class="flex flex-col min-h-screen h-full w-full overflow-x-hidden"
-	ondrop={dropFiles}
-	ondragenter={(e) => handleDrag(e, true)}
-	ondragover={(e) => handleDrag(e, true)}
-	ondragleave={(e) => handleDrag(e, false)}
-	role="region"
->
-	<Layout.UploadRegion />
+{#key $locale}
+	<div
+		class="flex flex-col min-h-screen h-full w-full overflow-x-hidden"
+		ondrop={dropFiles}
+		ondragenter={(e) => handleDrag(e, true)}
+		ondragover={(e) => handleDrag(e, true)}
+		ondragleave={(e) => handleDrag(e, false)}
+		role="region"
+	>
+		<Layout.UploadRegion />
 
-	<div>
-		<Layout.MobileLogo />
-		<Navbar.Desktop />
-	</div>
+		<div>
+			<Layout.MobileLogo />
+			<Navbar.Desktop />
+		</div>
 
-	<!-- 
+		<!-- 
 		SvelteKit throws the following warning when developing - safe to ignore as we render the children in this component:
 		`<slot />` or `{@render ...}` tag missing — inner content will not be rendered
 	-->
-	<Layout.PageContent {children} />
-	<div style="display:none">
-		{#each locales as locale}
-			<a href={localizeHref(page.url.pathname, { locale })}>{locale}</a>
-		{/each}
-	</div>
+		<Layout.PageContent {children} />
+		<div style="display:none">
+			{#each locales as locale}
+				<a href={localizeHref(page.url.pathname, { locale })}
+					>{locale}</a
+				>
+			{/each}
+		</div>
 
-	<Layout.Toasts />
-	<Layout.Dialogs />
+		<Layout.Toasts />
+		<Layout.Dialogs />
 
-	<div>
-		<Layout.Footer />
-		<Navbar.Mobile />
+		<div>
+			<Layout.Footer />
+			<Navbar.Mobile />
+		</div>
 	</div>
-</div>
+{/key}
 
 <!-- Gradients placed here to prevent it overlapping in transitions -->
 <Layout.Gradients />
