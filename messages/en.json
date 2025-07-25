@@ -3,17 +3,21 @@
 	"upload": {
 		"title": "The file converter you'll love.",
 		"subtitle": "All image, audio, and document processing is done on your device. Videos are converted on our lightning-fast servers. No file size limit, no ads, and completely open source.",
-		"supports_title": "VERT supports...",
-		"images": "Images",
-		"audio": "Audio",
-		"documents": "Documents",
-		"video": "Video",
-		"video_server_processing": "Video uploads to a server for processing by default, learn how to set it up locally [wiki_link]here[/wiki_link].",
-		"local_supported": "Local fully supported",
-		"status": "Status:",
-		"ready": "ready",
-		"not_ready": "not ready",
-		"supported_formats": "Supported formats:",
+		"cards": {
+			"title": "VERT supports...",
+			"images": "Images",
+			"audio": "Audio",
+			"documents": "Documents",
+			"video": "Video",
+			"video_server_processing": "Video uploads to a server for processing by default, learn how to set it up locally [wiki_link]here[/wiki_link].",
+			"local_supported": "Local fully supported",
+			"status": {
+				"text": "<b>Status:</b> {status}",
+				"ready": "ready",
+				"not_ready": "not ready"
+			},
+			"supported_formats": "Supported formats:"
+		},
 		"tooltip": {
 			"partial_support": "This format can only be converted as {direction}.",
 			"direction_input": "input (from)",
@@ -99,7 +103,7 @@
 		"title": "About",
 		"why": {
 			"title": "Why VERT?",
-			"description": "<b>File converters have always disappointed us.</b> They're ugly, riddled with ads, and most importantly; slow. We decided to solve this problem once and for all by making an alternative that solves all those problems, and more.<br/><br/>All non-video files are converted completely on-device; this means that there's no delay between sending and receiving the files from a server, and we never get to snoop on the files you convert. Video files get uploaded to our lightning-fast RTX 4000 Ada server.<br/><br/>Your videos stay on there for an hour if you do not convert them. If you do convert the file, the video will stay on the server for an hour, or until it is downloaded. The file will then be deleted from our server."
+			"description": "<b>File converters have always disappointed us.</b> They're ugly, riddled with ads, and most importantly; slow. We decided to solve this problem once and for all by making an alternative that solves all those problems, and more.<br/><br/>All non-video files are converted completely on-device; this means that there's no delay between sending and receiving the files from a server, and we never get to snoop on the files you convert.<br/><br/>Video files get uploaded to our lightning-fast RTX 4000 Ada server. Your videos stay on there for an hour if you do not convert them. If you do convert the file, the video will stay on the server for an hour, or until it is downloaded. The file will then be deleted from our server."
 		},
 		"sponsors": {
 			"title": "Sponsors",
@@ -147,7 +151,11 @@
 			"github_contributors": "Error fetching GitHub contributors"
 		}
 	},
-	"toasts": {
-		"hello": "world"
+	"workers": {
+		"errors": {
+			"general": "Error converting file {file}: {message}",
+			"magick": "Error in Magick worker, image conversion may not work as expected.`",
+			"ffmpeg": "Error loading ffmpeg, some features may not work."
+		}
 	}
 }

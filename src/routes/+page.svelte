@@ -31,19 +31,19 @@
 				false,
 			formats: getSupportedFormats("imagemagick"),
 			icon: Image,
-			title: m["upload.images"](),
+			title: m["upload.cards.images"](),
 		},
 		Audio: {
 			ready: converters.find((c) => c.name === "ffmpeg")?.ready || false,
 			formats: getSupportedFormats("ffmpeg"),
 			icon: AudioLines,
-			title: m["upload.audio"](),
+			title: m["upload.cards.audio"](),
 		},
 		Documents: {
 			ready: converters.find((c) => c.name === "pandoc")?.ready || false,
 			formats: getSupportedFormats("pandoc"),
 			icon: BookText,
-			title: m["upload.documents"](),
+			title: m["upload.cards.documents"](),
 		},
 		Video: {
 			ready:
@@ -51,7 +51,7 @@
 				(false && $vertdLoaded),
 			formats: getSupportedFormats("vertd"),
 			icon: Film,
-			title: m["upload.video"](),
+			title: m["upload.cards.video"](),
 		},
 	});
 
@@ -100,7 +100,7 @@
 	<hr />
 
 	<div class="mt-10 md:mt-16">
-		<h2 class="text-center text-4xl">{m["upload.supports_title"]()}</h2>
+		<h2 class="text-center text-4xl">{m["upload.cards.title"]()}</h2>
 
 		<div class="flex gap-4 mt-8 md:flex-row flex-col">
 			{#each Object.entries(status) as [key, s]}
@@ -125,25 +125,30 @@
 							<p>
 								{@html link(
 									"wiki_link",
-									m["upload.video_server_processing"](),
+									m["upload.cards.video_server_processing"](),
 									"https://github.com/VERT-sh/VERT/wiki/How-to-convert-video-with-VERT",
 								)}
 							</p>
 						{:else}
 							<p class="flex tems-center justify-center gap-2">
 								<Check size="20" />
-								{m["upload.local_supported"]()}
+								{m["upload.cards.local_supported"]()}
 							</p>
 						{/if}
 						<p>
-							<b>{m["upload.status"]()}</b>
-							{s.ready
-								? m["upload.ready"]()
-								: m["upload.not_ready"]()}
+							{@html m["upload.cards.status.text"]({
+								status: s.ready
+									? m["upload.cards.status.ready"]()
+									: m["upload.cards.status.not_ready"](),
+							})}
 						</p>
 						<div>
 							<span class="flex flex-wrap justify-center">
-								<b>{m["upload.supported_formats"]()}&nbsp;</b>
+								<b
+									>{m[
+										"upload.cards.supported_formats"
+									]()}&nbsp;</b
+								>
 								{#each s.formats.split(", ") as format, index}
 									{@const isPartial = format.endsWith("*")}
 									{@const formatName = isPartial
