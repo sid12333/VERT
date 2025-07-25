@@ -234,10 +234,10 @@
 			<div class="flex items-center justify-between">
 				{#each filteredData.categories as category}
 					<button
-						class="flex-grow text-lg text-muted hover:text-muted/20 border-b-[1px] pb-2 capitalize
-                        {currentCategory === category
+						class="flex-grow text-lg hover:text-muted/20 border-b-[1px] pb-2 capitalize {currentCategory ===
+						category
 							? 'text-accent border-b-accent'
-							: 'border-b-separator'}"
+							: 'border-b-separator text-muted'}"
 						onclick={() => selectCategory(category)}
 					>
 						{category}
