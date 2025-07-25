@@ -34,6 +34,7 @@ export class PandocConverter extends Converter {
 		if (result.type === "error") {
 			worker.terminate();
 			// throw new Error(result.error);
+			const error = result.error.toString();
 			switch (result.errorKind) {
 				case "PandocUnknownReaderError": {
 					throw new Error(
@@ -47,6 +48,15 @@ export class PandocConverter extends Converter {
 					);
 				}
 
+				case "PandocParseError": {
+					if (error.includes("JSON missing pandoc-api-version")) {
+						throw new Error(
+							`This JSON file is not a pandoc-converted JSON file. It must be converted with pandoc / VERT to be converted again.`,
+						);
+					}
+				}
+
+				// eslint-disable-next-line no-fallthrough
 				default:
 					if (result.errorKind)
 						throw new Error(
@@ -65,14 +75,13 @@ export class PandocConverter extends Converter {
 
 	public supportedFormats = [
 		new FormatInfo("docx", true, true),
-		new FormatInfo("xml", true, true),
 		new FormatInfo("doc", true, true),
 		new FormatInfo("md", true, true),
 		new FormatInfo("html", true, true),
 		new FormatInfo("rtf", true, true),
 		new FormatInfo("csv", true, true),
 		new FormatInfo("tsv", true, true),
-		new FormatInfo("json", true, true),
+		new FormatInfo("json", true, true), // must be a pandoc-converted json
 		new FormatInfo("rst", true, true),
 		new FormatInfo("epub", true, true),
 		new FormatInfo("odt", true, true),
