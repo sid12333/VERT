@@ -318,14 +318,17 @@ body {
 
 .hoverable {
 	@apply hover:scale-105 duration-200;
+	will-change: transform;
 }
 
 .hoverable-md {
 	@apply hover:scale-110 duration-200;
+	will-change: transform;
 }
 
 .hoverable-lg {
 	@apply hover:scale-[1.15] duration-200;
+	will-change: transform;
 }
 
 .selected {

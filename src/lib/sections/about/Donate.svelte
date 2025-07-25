@@ -210,22 +210,23 @@
 				Monthly
 			</button>
 		</div>
-		<div class="flex gap-3 w-full">
-			{#each presetAmounts as preset}
+		<div class="grid grid-cols-4 gap-3 w-full">
+			{#each presetAmounts as preset, i}
 				<button
 					onclick={() => amountClick(preset)}
 					class={clsx(
-						"btn flex-1 p-4 rounded-lg flex items-center justify-center",
+						"btn p-4 rounded-lg flex items-center justify-center",
 						{
 							"!scale-100": !$effects,
 							"bg-accent-red text-black": amount === preset,
 						},
 					)}
+					style={i === 2 ? "grid-column: 3;" : ""}
 				>
 					${preset} USD
 				</button>
 			{/each}
-			<div class="flex-[2] flex items-center justify-center">
+			<div class="flex items-center justify-center">
 				<FancyInput
 					bind:value={customAmount}
 					placeholder="Custom"

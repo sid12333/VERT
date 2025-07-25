@@ -115,28 +115,24 @@
 					</div>
 
 					<div class="file-category-card-content flex-grow gap-4">
-						<div class="flex flex-col gap-1">
-							{#if key === "Video"}
-								<p>
-									Video uploads to a server for processing by
-									default, learn how to set it up locally <a
-										target="_blank"
-										href="https://github.com/VERT-sh/VERT/wiki/How-to-convert-video-with-VERT"
-										>here</a
-									>.
-								</p>
-							{:else}
-								<p
-									class="flex tems-center justify-center gap-2"
-								>
-									<Check size="20" /> Local fully supported
-								</p>
-							{/if}
+						{#if key === "Video"}
 							<p>
-								<b>Status: </b>
-								{s.ready ? "ready" : "not ready"}
+								Video uploads to a server for processing by
+								default, learn how to set it up locally <a
+									target="_blank"
+									href="https://github.com/VERT-sh/VERT/wiki/How-to-convert-video-with-VERT"
+									>here</a
+								>.
 							</p>
-						</div>
+						{:else}
+							<p class="flex tems-center justify-center gap-2">
+								<Check size="20" /> Local fully supported
+							</p>
+						{/if}
+						<p>
+							<b>Status: </b>
+							{s.ready ? "ready" : "not ready"}
+						</p>
 						<div>
 							<span class="flex flex-wrap justify-center">
 								<b>Supported formats:&nbsp;</b>
