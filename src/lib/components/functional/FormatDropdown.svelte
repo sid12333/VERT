@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { duration, fade, transition } from "$lib/animation";
+	import { m } from "$lib/paraglide/messages";
 	import { isMobile, files } from "$lib/store/index.svelte";
 	import type { Categories } from "$lib/types";
 	import { ChevronDown, SearchIcon } from "lucide-svelte";
@@ -240,7 +241,7 @@
 							: 'border-b-separator text-muted'}"
 						onclick={() => selectCategory(category)}
 					>
-						{category}
+						{(m as any)[`upload.cards.${category}`]?.() || category}
 					</button>
 				{/each}
 			</div>

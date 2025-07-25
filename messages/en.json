@@ -1,8 +1,25 @@
 {
 	"$schema": "https://inlang.com/schema/inlang-message-format",
+	"navbar": {
+		"upload": "Upload",
+		"convert": "Convert",
+		"settings": "Settings",
+		"about": "About",
+		"toggle_theme": "Toggle theme"
+	},
+	"footer": {
+		"copyright": "© {year} VERT.",
+		"source_code": "Source code",
+		"discord_server": "Discord server"
+	},
 	"upload": {
 		"title": "The file converter you'll love.",
 		"subtitle": "All image, audio, and document processing is done on your device. Videos are converted on our lightning-fast servers. No file size limit, no ads, and completely open source.",
+		"uploader": {
+			"text": "Drop or click to {action}",
+			"convert": "convert",
+			"jpegify": "jpegify"
+		},
 		"cards": {
 			"title": "VERT supports...",
 			"images": "Images",
@@ -97,6 +114,10 @@
 			"plausible_description": "We use [plausible_link]Plausible[/plausible_link], a privacy-focused analytics tool, to gather completely anonymous statistics. All data is anonymized and aggregated, and no identifiable information is ever sent or stored. You can view the analytics [analytics_link]here[/analytics_link] and choose to opt out below.",
 			"opt_in": "Opt-in",
 			"opt_out": "Opt-out"
+		},
+		"language": {
+			"title": "Language",
+			"description": "Select your preferred language for the VERT interface."
 		}
 	},
 	"about": {
@@ -157,5 +178,12 @@
 			"magick": "Error in Magick worker, image conversion may not work as expected.`",
 			"ffmpeg": "Error loading ffmpeg, some features may not work."
 		}
+	},
+	"jpegify": {
+		"title": "SECRET JPEGIFY!!!",
+		"subtitle": "(shh... don't tell anyone!)",
+		"button": "JPEGIFY {compression}%!!!",
+		"download": "Download",
+		"delete": "Delete"
 	}
 }

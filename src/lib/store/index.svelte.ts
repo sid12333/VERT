@@ -6,6 +6,7 @@ import { parseBlob, selectCover } from "music-metadata";
 import { writable } from "svelte/store";
 import { addDialog } from "./DialogProvider";
 import PQueue from "p-queue";
+import { getLocale, setLocale } from "$lib/paraglide/runtime";
 
 class Files {
 	public files = $state<VertFile[]>([]);
@@ -292,3 +293,17 @@ export const vertdLoaded = writable(false);
 export const isMobile = writable(false);
 export const effects = writable(true);
 export const theme = writable<"light" | "dark">("light");
+export const locale = writable(getLocale());
+export const availableLocales = {
+	"en": "English",
+	"uwu": "UwU",
+}
+
+export function updateLocale(newLocale: string) {
+	log(["locale"], `set to ${newLocale}`);
+	localStorage.setItem("locale", newLocale);
+	// @ts-expect-error shush
+	setLocale(newLocale, { reload: false });
+	// @ts-expect-error shush
+	locale.set(newLocale);
+}

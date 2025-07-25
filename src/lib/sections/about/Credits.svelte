@@ -101,6 +101,8 @@
 							["jpegify_link", "github_link"],
 							m["about.credits.github_description"](),
 							["/jpegify", GITHUB_URL_VERT],
+							[false, true],
+							["text-black dynadark:text-white", "text-blue-500 font-normal hover:underline"]
 						)}
 					</p>
 				{:else}

@@ -7,6 +7,7 @@
 	import { converters } from "$lib/converters";
 	import { goto } from "$app/navigation";
 	import { page } from "$app/state";
+	import { m } from "$lib/paraglide/messages";
 
 	type Props = {
 		class?: string;
@@ -98,7 +99,11 @@
 			<UploadIcon class="w-full h-full text-on-accent" />
 		</div>
 		<h2 class="text-center text-2xl font-semibold mt-4">
-			Drop or click to {jpegify ? "JPEGIFY" : "convert"}
+			{m["upload.uploader.text"]({
+				action: jpegify
+					? m["upload.uploader.jpegify"]()
+					: m["upload.uploader.convert"]()
+			})}
 		</h2>
 	</Panel>
 </button>

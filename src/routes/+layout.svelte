@@ -19,6 +19,8 @@
 		theme,
 		dropping,
 		vertdLoaded,
+		locale,
+		updateLocale,
 	} from "$lib/store/index.svelte";
 	import "$lib/css/app.scss";
 	import { browser } from "$app/environment";
@@ -73,6 +75,7 @@
 		theme.set(
 			(localStorage.getItem("theme") as "light" | "dark") || "light",
 		);
+		updateLocale(localStorage.getItem("locale") || "en");
 
 		Settings.instance.load();
 

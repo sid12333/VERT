@@ -1,0 +1,189 @@
+{
+	"$schema": "https://inlang.com/schema/inlang-message-format",
+	"upload": {
+		"title": "The fiwe conwewtew you'ww wuv.",
+		"subtitle": "Aww image, audio, and document pwocessing is donye on youw dewice. Videos awe conwewted on ouw wightnying-fast sewwews. Nyo fiwe size wimit, nyo ads, and compwetewy open souwce.",
+		"uploader": {
+			"text": "Dwop or cwick to {action}",
+			"convert": "conwewt",
+			"jpegify": "jpegify"
+		},
+		"cards": {
+			"title": "VEWT suppowts...",
+			"images": "Images",
+			"audio": "Audio",
+			"documents": "Documents",
+			"video": "Video",
+			"video_server_processing": "Video upwoads to a sewwew fow pwocessing by defauwt, weawn how to set it up wocawwy [wiki_link]hewe[/wiki_link].",
+			"local_supported": "Wocaw fuwwy suppowted",
+			"status": {
+				"text": "<b>Status:</b> {status}",
+				"ready": "weady",
+				"not_ready": "nyot weady"
+			},
+			"supported_formats": "Suppowted fowmats:"
+		},
+		"tooltip": {
+			"partial_support": "This fowmat can onwy be conwewted as {direction}.",
+			"direction_input": "input (fwom)",
+			"direction_output": "output (to)"
+		}
+	},
+	"convert": {
+		"panel": {
+			"convert_all": "Conwewt aww",
+			"download_all": "Downwoad aww as .zip",
+			"remove_all": "Wemuv aww fiwes",
+			"set_all_to": "Set aww to",
+			"na": "N/A"
+		},
+		"tooltips": {
+			"unknown_file": "Unknyown fiwe type",
+			"audio_file": "Audio fiwe",
+			"video_file": "Video fiwe",
+			"document_file": "Document fiwe",
+			"image_file": "Image fiwe",
+			"convert_file": "Conwewt this fiwe",
+			"download_file": "Downwoad this fiwe"
+		},
+		"errors": {
+			"cant_convert": "We can't conwewt this fiwe.",
+			"vertd_server": "what awe you doing..? you'we supposed to wun the wewtd sewwew!",
+			"unsupported_format": "Onwy image, wideo, audio, and document fiwes awe suppowted",
+			"vertd_not_found": "Couwd nyot find the wewtd instance to stawt wideo conwewsion. Awe you suwe the instance UWW is set cowwectwy?"
+		}
+	},
+	"settings": {
+		"title": "Settings",
+		"errors": {
+			"save_failed": "Faiwed to sawe settings!"
+		},
+		"appearance": {
+			"title": "Appeawance",
+			"brightness_theme": "Bwightnyess theme",
+			"brightness_description": "Want a sunny fwash-bang, ow a quiet wonyewy nyight?",
+			"light": "Wight",
+			"dark": "Dawk",
+			"effect_settings": "Effect settings",
+			"effect_description": "Wouwd you wike fancy effects, ow a mowe static expewience?",
+			"enable": "Enyabwe",
+			"disable": "Disabwe"
+		},
+		"conversion": {
+			"title": "Conwewsion",
+			"filename_format": "Fiwe nyame fowmat",
+			"filename_description": "This wiww detewminye the nyame of the fiwe on downwoad, <b>nyot incwuding the fiwe extension.</b> You can put these fowwowing tempwates in the fowmat, which wiww be wepwaced with the wewewant infowmation: <b>%nyame%</b> fow the owiginyaw fiwe nyame, <b>%extension%</b> fow the owiginyaw fiwe extension, and <b>%date%</b> fow a date stwing of when the fiwe was conwewted.",
+			"placeholder": "VEWT_%nyame%"
+		},
+		"vertd": {
+			"title": "Video conwewsion",
+			"status": "status:",
+			"loading": "woading...",
+			"available": "awaiwabwe, commit id {commitId}",
+			"unavailable": "unyawaiwabwe (is the uww wight?)",
+			"description": "The <code>wewtd</code> pwojyect is a sewwew wwappew fow FFmpeg. This awwows you to conwewt wideos thwough the conwenyience of VEWT's web intewface, whiwe stiww being abwe to hawnyess the powew of youw GPU to do it as quickwy as possibwe.",
+			"hosting_info": "We host a pubwic instance fow youw conwenyience, but it is quite easy to host youw own on youw PC ow sewwew if you knyow what you awe doing. You can downwoad the sewwew binyawies [vertd_link]hewe[/vertd_link] - the pwocess of setting this up wiww become easiew in the futuwe, so stay tunyed!",
+			"instance_url": "Instance UWW",
+			"url_placeholder": "Exampwe: http://wocawhost:24153",
+			"conversion_speed": "Conwewsion speed",
+			"speed_description": "This descwibes the twadeoff between speed and quawity. Fastew speeds wiww wesuwt in wowew quawity, but wiww get the jyob donye quickew.",
+			"speeds": {
+				"very_slow": "Vewy Swow",
+				"slower": "Swowew",
+				"slow": "Swow",
+				"medium": "Medium",
+				"fast": "Fast",
+				"ultra_fast": "Uwtwa Fast"
+			}
+		},
+		"privacy": {
+			"title": "Pwiwacy",
+			"plausible_title": "Pwausibwe anyawytics",
+			"plausible_description": "We use [plausible_link]Pwausibwe[/plausible_link], a pwiwacy-focused anyawytics toow, to gathew compwetewy anyonymous statistics. Aww data is anyonymized and aggwegated, and nyo identifiabwe infowmation is ewew sent ow stowed. You can wiew the anyawytics [analytics_link]hewe[/analytics_link] and choose to opt out bewow.",
+			"opt_in": "Opt-in",
+			"opt_out": "Opt-out"
+		},
+		"language": {
+			"title": "Wanguage",
+			"description": "Sewect youw pwefewwed wanguage fow the VEWT intewface."
+		}
+	},
+	"about": {
+		"title": "About",
+		"why": {
+			"title": "Why VEWT?",
+			"description": "<b>Fiwe conwewtews hawe awways disappointed us.</b> They'we ugwy, widdwed with ads, and most impowtantwy; swow. We decided to sowwe this pwobwem once and fow aww by making an awtewnyatiwe that sowwes aww those pwobwems, and mowe.<br/><br/>Aww nyon-wideo fiwes awe conwewted compwetewy on-dewice; this means that thewe's nyo deway between sending and weceiwing the fiwes fwom a sewwew, and we nyewew get to snyoop on the fiwes you conwewt.<br/><br/>Video fiwes get upwoaded to ouw wightnying-fast WTX 4000 Ada sewwew. Youw wideos stay on thewe fow an houw if you do nyot conwewt them. If you do conwewt the fiwe, the wideo wiww stay on the sewwew fow an houw, ow untiw it is downwoaded. The fiwe wiww then be deweted fwom ouw sewwew."
+		},
+		"sponsors": {
+			"title": "Sponsows",
+			"description": "Want to suppowt us? Contact a dewewopew in the [discord_link]Discowd[/discord_link] sewwew, ow send an emaiw to",
+			"email_copied": "Emaiw copied to cwipboawd!"
+		},
+		"resources": {
+			"title": "Wesouwces",
+			"discord": "Discowd",
+			"source": "Souwce",
+			"email": "Emaiw"
+		},
+		"donate": {
+			"title": "Donyate to VEWT",
+			"description": "With youw suppowt, we can keep maintainying and impwowing VEWT.",
+			"one_time": "Onye-time",
+			"monthly": "Monthwy",
+			"custom": "Custom",
+			"pay_now": "Pay nyow",
+			"donate_amount": "Donyate ${amount} USD",
+			"thank_you": "Thank you fow youw donyation!",
+			"payment_failed": "Payment faiwed: {message}{period} You hawe nyot been chawged.",
+			"donation_error": "An ewwow occuwwed whiwe pwocessing youw donyation. Pwease twy again watew.",
+			"payment_error": "Ewwow fetching payment detaiws. Pwease twy again watew."
+		},
+		"credits": {
+			"title": "Cwedits",
+			"contact_team": "If you wouwd wike to contact the dewewopment team, pwease use the emaiw found on the \"Wesouwces\" cawd.",
+			"notable_contributors": "Nyotabwe contwibutows",
+			"notable_description": "We'd wike to thank these peopwe fow theiw majyow contwibutions to VEWT.",
+			"github_contributors": "GitHub contwibutows",
+			"github_description": "Big [jpegify_link]thanks[/jpegify_link] to aww these peopwe fow hewping out! [github_link]Want to hewp too?[/github_link]",
+			"no_contributors": "Seems wike nyo onye has contwibuted yet... [contribute_link]be the fiwst to contwibute![/contribute_link]",
+			"libraries": "Wibwawies",
+			"libraries_description": "A beeg thankies to FFmpeg (audio, wideo), ImageMagick (images) and Pandoc (documents) fow maintainying such excewwent wibwawies fow so many yeaws. VEWT wewies on them to pwowide you with youw conwewsions.",
+			"roles": {
+				"lead_developer": "Wead dewewopew; conwewsion backend, UI impwementation",
+				"developer": "Dewewopew; UI impwementation",
+				"designer": "Designyew; UX, bwanding, mawketing",
+				"docker_ci": "Maintainying Dockew & CI suppowt",
+				"former_cofounder": "Fowmew co-foundew & designyew"
+			}
+		},
+		"errors": {
+			"github_contributors": "Ewwow fetching GitHub contwibutows"
+		}
+	},
+	"workers": {
+		"errors": {
+			"general": "Ewwow conwewting fiwe {file}: {message}",
+			"magick": "Ewwow in Magick wowkew, image conwewsion may nyot wowk as expected.`",
+			"ffmpeg": "Ewwow woading ffmpeg, some featuwes may nyot wowk."
+		}
+	},
+	"jpegify": {
+		"title": "SECWET JPEGIFY!!!",
+		"subtitle": "(shh... don't teww anyonye!)",
+		"button": "JPEGIFY {compression}%!!!",
+		"download": "Downwoad",
+		"delete": "Dewete"
+	},
+	"navbar": {
+		"upload": "Upwoad",
+		"convert": "Conwewt",
+		"settings": "Settings", 
+		"about": "About",
+		"toggle_theme": "Toggwe theme"
+	},
+	"footer": {
+		"copyright": "© {year} VEWT.",
+		"source_code": "Souwce code",
+		"discord_server": "Discowd sewwew"
+	}
+}
