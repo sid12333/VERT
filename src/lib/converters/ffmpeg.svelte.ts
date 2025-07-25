@@ -15,6 +15,8 @@ export class FFmpegConverter extends Converter {
 		new FormatInfo("wav", true, true),
 		new FormatInfo("flac", true, true),
 		new FormatInfo("ogg", true, true),
+		new FormatInfo("oga", true, true),
+		new FormatInfo("opus", true, true),
 		new FormatInfo("aac", true, true),
 		new FormatInfo("m4a", true, true),
 		new FormatInfo("wma", true, true),
