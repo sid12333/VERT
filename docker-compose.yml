@@ -1,7 +1,7 @@
 services:
   vert:
     container_name: vert
-    image: vert-sh/vert:latest
+    image: ghcr.io/vert-sh/vert:latest
     environment:
       - PUB_HOSTNAME=${PUB_HOSTNAME:-vert.sh}
       - PUB_PLAUSIBLE_URL=${PUB_PLAUSIBLE_URL:-https://plausible.example.com}
