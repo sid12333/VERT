@@ -23,6 +23,7 @@
 	import "$lib/css/app.scss";
 	import { browser } from "$app/environment";
 	import { page } from "$app/state";
+	import { initStores as initAnimStores } from "$lib/animation/index.js";
 
 	let { children, data } = $props();
 	let enablePlausible = $state(false);
@@ -60,6 +61,8 @@
 	};
 
 	onMount(() => {
+		initAnimStores();
+
 		isMobile.set(window.innerWidth <= 768);
 		window.addEventListener("resize", () => {
 			isMobile.set(window.innerWidth <= 768);

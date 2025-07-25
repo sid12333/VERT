@@ -12,15 +12,14 @@ import {
 let effectsEnabled = true;
 let isMobileDevice = false;
 
-// FIXME: there is sometimes an issue in dev where subscribing to the store just breaks everything? (.subscribe() not existing on effects, somehow)
-// you gotta restart the dev server to fix and it only seems to happen in dev. somehow effects being called before its defined?
-effects.subscribe((value) => {
-	effectsEnabled = value;
-});
-
-isMobile.subscribe((value) => {
-	isMobileDevice = value;
-});
+export function initStores() {
+	effects.subscribe((value) => {
+		effectsEnabled = value;
+	});
+	isMobile.subscribe((value) => {
+		isMobileDevice = value;
+	});
+}
 
 export const transition =
 	"linear(0,0.006,0.025 2.8%,0.101 6.1%,0.539 18.9%,0.721 25.3%,0.849 31.5%,0.937 38.1%,0.968 41.8%,0.991 45.7%,1.006 50.1%,1.015 55%,1.017 63.9%,1.001)";
