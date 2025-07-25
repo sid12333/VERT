@@ -13,7 +13,6 @@
 		showGradient,
 		vertdLoaded,
 	} from "$lib/store/index.svelte";
-	import { addToast } from "$lib/store/ToastProvider";
 	import { VertFile } from "$lib/types";
 	import {
 		AudioLines,
@@ -247,6 +246,7 @@
 					>
 						<FormatDropdown
 							{categories}
+							from={file.from}
 							bind:selected={file.to}
 							onselect={(option) => handleSelect(option, file)}
 						/>

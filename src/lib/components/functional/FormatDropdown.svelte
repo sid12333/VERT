@@ -8,6 +8,7 @@
 
 	type Props = {
 		categories: Categories;
+		from?: string;
 		selected?: string;
 		onselect?: (option: string) => void;
 		disabled?: boolean;
@@ -15,6 +16,7 @@
 
 	let {
 		categories,
+		from,
 		selected = $bindable(""),
 		onselect,
 		disabled,
@@ -109,19 +111,17 @@
 
 	const clickDropdown = () => {
 		open = !open;
-		if (open) {
-			setTimeout(() => {
-				if (dropdownMenu) {
-					const searchInput = dropdownMenu.querySelector(
-						"#format-search",
-					) as HTMLInputElement;
-					if (searchInput) {
-						searchInput.focus();
-						searchInput.select();
-					}
-				}
-			}, 0); // let dropdown open first
-		}
+		if (!open) return;
+		setTimeout(() => {
+			if (!dropdownMenu) return;
+			const searchInput = dropdownMenu.querySelector(
+				"#format-search",
+			) as HTMLInputElement;
+			if (searchInput) {
+				searchInput.focus();
+				searchInput.select();
+			}
+		}, 0); // let dropdown open first
 	};
 
 	onMount(() => {
@@ -156,7 +156,7 @@
 	bind:this={dropdown}
 >
 	<button
-		class="relative flex items-center justify-center w-full font-display  px-3 py-3.5 bg-button rounded-full overflow-hidden cursor-pointer focus:!outline-none
+		class="relative flex items-center justify-center w-full font-display px-3 py-3.5 bg-button rounded-full overflow-hidden cursor-pointer focus:!outline-none
 		{disabled ? 'opacity-50 cursor-auto' : 'cursor-pointer'}"
 		onclick={() => clickDropdown()}
 		onmouseenter={() => (hover = true)}
@@ -252,7 +252,8 @@
 						class="w-full p-2 text-center rounded-xl
                         {format === selected
 							? 'bg-accent text-black'
-							: 'hover:bg-panel'}"
+							: 'hover:bg-panel'}
+						{format === from ? 'bg-separator' : ''}"
 						onclick={() => selectOption(format)}
 					>
 						{format}
