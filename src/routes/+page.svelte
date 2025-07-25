@@ -99,7 +99,7 @@
 		<div class="flex gap-4 mt-8 md:flex-row flex-col">
 			{#each Object.entries(status) as [key, s]}
 				{@const Icon = s.icon}
-				<div class="file-category-card w-full flex flex-col">
+				<div class="file-category-card w-full flex flex-col gap-4">
 					<div class="file-category-card-inner">
 						<div
 							class={clsx("icon-container", {
@@ -114,27 +114,29 @@
 						<span>{key}</span>
 					</div>
 
-					<div class="file-category-card-content flex-grow">
-						{#if key === "Video"}
+					<div class="file-category-card-content flex-grow gap-4">
+						<div class="flex flex-col gap-1">
+							{#if key === "Video"}
+								<p>
+									Video uploads to a server for processing by
+									default, learn how to set it up locally <a
+										target="_blank"
+										href="https://github.com/VERT-sh/VERT/wiki/How-to-convert-video-with-VERT"
+										>here</a
+									>.
+								</p>
+							{:else}
+								<p
+									class="flex tems-center justify-center gap-2"
+								>
+									<Check size="20" /> Local fully supported
+								</p>
+							{/if}
 							<p>
-								Video uploads to a server for processing by
-								default, learn how to set it up locally <a
-									target="_blank"
-									href="https://github.com/VERT-sh/VERT/wiki/How-to-convert-video-with-VERT"
-									>here</a
-								>.
+								<b>Status: </b>
+								{s.ready ? "ready" : "not ready"}
 							</p>
-						{:else}
-							<p
-								class="flex items-center justify-center gap-2 h-full"
-							>
-								<Check size="20" /> Local fully supported
-							</p>
-						{/if}
-						<p>
-							<b>Status: </b>
-							{s.ready ? "ready" : "not ready"}
-						</p>
+						</div>
 						<div>
 							<span class="flex flex-wrap justify-center">
 								<b>Supported formats:&nbsp;</b>
@@ -177,7 +179,7 @@
 	}
 
 	.file-category-card p {
-		@apply font-normal text-center text-sm mt-4;
+		@apply font-normal text-center text-sm;
 	}
 
 	.file-category-card-inner {
