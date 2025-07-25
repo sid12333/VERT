@@ -35,9 +35,10 @@
 		HeartIcon,
 		WalletIcon,
 	} from "lucide-svelte";
-	import { onMount, tick } from "svelte";
+	import { onMount } from "svelte";
 	import { Elements, PaymentElement } from "svelte-stripe";
 	import { quintOut } from "svelte/easing";
+	import { m } from "$lib/paraglide/messages";
 
 	let amount = $state(1);
 	let customAmount = $state("");
@@ -68,7 +69,7 @@
 			paymentState = "prepay";
 			addToast(
 				"error",
-				"Error fetching payment details. Please try again later.",
+				m["about.donate.payment_error"](),
 			);
 			return;
 		}
@@ -98,9 +99,13 @@
 
 		const submitResult = await elements.submit();
 		if (submitResult.error) {
+			const period = submitResult.error.message?.endsWith(".") ? "" : ".";
 			addToast(
 				"error",
-				`Payment failed: ${submitResult.error.message}${submitResult.error.message?.endsWith(".") ? "" : "."} You have not been charged.`,
+				m["about.donate.payment_failed"]({ 
+					message: submitResult.error.message || "",
+					period 
+				}),
 			);
 			enablePay = true;
 			return;
@@ -116,12 +121,16 @@
 		});
 
 		if (res.error) {
+			const period = res.error.message?.endsWith(".") ? "" : ".";
 			addToast(
 				"error",
-				`Payment failed: ${res.error.message}${res.error.message?.endsWith(".") ? "" : "."} You have not been charged.`,
+				m["about.donate.payment_failed"]({ 
+					message: res.error.message || "",
+					period 
+				}),
 			);
 		} else {
-			addToast("success", "Thank you for your donation!");
+			addToast("success", m["about.donate.thank_you"]());
 		}
 
 		paymentState = "prepay";
@@ -140,12 +149,12 @@
 		if (status) {
 			switch (status) {
 				case "succeeded":
-					addToast("success", "Thank you for your donation!");
+					addToast("success", m["about.donate.thank_you"]());
 					break;
 				default:
 					addToast(
 						"error",
-						"An error occurred while processing your donation. Please try again later.",
+						m["about.donate.donation_error"](),
 					);
 			}
 
@@ -162,10 +171,10 @@
 			>
 				<HeartIcon color="black" />
 			</div>
-			Donate to VERT
+			{m["about.donate.title"]()}
 		</h2>
 		<p class="text-base font-normal">
-			With your support, we can keep maintaining and improving VERT.
+			{m["about.donate.description"]()}
 		</p>
 	</div>
 
@@ -192,7 +201,7 @@
 				)}
 			>
 				<HandCoinsIcon size="24" class="inline-block mr-2" />
-				One-time
+				{m["about.donate.one_time"]()}
 			</button>
 
 			<button
@@ -207,7 +216,7 @@
 				)}
 			>
 				<CalendarHeartIcon size="24" class="inline-block mr-2" />
-				Monthly
+				{m["about.donate.monthly"]()}
 			</button>
 		</div>
 		<div class="grid grid-cols-4 gap-3 w-full">
@@ -229,7 +238,7 @@
 			<div class="flex items-center justify-center">
 				<FancyInput
 					bind:value={customAmount}
-					placeholder="Custom"
+					placeholder={m["about.donate.custom"]()}
 					prefix="$"
 					type="number"
 				/>
@@ -288,7 +297,7 @@
 								class="btn w-full h-12 bg-accent-red text-black rounded-full mt-4"
 								onclick={donate}
 							>
-								Donate ${amount.toFixed(2)} USD
+								{m["about.donate.donate_amount"]({ amount: amount.toFixed(2) })}
 							</button>
 						</div>
 					</div>
@@ -304,7 +313,7 @@
 						class="row-start-1 col-start-1 flex justify-center items-center"
 					>
 						<WalletIcon size="24" class="inline-block mr-2" />
-						Pay now
+						{m["about.donate.pay_now"]()}
 					</div>
 				{/if}
 			</div>

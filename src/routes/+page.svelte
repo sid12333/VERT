@@ -5,6 +5,8 @@
 	import { vertdLoaded } from "$lib/store/index.svelte";
 	import clsx from "clsx";
 	import { AudioLines, BookText, Check, Film, Image } from "lucide-svelte";
+	import { m } from "$lib/paraglide/messages";
+	import { link } from "$lib/paraglide";
 
 	const getSupportedFormats = (name: string) =>
 		converters
@@ -20,6 +22,7 @@
 			ready: boolean;
 			formats: string;
 			icon: typeof Image;
+			title: string;
 		};
 	} = $derived({
 		Images: {
@@ -28,16 +31,19 @@
 				false,
 			formats: getSupportedFormats("imagemagick"),
 			icon: Image,
+			title: m["upload.images"](),
 		},
 		Audio: {
 			ready: converters.find((c) => c.name === "ffmpeg")?.ready || false,
 			formats: getSupportedFormats("ffmpeg"),
 			icon: AudioLines,
+			title: m["upload.audio"](),
 		},
 		Documents: {
 			ready: converters.find((c) => c.name === "pandoc")?.ready || false,
 			formats: getSupportedFormats("pandoc"),
 			icon: BookText,
+			title: m["upload.documents"](),
 		},
 		Video: {
 			ready:
@@ -45,6 +51,7 @@
 				(false && $vertdLoaded),
 			formats: getSupportedFormats("vertd"),
 			icon: Film,
+			title: m["upload.video"](),
 		},
 	});
 
@@ -58,9 +65,10 @@
 		);
 
 		if (formatInfo) {
-			return `This format can only be converted as ${
-				formatInfo.fromSupported ? "input (from)" : "output (to)"
-			}.`;
+			const direction = formatInfo.fromSupported
+				? m["upload.tooltip.direction_input"]()
+				: m["upload.tooltip.direction_output"]();
+			return m["upload.tooltip.partial_support"]({ direction });
 		}
 		return "";
 	};
@@ -75,14 +83,12 @@
 				<h1
 					class="text-4xl px-12 md:p-0 md:text-6xl flex-wrap tracking-tight leading-tight md:leading-[72px] mb-4 md:mb-6"
 				>
-					The file converter you'll love.
+					{m["upload.title"]()}
 				</h1>
 				<p
 					class="font-normal px-5 md:p-0 text-lg md:text-xl text-black text-muted dynadark:text-muted"
 				>
-					All image, audio, and document processing is done on your
-					device. Videos are converted on our lightning-fast servers.
-					No file size limit, no ads, and completely open source.
+					{m["upload.subtitle"]()}
 				</p>
 			</div>
 			<div class="flex-grow w-full h-72">
@@ -94,7 +100,7 @@
 	<hr />
 
 	<div class="mt-10 md:mt-16">
-		<h2 class="text-center text-4xl">VERT supports...</h2>
+		<h2 class="text-center text-4xl">{m["upload.supports_title"]()}</h2>
 
 		<div class="flex gap-4 mt-8 md:flex-row flex-col">
 			{#each Object.entries(status) as [key, s]}
@@ -111,31 +117,33 @@
 						>
 							<Icon size="20" />
 						</div>
-						<span>{key}</span>
+						<span>{s.title}</span>
 					</div>
 
 					<div class="file-category-card-content flex-grow gap-4">
 						{#if key === "Video"}
 							<p>
-								Video uploads to a server for processing by
-								default, learn how to set it up locally <a
-									target="_blank"
-									href="https://github.com/VERT-sh/VERT/wiki/How-to-convert-video-with-VERT"
-									>here</a
-								>.
+								{@html link(
+									"wiki_link",
+									m["upload.video_server_processing"](),
+									"https://github.com/VERT-sh/VERT/wiki/How-to-convert-video-with-VERT",
+								)}
 							</p>
 						{:else}
 							<p class="flex tems-center justify-center gap-2">
-								<Check size="20" /> Local fully supported
+								<Check size="20" />
+								{m["upload.local_supported"]()}
 							</p>
 						{/if}
 						<p>
-							<b>Status: </b>
-							{s.ready ? "ready" : "not ready"}
+							<b>{m["upload.status"]()}</b>
+							{s.ready
+								? m["upload.ready"]()
+								: m["upload.not_ready"]()}
 						</p>
 						<div>
 							<span class="flex flex-wrap justify-center">
-								<b>Supported formats:&nbsp;</b>
+								<b>{m["upload.supported_formats"]()}&nbsp;</b>
 								{#each s.formats.split(", ") as format, index}
 									{@const isPartial = format.endsWith("*")}
 									{@const formatName = isPartial

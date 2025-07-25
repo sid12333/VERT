@@ -6,6 +6,8 @@
 	import clsx from "clsx";
 	import Dropdown from "$lib/components/functional/Dropdown.svelte";
 	import { vertdLoaded } from "$lib/store/index.svelte";
+	import { m } from "$lib/paraglide/messages";
+	import { link } from "$lib/paraglide";
 
 	let vertdCommit = $state<string | null>(null);
 	let abortController: AbortController | null = null;
@@ -55,7 +57,7 @@
 				class="inline-block -mt-1 mr-2 bg-accent-red p-2 rounded-full overflow-visible"
 				color="black"
 			/>
-			Video conversion
+			{m["settings.vertd.title"]()}
 		</h2>
 		<p
 			class={clsx("text-sm font-normal", {
@@ -64,90 +66,79 @@
 				"!text-muted": vertdCommit === "loading",
 			})}
 		>
-			status: {vertdCommit
+			{m["settings.vertd.status"]()} {vertdCommit
 				? vertdCommit === "loading"
-					? "loading..."
-					: `available, commit id ${vertdCommit}`
-				: "unavailable (is the url right?)"}
+					? m["settings.vertd.loading"]()
+					: m["settings.vertd.available"]({ commitId: vertdCommit })
+				: m["settings.vertd.unavailable"]()}
 		</p>
 		<div class="flex flex-col gap-8">
 			<div class="flex flex-col gap-4">
 				<p class="text-sm text-muted font-normal">
-					The <code>vertd</code> project is a server wrapper for FFmpeg.
-					This allows you to convert videos through the convenience of
-					VERT's web interface, while still being able to harness the power
-					of your GPU to do it as quickly as possible.
+					{@html m["settings.vertd.description"]()}
 				</p>
 				<p class="text-sm text-muted font-normal">
-					We host a public instance for your convenience, but it is
-					quite easy to host your own on your PC or server if you know
-					what you are doing. You can download the server binaries <a
-						href={GITHUB_URL_VERTD}
-						target="_blank">here</a
-					> - the process of setting this up will become easier in the
-					future, so stay tuned!
+					{@html link("vertd_link", m["settings.vertd.hosting_info"](), GITHUB_URL_VERTD)}
 				</p>
 				<div class="flex flex-col gap-2">
-					<p class="text-base font-bold">Instance URL</p>
+					<p class="text-base font-bold">{m["settings.vertd.instance_url"]()}</p>
 					<input
 						type="text"
-						placeholder="Example: http://localhost:24153"
+						placeholder={m["settings.vertd.url_placeholder"]()}
 						bind:value={settings.vertdURL}
 					/>
 				</div>
 				<div class="flex flex-col gap-4">
 					<div class="flex flex-col gap-2">
-						<p class="text-base font-bold">Conversion speed</p>
+						<p class="text-base font-bold">{m["settings.vertd.conversion_speed"]()}</p>
 						<p class="text-sm text-muted font-normal">
-							This describes the tradeoff between speed and
-							quality. Faster speeds will result in lower quality,
-							but will get the job done quicker.
+							{m["settings.vertd.speed_description"]()}
 						</p>
 					</div>
 					<Dropdown
 						options={[
-							"Very Slow",
-							"Slower",
-							"Slow",
-							"Medium",
-							"Fast",
-							"Ultra Fast",
+							m["settings.vertd.speeds.very_slow"](),
+							m["settings.vertd.speeds.slower"](),
+							m["settings.vertd.speeds.slow"](),
+							m["settings.vertd.speeds.medium"](),
+							m["settings.vertd.speeds.fast"](),
+							m["settings.vertd.speeds.ultra_fast"](),
 						]}
 						settingsStyle
 						selected={(() => {
 							switch (settings.vertdSpeed) {
 								case "verySlow":
-									return "Very Slow";
+									return m["settings.vertd.speeds.very_slow"]();
 								case "slower":
-									return "Slower";
+									return m["settings.vertd.speeds.slower"]();
 								case "slow":
-									return "Slow";
+									return m["settings.vertd.speeds.slow"]();
 								case "medium":
-									return "Medium";
+									return m["settings.vertd.speeds.medium"]();
 								case "fast":
-									return "Fast";
+									return m["settings.vertd.speeds.fast"]();
 								case "ultraFast":
-									return "Ultra Fast";
+									return m["settings.vertd.speeds.ultra_fast"]();
 							}
 						})()}
 						onselect={(selected) => {
 							switch (selected) {
-								case "Very Slow":
+								case m["settings.vertd.speeds.very_slow"]():
 									settings.vertdSpeed = "verySlow";
 									break;
-								case "Slower":
+								case m["settings.vertd.speeds.slower"]():
 									settings.vertdSpeed = "slower";
 									break;
-								case "Slow":
+								case m["settings.vertd.speeds.slow"]():
 									settings.vertdSpeed = "slow";
 									break;
-								case "Medium":
+								case m["settings.vertd.speeds.medium"]():
 									settings.vertdSpeed = "medium";
 									break;
-								case "Fast":
+								case m["settings.vertd.speeds.fast"]():
 									settings.vertdSpeed = "fast";
 									break;
-								case "Ultra Fast":
+								case m["settings.vertd.speeds.ultra_fast"]():
 									settings.vertdSpeed = "ultraFast";
 									break;
 							}

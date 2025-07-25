@@ -7,6 +7,7 @@
 	import ProgressBar from "../visual/ProgressBar.svelte";
 	import FormatDropdown from "./FormatDropdown.svelte";
 	import { categories } from "$lib/converters";
+	import { m } from "$lib/paraglide/messages";
 
 	const length = $derived(files.files.length);
 	const progress = $derived(files.files.filter((f) => f.result).length);
@@ -27,7 +28,7 @@
 				disabled={!files.ready}
 			>
 				<RefreshCw size="24" />
-				<p>Convert all</p>
+				<p>{m["convert.panel.convert_all"]()}</p>
 			</button>
 			<button
 				class="btn {$effects
@@ -37,7 +38,7 @@
 				onclick={() => files.downloadAll()}
 			>
 				<FolderArchiveIcon size="24" />
-				<p>Download all as .zip</p>
+				<p>{m["convert.panel.download_all"]()}</p>
 			</button>
 			{#if $isMobile}
 				<button
@@ -48,10 +49,10 @@
 					onclick={() => (files.files = [])}
 				>
 					<Trash2Icon size="24" />
-					<p>Remove all files</p>
+					<p>{m["convert.panel.remove_all"]()}</p>
 				</button>
 			{:else}
-				<Tooltip text="Remove all files" position="right">
+				<Tooltip text={m["convert.panel.remove_all"]()} position="right">
 					<button
 						class="btn p-4 {$effects
 							? ''
@@ -66,7 +67,7 @@
 		</div>
 		<div class="w-full bg-separator h-0.5 flex md:hidden"></div>
 		<div class="flex items-center gap-2">
-			<p class="whitespace-nowrap text-xl">Set all to</p>
+			<p class="whitespace-nowrap text-xl">{m["convert.panel.set_all_to"]()}</p>
 			{#if files.requiredConverters.length === 1}
 				<FormatDropdown
 					onselect={(r) =>
@@ -79,7 +80,7 @@
 					{categories}
 				/>
 			{:else}
-				<Dropdown options={["N/A"]} disabled />
+				<Dropdown options={[m["convert.panel.na"]()]} disabled />
 			{/if}
 		</div>
 	</div>

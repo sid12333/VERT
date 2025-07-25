@@ -5,6 +5,8 @@
 	import { DISCORD_URL } from "$lib/consts";
 	import { error } from "$lib/logger";
 	import { addToast } from "$lib/store/ToastProvider";
+	import { m } from "$lib/paraglide/messages";
+	import { link } from "$lib/paraglide";
 
 	let copied = false;
 	let timeoutId: number | undefined;
@@ -13,7 +15,7 @@
 		try {
 			navigator.clipboard.writeText("hello@vert.sh");
 			copied = true;
-			addToast("success", "Email copied to clipboard!");
+			addToast("success", m["about.sponsors.email_copied"]());
 
 			if (timeoutId) clearTimeout(timeoutId);
 			timeoutId = setTimeout(() => (copied = false), 2000);
@@ -30,7 +32,7 @@
 		>
 			<PiggyBankIcon color="black" />
 		</div>
-		Sponsors
+		{m["about.sponsors.title"]()}
 	</h2>
 	<div class="mt-2 [&>*]:font-normal h-full flex justify-between flex-col">
 		<div class="flex gap-3 justify-center text-lg">
@@ -43,11 +45,11 @@
 			</a>
 		</div>
 		<p class="text-muted">
-			Want to support us? Contact a developer in the <a
-				href={DISCORD_URL}
-				target="_blank">Discord</a
-			>
-			server, or send an email to
+			{@html link(
+				"discord_link",
+				m["about.sponsors.description"](),
+				DISCORD_URL,
+			)}
 			<span class="inline-block mx-[2px] relative top-[2px]">
 				<button
 					id="email"

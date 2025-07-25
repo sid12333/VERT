@@ -28,6 +28,7 @@
 		XIcon,
 	} from "lucide-svelte";
 	import { onMount } from "svelte";
+	import { m } from "$lib/paraglide/messages";
 
 	onMount(() => {
 		// depending on format, select right category and format
@@ -120,23 +121,23 @@
 	<Panel class="p-5 flex flex-col min-w-0 gap-4 relative">
 		<div class="flex-shrink-0 h-8 w-full flex items-center gap-2">
 			{#if !converters.length}
-				<Tooltip text="Unknown file type" position="bottom">
+				<Tooltip text={m["convert.tooltips.unknown_file"]()} position="bottom">
 					<FileQuestionIcon size="24" class="flex-shrink-0" />
 				</Tooltip>
 			{:else if isAudio}
-				<Tooltip text="Audio file" position="bottom">
+				<Tooltip text={m["convert.tooltips.audio_file"]()} position="bottom">
 					<AudioLines size="24" class="flex-shrink-0" />
 				</Tooltip>
 			{:else if isVideo}
-				<Tooltip text="Video file" position="bottom">
+				<Tooltip text={m["convert.tooltips.video_file"]()} position="bottom">
 					<FilmIcon size="24" class="flex-shrink-0" />
 				</Tooltip>
 			{:else if isDocument}
-				<Tooltip text="Document file" position="bottom">
+				<Tooltip text={m["convert.tooltips.document_file"]()} position="bottom">
 					<BookText size="24" class="flex-shrink-0" />
 				</Tooltip>
 			{:else}
-				<Tooltip text="Image file" position="bottom">
+				<Tooltip text={m["convert.tooltips.image_file"]()} position="bottom">
 					<ImageIcon size="24" class="flex-shrink-0" />
 				</Tooltip>
 			{/if}
@@ -172,11 +173,10 @@
 					class="h-full flex flex-col text-center justify-center text-failure"
 				>
 					<p class="font-body font-bold">
-						We can't convert this file.
+						{m["convert.errors.cant_convert"]()}
 					</p>
 					<p class="font-normal">
-						what are you doing..? you're supposed to run the vertd
-						server!
+						{m["convert.errors.vertd_server"]()}
 					</p>
 				</div>
 			{:else}
@@ -184,11 +184,10 @@
 					class="h-full flex flex-col text-center justify-center text-failure"
 				>
 					<p class="font-body font-bold">
-						We can't convert this file.
+						{m["convert.errors.cant_convert"]()}
 					</p>
 					<p class="font-normal">
-						Only image, video, audio, and document files are
-						supported
+						{m["convert.errors.unsupported_format"]()}
 					</p>
 				</div>
 			{/if}
@@ -196,10 +195,9 @@
 			<div
 				class="h-full flex flex-col text-center justify-center text-failure"
 			>
-				<p class="font-body font-bold">We can't convert this file.</p>
+				<p class="font-body font-bold">{m["convert.errors.cant_convert"]()}</p>
 				<p class="font-normal">
-					Could not find the vertd instance to start video conversion.
-					Are you sure the instance URL is set correctly?
+					{m["convert.errors.vertd_not_found"]()}
 				</p>
 			</div>
 		{:else}
@@ -251,7 +249,7 @@
 							onselect={(option) => handleSelect(option, file)}
 						/>
 						<div class="w-full flex items-center justify-between">
-							<Tooltip text="Convert this file" position="bottom">
+							<Tooltip text={m["convert.tooltips.convert_file"]()} position="bottom">
 								<button
 									class="btn {$effects
 										? ''
@@ -269,7 +267,7 @@
 								</button>
 							</Tooltip>
 							<Tooltip
-								text="Download this file"
+								text={m["convert.tooltips.download_file"]()}
 								position="bottom"
 							>
 								<button

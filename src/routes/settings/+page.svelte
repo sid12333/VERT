@@ -6,6 +6,7 @@
 	import { PUB_PLAUSIBLE_URL } from "$env/static/public";
 	import { SettingsIcon } from "lucide-svelte";
 	import { onMount } from "svelte";
+	import { m } from "$lib/paraglide/messages";
 
 	let settings = $state(Settings.Settings.instance.settings);
 
@@ -31,7 +32,7 @@
 			log(["settings"], "saving settings");
 		} catch (error) {
 			log(["settings", "error"], `failed to save settings: ${error}`);
-			addToast("error", "Failed to save settings!");
+			addToast("error", m["settings.errors.save_failed"]());
 		}
 	});
 
@@ -51,7 +52,7 @@
 <div class="flex flex-col h-full items-center">
 	<h1 class="hidden md:block text-[40px] tracking-tight leading-[72px] mb-6">
 		<SettingsIcon size="40" class="inline-block -mt-2 mr-2" />
-		Settings
+		{m["settings.title"]()}
 	</h1>
 
 	<div

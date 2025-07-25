@@ -14,6 +14,7 @@
 		SunIcon,
 	} from "lucide-svelte";
 	import { onMount, onDestroy } from "svelte";
+	import { m } from "$lib/paraglide/messages";
 
 	let lightElement: HTMLButtonElement;
 	let darkElement: HTMLButtonElement;
@@ -70,14 +71,14 @@
 				class="inline-block -mt-1 mr-2 bg-accent-purple p-2 rounded-full"
 				color="black"
 			/>
-			Appearance
+			{m["settings.appearance.title"]()}
 		</h2>
 		<div class="flex flex-col gap-8">
 			<div class="flex flex-col gap-4">
 				<div class="flex flex-col gap-2">
-					<p class="text-base font-bold">Brightness theme</p>
+					<p class="text-base font-bold">{m["settings.appearance.brightness_theme"]()}</p>
 					<p class="text-sm text-muted font-normal italic">
-						Want a sunny flash-bang, or a quiet lonely night?
+						{m["settings.appearance.brightness_description"]()}
 					</p>
 				</div>
 				<div class="flex flex-col gap-3 w-full">
@@ -88,7 +89,7 @@
 							class="btn {$effects ? "" : "!scale-100"} flex-1 p-4 rounded-lg text-black dynadark:text-white flex items-center justify-center"
 						>
 							<SunIcon size="24" class="inline-block mr-2" />
-							Light
+							{m["settings.appearance.light"]()}
 						</button>
 
 						<button
@@ -97,17 +98,16 @@
 							class="btn {$effects ? "" : "!scale-100"} flex-1 p-4 rounded-lg text-black flex items-center justify-center"
 						>
 							<MoonIcon size="24" class="inline-block mr-2" />
-							Dark
+							{m["settings.appearance.dark"]()}
 						</button>
 					</div>
 				</div>
 			</div>
 			<div class="flex flex-col gap-4">
 				<div class="flex flex-col gap-2">
-					<p class="text-base font-bold">Effect settings</p>
+					<p class="text-base font-bold">{m["settings.appearance.effect_settings"]()}</p>
 					<p class="text-sm text-muted font-normal italic">
-						Would you like fancy effects, or a more static
-						experience?
+						{m["settings.appearance.effect_description"]()}
 					</p>
 				</div>
 				<div class="flex flex-col gap-3 w-full">
@@ -118,7 +118,7 @@
 							class="btn {$effects ? "" : "!scale-100"} flex-1 p-4 rounded-lg text-black dynadark:text-white flex items-center justify-center"
 						>
 							<PlayIcon size="24" class="inline-block mr-2" />
-							Enable
+							{m["settings.appearance.enable"]()}
 						</button>
 
 						<button
@@ -127,7 +127,7 @@
 							class="btn {$effects ? "" : "!scale-100"} flex-1 p-4 rounded-lg text-black dynadark:text-white flex items-center justify-center"
 						>
 							<PauseIcon size="24" class="inline-block mr-2" />
-							Disable
+							{m["settings.appearance.disable"]()}
 						</button>
 					</div>
 				</div>
