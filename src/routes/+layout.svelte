@@ -24,6 +24,7 @@
 	import { browser } from "$app/environment";
 	import { page } from "$app/state";
 	import { initStores as initAnimStores } from "$lib/animation/index.js";
+	import { locales, localizeHref } from "$lib/paraglide/runtime";
 
 	let { children, data } = $props();
 	let enablePlausible = $state(false);
@@ -162,6 +163,11 @@
 		`<slot />` or `{@render ...}` tag missing — inner content will not be rendered
 	-->
 	<Layout.PageContent {children} />
+	<div style="display:none">
+		{#each locales as locale}
+			<a href={localizeHref(page.url.pathname, { locale })}>{locale}</a>
+		{/each}
+	</div>
 
 	<Layout.Toasts />
 	<Layout.Dialogs />
