@@ -62,35 +62,79 @@
 				categories[cat].canConvertTo?.includes(currentCategory || ""),
 		);
 	});
+
+	const shouldInclude = (format: string, category: string): boolean => {
+		// if converting from audio to video, dont show gifs
+		if (categories["audio"]?.formats.includes(from ?? "") && format === ".gif") {
+			return false;
+		}
+
+		return true;
+	};
+
 	const filteredData = $derived.by(() => {
+		const normalize = (str: string) => str.replace(/^\./, "").toLowerCase();
+
+		// if no query, return formats for current category
 		if (!searchQuery) {
 			return {
 				categories: availableCategories,
 				formats: currentCategory
-					? categories[currentCategory].formats
+					? categories[currentCategory].formats.filter((format) =>
+							shouldInclude(format, currentCategory!),
+						)
 					: [],
 			};
 		}
+		const searchLower = normalize(searchQuery);
 
-		// filter categories that have matching formats
+		// find all categories that have formats matching the search query
 		const matchingCategories = availableCategories.filter((cat) =>
-			categories[cat].formats.some((format) =>
-				format.toLowerCase().includes(searchQuery.toLowerCase()),
+			categories[cat].formats.some(
+				(format) =>
+					normalize(format).includes(searchLower) &&
+					shouldInclude(format, cat),
 			),
 		);
+		if (matchingCategories.length === 0) {
+			return {
+				categories: availableCategories,
+				formats: [],
+			};
+		}
 
-		// only show formats from the current category that match the search
-		const filteredFormats =
-			currentCategory && categories[currentCategory]
-				? categories[currentCategory].formats.filter((format) =>
-						format
-							.toLowerCase()
-							.includes(searchQuery.toLowerCase()),
-					)
-				: [];
+		// if current category has no matches, switch to first category that does
+		const currentCategoryHasMatches =
+			currentCategory &&
+			matchingCategories.some((cat) => cat === currentCategory);
+		if (!currentCategoryHasMatches && matchingCategories.length > 0) {
+			const newCategory = matchingCategories[0];
+			currentCategory = newCategory;
+		}
+
+		// return formats only from the current category that match the search
+		let filteredFormats = currentCategory
+			? categories[currentCategory].formats.filter(
+					(format) =>
+						normalize(format).includes(searchLower) &&
+						shouldInclude(format, currentCategory!),
+				)
+			: [];
+
+		// sorting exact match first, then others
+		filteredFormats = filteredFormats.sort((a, b) => {
+			const aExact = normalize(a) === searchLower;
+			const bExact = normalize(b) === searchLower;
+			if (aExact && !bExact) return -1;
+			if (!aExact && bExact) return 1;
+			return 0;
+		});
 
 		return {
-			categories: matchingCategories,
+			categories:
+				matchingCategories.length > 0
+					? matchingCategories
+					: availableCategories,
 			formats: filteredFormats,
 		};
 	});
@@ -98,6 +142,21 @@
 	const selectOption = (option: string) => {
 		selected = option;
 		open = false;
+
+		// find the category of this option if it's not in the current category
+		if (
+			currentCategory &&
+			!categories[currentCategory].formats.includes(option)
+		) {
+			const formatCategory = Object.keys(categories).find((cat) =>
+				categories[cat].formats.includes(option),
+			);
+
+			if (formatCategory) {
+				currentCategory = formatCategory;
+			}
+		}
+
 		onselect?.(option);
 	};
 
@@ -107,7 +166,39 @@
 	};
 
 	const handleSearch = (event: Event) => {
-		searchQuery = (event.target as HTMLInputElement).value;
+		const query = (event.target as HTMLInputElement).value;
+		searchQuery = query;
+
+		// find which categories have matching formats & switch
+		if (query) {
+			const queryLower = query.toLowerCase();
+			const categoriesWithMatches = availableCategories.filter((cat) =>
+				categories[cat].formats.some((format) =>
+					format.toLowerCase().includes(queryLower),
+				),
+			);
+
+			if (categoriesWithMatches.length > 0) {
+				const currentHasMatches =
+					currentCategory &&
+					categories[currentCategory].formats.some((format) =>
+						format.toLowerCase().includes(queryLower),
+					);
+
+				if (!currentHasMatches) {
+					currentCategory = categoriesWithMatches[0];
+				}
+			}
+		}
+	};
+
+	const onEnter = (event: KeyboardEvent) => {
+		if (event.key === "Enter") {
+			event.preventDefault();
+			if (filteredData.formats.length > 0) {
+				selectOption(filteredData.formats[0]);
+			}
+		}
 	};
 
 	const clickDropdown = () => {
@@ -201,7 +292,6 @@
 	{#if open}
 		<div
 			bind:this={dropdownMenu}
-			style={hover ? "will-change: opacity, fade, transform" : ""}
 			transition:fade={{
 				duration,
 				easing: quintOut,
@@ -219,6 +309,7 @@
 						class="flex-grow w-full !pl-11 !pr-3 rounded-lg bg-panel text-foreground"
 						bind:value={searchQuery}
 						oninput={handleSearch}
+						onkeydown={onEnter}
 						onfocus={() => {}}
 						id="format-search"
 						autocomplete="off"
@@ -228,15 +319,25 @@
 					>
 						<SearchIcon class="w-4 h-4" />
 					</span>
+					{#if searchQuery}
+						<span
+							class="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-muted"
+							style="font-size: 0.7rem;"
+						>
+							{filteredData.formats.length}
+							{filteredData.formats.length === 1
+								? "result"
+								: "results"}
+						</span>
+					{/if}
 				</div>
 			</div>
-
 			<!-- available categories -->
 			<div class="flex items-center justify-between">
 				{#each filteredData.categories as category}
 					<button
-						class="flex-grow text-lg hover:text-muted/20 border-b-[1px] pb-2 capitalize {currentCategory ===
-						category
+						class="flex-grow text-lg hover:text-muted/20 border-b-[1px] pb-2 capitalize
+                        {currentCategory === category
 							? 'text-accent border-b-accent'
 							: 'border-b-separator text-muted'}"
 						onclick={() => selectCategory(category)}
@@ -245,21 +346,26 @@
 					</button>
 				{/each}
 			</div>
-
 			<!-- available formats -->
 			<div class="max-h-80 overflow-y-auto grid grid-cols-3 gap-2 p-2">
-				{#each filteredData.formats as format}
-					<button
-						class="w-full p-2 text-center rounded-xl
-                        {format === selected
-							? 'bg-accent text-black'
-							: 'hover:bg-panel'}
+				{#if filteredData.formats.length > 0}
+					{#each filteredData.formats as format}
+						<button
+							class="w-full p-2 text-center rounded-xl
+							{format === selected ? 'bg-accent text-black' : 'hover:bg-panel'}
 						{format === from ? 'bg-separator' : ''}"
-						onclick={() => selectOption(format)}
-					>
-						{format}
-					</button>
-				{/each}
+							onclick={() => selectOption(format)}
+						>
+							{format}
+						</button>
+					{/each}
+				{:else}
+					<div class="col-span-3 text-center p-4 text-muted">
+						{searchQuery
+							? "No formats match your search"
+							: "No formats available"}
+					</div>
+				{/if}
 			</div>
 		</div>
 	{/if}

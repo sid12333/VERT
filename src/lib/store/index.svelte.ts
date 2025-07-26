@@ -1,5 +1,5 @@
 import { browser } from "$app/environment";
-import { converters } from "$lib/converters";
+import { byNative, converters } from "$lib/converters";
 import { error, log } from "$lib/logger";
 import { VertFile } from "$lib/types";
 import { parseBlob, selectCover } from "music-metadata";
@@ -33,11 +33,13 @@ class Files {
 		this.thumbnailQueue.add(async () => {
 			const isAudio = converters
 				.find((c) => c.name === "ffmpeg")
-				?.formatStrings()
+				?.supportedFormats.filter((f) => f.isNative)
+				.map((f) => f.name)
 				?.includes(file.from.toLowerCase());
 			const isVideo = converters
 				.find((c) => c.name === "vertd")
-				?.formatStrings()
+				?.supportedFormats.filter((f) => f.isNative)
+				.map((f) => f.name)
 				?.includes(file.from.toLowerCase());
 
 			try {
@@ -121,11 +123,11 @@ class Files {
 				log(["files"], `no extension found for ${file.name}`);
 				return;
 			}
-			const converter = converters.find((c) =>
-				c
-					.formatStrings()
-					.includes(format || ".somenonexistentextension"),
-			);
+			const converter = converters
+				.sort(byNative(format))
+				.find((converter) =>
+					converter.formatStrings().includes(format),
+				);
 			if (!converter) {
 				log(["files"], `no converter found for ${file.name}`);
 				this.files.push(new VertFile(file, format));
