@@ -4,6 +4,7 @@ import { FFmpeg } from "@ffmpeg/ffmpeg";
 import { browser } from "$app/environment";
 import { error, log } from "$lib/logger";
 import { addToast } from "$lib/store/ToastProvider";
+import { m } from "$lib/paraglide/messages";
 
 export class FFmpegConverter extends Converter {
 	private ffmpeg: FFmpeg = null!;
@@ -49,7 +50,7 @@ export class FFmpegConverter extends Converter {
 			error(["converters", this.name], `error loading ffmpeg: ${err}`);
 			addToast(
 				"error",
-				`Error loading ffmpeg, some features may not work.`,
+				m["workers.errors.ffmpeg"](),
 			);
 		}
 	}

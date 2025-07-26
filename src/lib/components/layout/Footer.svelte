@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { GITHUB_URL_VERT, DISCORD_URL } from "$lib/consts";
+	import { m } from "$lib/paraglide/messages";
 
-	const items = Object.entries({
-		//"Privacy policy": "#",
-		"Source code": GITHUB_URL_VERT,
-		"Discord server": DISCORD_URL,
-	});
+	const items = $derived([
+		[m["footer.source_code"](), GITHUB_URL_VERT],
+		[m["footer.discord_server"](), DISCORD_URL],
+	]);
 
 	const year = new Date().getFullYear();
 </script>
@@ -16,7 +16,7 @@
 	<div
 		class="w-full h-full flex items-center justify-center text-muted gap-3 relative"
 	>
-		<p>© {year} VERT.</p>
+		<p>{m["footer.copyright"]({ year })}</p>
 		{#each items as [name, url] (name)}
 			<!-- bullet point -->
 			<p>•</p>

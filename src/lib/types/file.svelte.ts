@@ -1,6 +1,7 @@
 import { converters } from "$lib/converters";
 import type { Converter } from "$lib/converters/converter.svelte";
 import { error } from "$lib/logger";
+import { m } from "$lib/paraglide/messages";
 import { addToast } from "$lib/store/ToastProvider";
 
 export class VertFile {
@@ -75,7 +76,10 @@ export class VertFile {
 			error(["files"], castedErr.message);
 			addToast(
 				"error",
-				`Error converting file ${this.file.name}: ${castedErr.message || castedErr}`,
+				m["workers.errors.general"]({
+					file: this.file.name,
+					message: castedErr.message || castedErr,
+				}),
 			);
 			this.result = null;
 		}

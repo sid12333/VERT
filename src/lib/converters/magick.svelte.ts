@@ -1,5 +1,6 @@
 import { browser } from "$app/environment";
 import { error, log } from "$lib/logger";
+import { m } from "$lib/paraglide/messages";
 import { addToast } from "$lib/store/ToastProvider";
 import type { OmitBetterStrict, WorkerMessage } from "$lib/types";
 import { VertFile } from "$lib/types";
@@ -71,7 +72,7 @@ export class MagickConverter extends Converter {
 				);
 				addToast(
 					"error",
-					`Error in Magick worker, image conversion may not work as expected.`,
+					m["workers.errors.magick"](),
 				);
 				throw new Error(message.error);
 			}

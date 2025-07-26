@@ -113,8 +113,6 @@ const formatToReader = (format: Format): string => {
 			return "rtf";
 		case ".rst":
 			return "rst";
-		case ".xml":
-			return "xml";
 	}
 
 	throw new Error(`Unsupported format: ${format}`);

@@ -5,6 +5,8 @@
 		effects,
 		setEffects,
 		setTheme,
+		updateLocale,
+		availableLocales,
 	} from "$lib/store/index.svelte";
 	import {
 		MoonIcon,
@@ -14,6 +16,23 @@
 		SunIcon,
 	} from "lucide-svelte";
 	import { onMount, onDestroy } from "svelte";
+	import { m } from "$lib/paraglide/messages";
+	import { getLocale } from "$lib/paraglide/runtime";
+	import Dropdown from "$lib/components/functional/Dropdown.svelte";
+
+	let currentLocale = $state("en");
+
+	const getLanguageDisplayName = (locale: string) => {
+		try {
+			return availableLocales[locale as keyof typeof availableLocales];
+		} catch {
+			return locale.toUpperCase();
+		}
+	};
+
+	const languageOptions = Object.keys(availableLocales).map((locale) =>
+		getLanguageDisplayName(locale),
+	);
 
 	let lightElement: HTMLButtonElement;
 	let darkElement: HTMLButtonElement;
@@ -49,6 +68,8 @@
 	onMount(() => {
 		effectsUnsubscribe = effects.subscribe(updateEffectsClasses);
 		themeUnsubscribe = theme.subscribe(updateThemeClasses);
+
+		currentLocale = localStorage.getItem("locale") || getLocale();
 	});
 
 	onDestroy(() => {
@@ -57,9 +78,20 @@
 	});
 
 	$effect(() => {
-        updateEffectsClasses($effects);
-        updateThemeClasses($theme);
-    });
+		updateEffectsClasses($effects);
+		updateThemeClasses($theme);
+	});
+
+	function handleLanguageChange(selectedLanguage: string) {
+		const selectedLocale = Object.keys(availableLocales).find(
+			(locale) => getLanguageDisplayName(locale) === selectedLanguage,
+		);
+
+		if (selectedLocale && selectedLocale !== currentLocale) {
+			currentLocale = selectedLocale;
+			updateLocale(selectedLocale);
+		}
+	}
 </script>
 
 <Panel class="flex flex-col gap-8 p-6">
@@ -70,14 +102,16 @@
 				class="inline-block -mt-1 mr-2 bg-accent-purple p-2 rounded-full"
 				color="black"
 			/>
-			Appearance
+			{m["settings.appearance.title"]()}
 		</h2>
 		<div class="flex flex-col gap-8">
 			<div class="flex flex-col gap-4">
 				<div class="flex flex-col gap-2">
-					<p class="text-base font-bold">Brightness theme</p>
+					<p class="text-base font-bold">
+						{m["settings.appearance.brightness_theme"]()}
+					</p>
 					<p class="text-sm text-muted font-normal italic">
-						Want a sunny flash-bang, or a quiet lonely night?
+						{m["settings.appearance.brightness_description"]()}
 					</p>
 				</div>
 				<div class="flex flex-col gap-3 w-full">
@@ -85,29 +119,34 @@
 						<button
 							bind:this={lightElement}
 							onclick={() => setTheme("light")}
-							class="btn {$effects ? "" : "!scale-100"} flex-1 p-4 rounded-lg text-black dynadark:text-white flex items-center justify-center"
+							class="btn {$effects
+								? ''
+								: '!scale-100'} flex-1 p-4 rounded-lg text-black dynadark:text-white flex items-center justify-center"
 						>
 							<SunIcon size="24" class="inline-block mr-2" />
-							Light
+							{m["settings.appearance.light"]()}
 						</button>
 
 						<button
 							bind:this={darkElement}
 							onclick={() => setTheme("dark")}
-							class="btn {$effects ? "" : "!scale-100"} flex-1 p-4 rounded-lg text-black flex items-center justify-center"
+							class="btn {$effects
+								? ''
+								: '!scale-100'} flex-1 p-4 rounded-lg text-black flex items-center justify-center"
 						>
 							<MoonIcon size="24" class="inline-block mr-2" />
-							Dark
+							{m["settings.appearance.dark"]()}
 						</button>
 					</div>
 				</div>
 			</div>
 			<div class="flex flex-col gap-4">
 				<div class="flex flex-col gap-2">
-					<p class="text-base font-bold">Effect settings</p>
+					<p class="text-base font-bold">
+						{m["settings.appearance.effect_settings"]()}
+					</p>
 					<p class="text-sm text-muted font-normal italic">
-						Would you like fancy effects, or a more static
-						experience?
+						{m["settings.appearance.effect_description"]()}
 					</p>
 				</div>
 				<div class="flex flex-col gap-3 w-full">
@@ -115,21 +154,43 @@
 						<button
 							bind:this={enableEffectsElement}
 							onclick={() => setEffects(true)}
-							class="btn {$effects ? "" : "!scale-100"} flex-1 p-4 rounded-lg text-black dynadark:text-white flex items-center justify-center"
+							class="btn {$effects
+								? ''
+								: '!scale-100'} flex-1 p-4 rounded-lg text-black dynadark:text-white flex items-center justify-center"
 						>
 							<PlayIcon size="24" class="inline-block mr-2" />
-							Enable
+							{m["settings.appearance.enable"]()}
 						</button>
 
 						<button
 							bind:this={disableEffectsElement}
 							onclick={() => setEffects(false)}
-							class="btn {$effects ? "" : "!scale-100"} flex-1 p-4 rounded-lg text-black dynadark:text-white flex items-center justify-center"
+							class="btn {$effects
+								? ''
+								: '!scale-100'} flex-1 p-4 rounded-lg text-black dynadark:text-white flex items-center justify-center"
 						>
 							<PauseIcon size="24" class="inline-block mr-2" />
-							Disable
+							{m["settings.appearance.disable"]()}
 						</button>
 					</div>
+				</div>
+			</div>
+			<div class="flex flex-col gap-4">
+				<div class="flex flex-col gap-2">
+					<p class="text-base font-bold">
+						{m["settings.language.title"]()}
+					</p>
+					<p class="text-sm text-muted font-normal italic">
+						{m["settings.language.description"]()}
+					</p>
+				</div>
+				<div class="flex flex-col gap-3 w-full">
+					<Dropdown
+						options={languageOptions}
+						settingsStyle
+						selected={getLanguageDisplayName(currentLocale)}
+						onselect={handleLanguageChange}
+					/>
 				</div>
 			</div>
 		</div>

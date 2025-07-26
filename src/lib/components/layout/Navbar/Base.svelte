@@ -22,6 +22,7 @@
 	import Logo from "../../visual/svg/Logo.svelte";
 	import { beforeNavigate } from "$app/navigation";
 	import Tooltip from "$lib/components/visual/Tooltip.svelte";
+	import { m } from "$lib/paraglide/messages";
 
 	const items = $derived<
 		{
@@ -33,13 +34,13 @@
 		}[]
 	>([
 		{
-			name: "Upload",
+			name: m["navbar.upload"](),
 			url: "/",
 			activeMatch: (pathname) => pathname === "/",
 			icon: UploadIcon,
 		},
 		{
-			name: "Convert",
+			name: m["navbar.convert"](),
 			url: "/convert/",
 			activeMatch: (pathname) =>
 				pathname === "/convert/" || pathname === "/convert",
@@ -47,13 +48,13 @@
 			badge: files.files.length,
 		},
 		{
-			name: "Settings",
+			name: m["navbar.settings"](),
 			url: "/settings/",
 			activeMatch: (pathname) => pathname.startsWith("/settings"),
 			icon: SettingsIcon,
 		},
 		{
-			name: "About",
+			name: m["navbar.about"](),
 			url: "/about/",
 			activeMatch: (pathname) => pathname.startsWith("/about"),
 			icon: InfoIcon,
@@ -180,7 +181,7 @@
 			{@render link(item, i)}
 		{/each}
 		<div class="w-0.5 bg-separator h-full hidden md:flex"></div>
-		<Tooltip text="Toggle theme" position="right">
+		<Tooltip text={m["navbar.toggle_theme"]()} position="right">
 			<button
 				onclick={() => {
 					const isDark =

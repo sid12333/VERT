@@ -8,6 +8,7 @@
 		MailIcon,
 		MessageCircleMoreIcon,
 	} from "lucide-svelte";
+	import { m } from "$lib/paraglide/messages";
 </script>
 
 <Panel class="flex flex-col gap-4 p-6">
@@ -17,7 +18,7 @@
 		>
 			<LinkIcon color="black" />
 		</div>
-		Resources
+		{m["about.resources.title"]()}
 	</h2>
 	<div class="flex gap-3">
 		<a
@@ -29,7 +30,7 @@
 				: '!scale-100'} flex-1 gap-2 p-4 rounded-full bg-button text-black dynadark:text-white flex items-center justify-center"
 		>
 			<MessageCircleMoreIcon size="24" class="inline-block mr-2" />
-			Discord
+			{m["about.resources.discord"]()}
 		</a>
 		<a
 			href={GITHUB_URL_VERT}
@@ -40,7 +41,7 @@
 				: '!scale-100'} flex-1 gap-2 p-4 rounded-full bg-button text-black dynadark:text-white flex items-center justify-center"
 		>
 			<GithubIcon size="24" class="inline-block mr-2" />
-			Source
+			{m["about.resources.source"]()}
 		</a>
 		<a
 			href="mailto:{CONTACT_EMAIL}"
@@ -51,7 +52,7 @@
 				: '!scale-100'} flex-1 gap-2 p-4 rounded-full bg-button text-black dynadark:text-white flex items-center justify-center"
 		>
 			<MailIcon size="24" class="inline-block mr-2" />
-			Email
+			{m["about.resources.email"]()}
 		</a>
 	</div>
 </Panel>
