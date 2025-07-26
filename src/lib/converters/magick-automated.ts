@@ -4,10 +4,11 @@ import { FormatInfo } from "./converter.svelte";
 // placed into this file to easily differentiate (and also clean up the main magick file)
 // some formats also have a comment from what i saw during testing
 export const imageFormats = [
+	// TODO: yaml, json, txt - not sure when these are used (just contains image info seemingly?), probably will remove cause its not very useful for 99.99% of people
 	new FormatInfo("a", false, true),
 	new FormatInfo("aai", true, true),
 	new FormatInfo("ai", false, true),
-	new FormatInfo("art", true, false),
+	new FormatInfo("art", false, true),
 	new FormatInfo("avs", true, true),
 	new FormatInfo("b", false, true),
 	new FormatInfo("bgr", false, true),
@@ -103,7 +104,6 @@ export const imageFormats = [
 	new FormatInfo("ps3", false, true),
 	new FormatInfo("psb", true, true),
 	new FormatInfo("ptif", true, true),
-	new FormatInfo("py", false, true),
 	new FormatInfo("qoi", true, true),
 	new FormatInfo("r", false, true),
 	new FormatInfo("ras", true, true),
