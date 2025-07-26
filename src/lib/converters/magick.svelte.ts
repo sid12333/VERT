@@ -5,6 +5,7 @@ import type { OmitBetterStrict, WorkerMessage } from "$lib/types";
 import { VertFile } from "$lib/types";
 import MagickWorker from "$lib/workers/magick?worker&url";
 import { Converter, FormatInfo } from "./converter.svelte";
+import { imageFormats } from "./magick-automated";
 
 export class MagickConverter extends Converter {
 	private worker: Worker = browser
@@ -50,6 +51,10 @@ export class MagickConverter extends Converter {
 		new FormatInfo("jfif", true, true),
 		new FormatInfo("eps", false, true),
 		new FormatInfo("arw", true, false),
+		new FormatInfo("psd", true, true),
+
+		// formats added from maya's somewhat automated testing
+		...imageFormats,
 	];
 
 	public readonly reportsProgress = false;
