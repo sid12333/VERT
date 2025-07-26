@@ -4,7 +4,7 @@
 	import type { ISettings } from "./index.svelte";
 	import { effects } from "$lib/store/index.svelte";
 	import { m } from "$lib/paraglide/messages";
-	import { link } from "$lib/paraglide";
+	import { link } from "$lib/store/index.svelte";
 
 	const { settings }: { settings: ISettings } = $props();
 </script>

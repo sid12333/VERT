@@ -6,7 +6,7 @@
 	import { error } from "$lib/logger";
 	import { addToast } from "$lib/store/ToastProvider";
 	import { m } from "$lib/paraglide/messages";
-	import { link } from "$lib/paraglide";
+	import { link } from "$lib/store/index.svelte";
 
 	let copied = false;
 	let timeoutId: number | undefined;

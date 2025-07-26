@@ -3,7 +3,7 @@
 	import { HeartHandshakeIcon } from "lucide-svelte";
 	import { GITHUB_URL_VERT } from "$lib/consts";
 	import { m } from "$lib/paraglide/messages";
-	import { link } from "$lib/paraglide";
+	import { link } from "$lib/store/index.svelte";
 
 	let { mainContribs, notableContribs, ghContribs } = $props();
 </script>

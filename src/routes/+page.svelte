@@ -6,7 +6,7 @@
 	import clsx from "clsx";
 	import { AudioLines, BookText, Check, Film, Image } from "lucide-svelte";
 	import { m } from "$lib/paraglide/messages";
-	import { link } from "$lib/paraglide";
+	import { link } from "$lib/store/index.svelte";
 
 	const getSupportedFormats = (name: string) =>
 		converters

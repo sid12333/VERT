@@ -7,7 +7,7 @@
 	import Dropdown from "$lib/components/functional/Dropdown.svelte";
 	import { vertdLoaded } from "$lib/store/index.svelte";
 	import { m } from "$lib/paraglide/messages";
-	import { link } from "$lib/paraglide";
+	import { link } from "$lib/store/index.svelte";
 
 	let vertdCommit = $state<string | null>(null);
 	let abortController: AbortController | null = null;
