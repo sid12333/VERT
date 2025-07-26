@@ -6,7 +6,17 @@ import { error, log } from "$lib/logger";
 import { addToast } from "$lib/store/ToastProvider";
 import { m } from "$lib/paraglide/messages";
 
-const videoFormats = [".mkv", ".mp4", ".avi", ".mov", ".webm", ".ts", ".mts", ".m2ts", ".wmv"];
+const videoFormats = [
+	"mkv",
+	"mp4",
+	"avi",
+	"mov",
+	"webm",
+	"ts",
+	"mts",
+	"m2ts",
+	"wmv",
+];
 
 export class FFmpegConverter extends Converter {
 	private ffmpeg: FFmpeg = null!;
@@ -51,83 +61,202 @@ export class FFmpegConverter extends Converter {
 			})();
 		} catch (err) {
 			error(["converters", this.name], `error loading ffmpeg: ${err}`);
-			addToast(
-				"error",
-				m["workers.errors.ffmpeg"](),
-			);
+			addToast("error", m["workers.errors.ffmpeg"]());
 		}
 	}
 
 	public async convert(input: VertFile, to: string): Promise<VertFile> {
 		if (!to.startsWith(".")) to = `.${to}`;
-		const ffmpeg = new FFmpeg();
-		ffmpeg.on("progress", (progress) => {
-			input.progress = progress.progress * 100;
-		});
-		ffmpeg.on("log", (l) => {
-			log(["converters", this.name], l.message);
 
-			if (l.message.includes("Stream map '0:a:0' matches no streams.")) {
-				error(
-					["converters", this.name],
-					`No audio stream found in ${input.name}.`,
-				);
-				addToast("error", `No audio stream found in ${input.name}.`);
-			}
-		});
-		const baseURL =
-			"https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/esm";
-		await ffmpeg.load({
-			coreURL: `${baseURL}/ffmpeg-core.js`,
-			wasmURL: `${baseURL}/ffmpeg-core.wasm`,
-		});
+		const ffmpeg = await this.setupFFmpeg(input);
 		const buf = new Uint8Array(await input.file.arrayBuffer());
 		await ffmpeg.writeFile("input", buf);
 		log(
 			["converters", this.name],
 			`wrote ${input.name} to ffmpeg virtual fs`,
 		);
-		if (videoFormats.includes(input.from.slice(1))) {
-			// create an audio track from the video
-			await ffmpeg.exec(["-i", "input", "-map", "0:a:0", "output" + to]);
-		} else if (videoFormats.includes(to.slice(1))) {
-			// nab the album art
-			await ffmpeg.exec([
-				"-i",
-				"input",
-				"-an",
-				"-vcodec",
-				"copy",
-				"cover.png",
-			]);
-			const cmd = [
-				"-i",
-				"input",
-				"-i",
-				"cover.png",
-				"-loop",
-				"1",
-				"-pix_fmt",
-				"yuv420p",
-				...toArgs(to),
-				"output" + to,
-			];
-			console.log(cmd);
-			await ffmpeg.exec(cmd);
-		} else {
-			await ffmpeg.exec(["-i", "input", "output" + to]);
-		}
 
-		log(["converters", this.name], `executed ffmpeg command`);
+		const command = await this.buildConversionCommand(ffmpeg, input, to);
+		log(["converters", this.name], `FFmpeg command: ${command.join(" ")}`);
+		await ffmpeg.exec(command);
+		log(["converters", this.name], "executed ffmpeg command");
+
 		const output = (await ffmpeg.readFile(
 			"output" + to,
 		)) as unknown as Uint8Array;
+		const outputFileName =
+			input.name.split(".").slice(0, -1).join(".") + to;
 		log(
 			["converters", this.name],
-			`read ${input.name.split(".").slice(0, -1).join(".") + to} from ffmpeg virtual fs`,
+			`read ${outputFileName} from ffmpeg virtual fs`,
 		);
 		ffmpeg.terminate();
+
 		return new VertFile(new File([output], input.name), to);
+	}
+
+	private async setupFFmpeg(input: VertFile): Promise<FFmpeg> {
+		const ffmpeg = new FFmpeg();
+
+		ffmpeg.on("progress", (progress) => {
+			input.progress = progress.progress * 100;
+		});
+
+		ffmpeg.on("log", (l) => {
+			log(["converters", this.name], l.message);
+			if (l.message.includes("Stream map '0:a:0' matches no streams.")) {
+				const fileName = input.name;
+				error(
+					["converters", this.name],
+					`No audio stream found in ${fileName}.`,
+				);
+				addToast("error", `No audio stream found in ${fileName}.`);
+			}
+		});
+
+		const baseURL =
+			"https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.10/dist/esm";
+		await ffmpeg.load({
+			coreURL: `${baseURL}/ffmpeg-core.js`,
+			wasmURL: `${baseURL}/ffmpeg-core.wasm`,
+		});
+
+		return ffmpeg;
+	}
+
+	private async buildConversionCommand(
+		ffmpeg: FFmpeg,
+		input: VertFile,
+		to: string,
+	): Promise<string[]> {
+		const inputFormat = input.from.slice(1);
+		const outputFormat = to.slice(1);
+
+		// video to audio
+		if (videoFormats.includes(inputFormat)) {
+			log(
+				["converters", this.name],
+				`Converting video ${input.from} to audio ${to}`,
+			);
+			return ["-i", "input", "-map", "0:a:0", "output" + to];
+		}
+
+		// audio to video
+		if (videoFormats.includes(outputFormat)) {
+			log(
+				["converters", this.name],
+				`Converting audio ${input.from} to video ${to}`,
+			);
+
+			const hasAlbumArt = await this.extractAlbumArt(ffmpeg);
+
+			if (hasAlbumArt) {
+				log(
+					["converters", this.name],
+					"Using album art as video background",
+				);
+				return [
+					"-loop",
+					"1",
+					"-i",
+					"cover.jpg",
+					"-i",
+					"input",
+					"-vf",
+					"scale=trunc(iw/2)*2:trunc(ih/2)*2",
+					"-c:a",
+					"aac",
+					"-shortest",
+					"-pix_fmt",
+					"yuv420p",
+					"-r",
+					"1",
+					...toArgs(to),
+					"output" + to,
+				];
+			} else {
+				log(["converters", this.name], "Using solid color background");
+				return [
+					"-f",
+					"lavfi",
+					"-i",
+					"color=c=black:s=640x480:rate=1",
+					"-i",
+					"input",
+					"-c:a",
+					"aac",
+					"-shortest",
+					"-pix_fmt",
+					"yuv420p",
+					"-r",
+					"1",
+					...toArgs(to),
+					"output" + to,
+				];
+			}
+		}
+
+		// fallback
+		log(["converters", this.name], `Converting ${input.from} to ${to}`);
+		return ["-i", "input", "output" + to];
+	}
+
+	private async extractAlbumArt(ffmpeg: FFmpeg): Promise<boolean> {
+		//  extract using stream mapping (should work for most)
+		if (
+			await this.tryExtractAlbumArt(ffmpeg, [
+				"-i",
+				"input",
+				"-map",
+				"0:1",
+				"-c:v",
+				"copy",
+				"cover.jpg",
+			])
+		) {
+			log(
+				["converters", this.name],
+				"Successfully extracted album art from stream 0:1",
+			);
+			return true;
+		}
+
+		// fallback: extract without stream mapping (this probably won't happen)
+		if (
+			await this.tryExtractAlbumArt(ffmpeg, [
+				"-i",
+				"input",
+				"-an",
+				"-c:v",
+				"copy",
+				"cover.jpg",
+			])
+		) {
+			log(
+				["converters", this.name],
+				"Successfully extracted album art (fallback method)",
+			);
+			return true;
+		}
+
+		log(
+			["converters", this.name],
+			"No album art found, will create solid color background",
+		);
+		return false;
+	}
+
+	private async tryExtractAlbumArt(
+		ffmpeg: FFmpeg,
+		command: string[],
+	): Promise<boolean> {
+		try {
+			await ffmpeg.exec(command);
+			const coverData = await ffmpeg.readFile("cover.jpg");
+			return !!(coverData && (coverData as Uint8Array).length > 0);
+		} catch {
+			return false;
+		}
 	}
 }
 
