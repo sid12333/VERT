@@ -22,12 +22,16 @@ export class MagickConverter extends Converter {
 		new FormatInfo("jpg", true, true),
 		new FormatInfo("webp", true, true),
 		new FormatInfo("gif", true, true),
-		new FormatInfo("heic", true, false),
+		new FormatInfo("svg", false, true), // converting from SVG unsupported my magick-wasm - suggested to let browser draw with canvas and read image to "convert" (gh issues)
+		new FormatInfo("jxl", true, true),
+		new FormatInfo("avif", true, true),
+		new FormatInfo("heic", true, false), // seems to be unreliable? HEIC/HEIF is very weird if it will actually work
+		new FormatInfo("heif", true, false),
 		// TODO: .ico files can encode multiple images at various
 		// sizes, bitdepths, etc. we should support that in future
 		new FormatInfo("ico", true, true),
-		new FormatInfo("bmp", true, false),
-		new FormatInfo("cur", true, false),
+		new FormatInfo("bmp", true, true),
+		new FormatInfo("cur", true, true),
 		new FormatInfo("ani", true, false),
 		new FormatInfo("icns", true, false),
 		new FormatInfo("nef", true, false),
@@ -40,10 +44,12 @@ export class MagickConverter extends Converter {
 		new FormatInfo("pfm", true, true),
 		new FormatInfo("pgm", true, true),
 		new FormatInfo("pnm", true, true),
-		new FormatInfo("ppm", false, true),
+		new FormatInfo("ppm", true, true),
 		new FormatInfo("tif", true, true),
 		new FormatInfo("tiff", true, true),
 		new FormatInfo("jfif", true, true),
+		new FormatInfo("eps", false, true),
+		new FormatInfo("arw", true, false),
 	];
 
 	public readonly reportsProgress = false;
