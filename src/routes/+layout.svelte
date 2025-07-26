@@ -83,7 +83,6 @@
 	});
 
 	$effect(() => {
-		// Enable plausible if enabled
 		enablePlausible =
 			!!PUB_PLAUSIBLE_URL && Settings.instance.settings.plausible;
 		if (!enablePlausible && browser) {
