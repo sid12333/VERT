@@ -7,6 +7,7 @@
 	import { AudioLines, BookText, Check, Film, Image } from "lucide-svelte";
 	import { m } from "$lib/paraglide/messages";
 	import { link } from "$lib/store/index.svelte";
+	import { onMount } from "svelte";
 
 	const getSupportedFormats = (name: string) =>
 		converters
@@ -72,6 +73,30 @@
 		}
 		return "";
 	};
+
+	let scrollContainers: HTMLElement[] = [];
+	// svelte-ignore state_referenced_locally
+	let showBlur = $state(Array(Object.keys(status).length).fill(false));
+
+	const checkScrollable = (index: number) => {
+		const container = scrollContainers[index];
+		if (!container) return;
+		showBlur[index] = container.scrollHeight > container.clientHeight;
+	};
+
+	onMount(() => {
+		const handleResize = () => {
+			for (let i = 0; i < scrollContainers.length; i++)
+				checkScrollable(i);
+		};
+
+		handleResize();
+		window.addEventListener("resize", handleResize);
+
+		return () => {
+			window.removeEventListener("resize", handleResize);
+		};
+	});
 </script>
 
 <div class="max-w-6xl w-full mx-auto px-6 md:px-8">
@@ -103,7 +128,7 @@
 		<h2 class="text-center text-4xl">{m["upload.cards.title"]()}</h2>
 
 		<div class="flex gap-4 mt-8 md:flex-row flex-col">
-			{#each Object.entries(status) as [key, s]}
+			{#each Object.entries(status) as [key, s], i}
 				{@const Icon = s.icon}
 				<div class="file-category-card w-full flex flex-col gap-4">
 					<div class="file-category-card-inner">
@@ -120,61 +145,89 @@
 						<span>{s.title}</span>
 					</div>
 
-					<div class="file-category-card-content flex-grow gap-4">
-						{#if key === "Video"}
-							<p>
-								{@html link(
-									"wiki_link",
-									m["upload.cards.video_server_processing"](),
-									"https://github.com/VERT-sh/VERT/wiki/How-to-convert-video-with-VERT",
-								)}
-							</p>
-						{:else}
-							<p class="flex tems-center justify-center gap-2">
-								<Check size="20" />
-								{m["upload.cards.local_supported"]()}
-							</p>
-						{/if}
-						<p>
-							{@html m["upload.cards.status.text"]({
-								status: s.ready
-									? m["upload.cards.status.ready"]()
-									: m["upload.cards.status.not_ready"](),
-							})}
-						</p>
-						<div>
-							<span class="flex flex-wrap justify-center">
-								<b
-									>{m[
-										"upload.cards.supported_formats"
-									]()}&nbsp;</b
-								>
-								{#each s.formats.split(", ") as format, index}
-									{@const isPartial = format.endsWith("*")}
-									{@const formatName = isPartial
-										? format.slice(0, -1)
-										: format}
-									<span
-										class="text-sm font-normal flex items-center"
+					<div class="file-category-card-content flex-grow relative">
+						<div
+							class="h-[12.25rem] overflow-y-auto overflow-x-hidden"
+							bind:this={scrollContainers[i]}
+						>
+							<div class="flex flex-col gap-4">
+								{#if key === "Video"}
+									<p>
+										{@html link(
+											"wiki_link",
+											m[
+												"upload.cards.video_server_processing"
+											](),
+											"https://github.com/VERT-sh/VERT/wiki/How-to-convert-video-with-VERT",
+										)}
+									</p>
+								{:else}
+									<p
+										class="flex tems-center justify-center gap-2"
 									>
-										{#if isPartial}
-											<Tooltip
-												text={getTooltip(formatName)}
+										<Check size="20" />
+										{m["upload.cards.local_supported"]()}
+									</p>
+								{/if}
+								<p>
+									{@html m["upload.cards.status.text"]({
+										status: s.ready
+											? m["upload.cards.status.ready"]()
+											: m[
+													"upload.cards.status.not_ready"
+												](),
+									})}
+								</p>
+								<div class="flex flex-col items-center">
+									<b
+										>{m[
+											"upload.cards.supported_formats"
+										]()}&nbsp;</b
+									>
+									<p
+										class="flex flex-wrap justify-center leading-tight px-2"
+									>
+										{#each s.formats.split(", ") as format, index}
+											{@const isPartial =
+												format.endsWith("*")}
+											{@const formatName = isPartial
+												? format.slice(0, -1)
+												: format}
+											<span
+												class="text-sm font-normal flex items-center"
 											>
-												{formatName}<span
-													class="text-red-500">*</span
-												>
-											</Tooltip>
-										{:else}
-											{formatName}
-										{/if}
-										{#if index < s.formats.split(", ").length - 1}
-											<span>,&nbsp;</span>
-										{/if}
-									</span>
-								{/each}
-							</span>
+												{#if isPartial}
+													<Tooltip
+														text={getTooltip(
+															formatName,
+														)}
+													>
+														{formatName}<span
+															class="text-red-500"
+															>*</span
+														>
+													</Tooltip>
+												{:else}
+													{formatName}
+												{/if}
+												{#if index < s.formats.split(", ").length - 1}
+													<span>,&nbsp;</span>
+												{/if}
+											</span>
+										{/each}
+									</p>
+								</div>
+							</div>
 						</div>
+						<!-- blur at bottom if scrollable -->
+						{#if showBlur[i]}
+							<div
+								class="absolute left-0 bottom-0 w-full h-10 pointer-events-none"
+								style="
+									background: linear-gradient(to top, rgba(255,255,255,0.8), transparent 100%);
+								"
+							></div>
+						{/if}
 					</div>
 				</div>
 			{/each}
@@ -184,7 +237,7 @@
 
 <style>
 	.file-category-card {
-		@apply bg-panel rounded-2xl p-5 shadow-panel;
+		@apply bg-panel rounded-2xl p-5 shadow-panel relative;
 	}
 
 	.file-category-card p {

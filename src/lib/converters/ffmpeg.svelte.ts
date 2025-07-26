@@ -277,8 +277,6 @@ const toArgs = (ext: string): string[] => {
 				"18",
 				"-tune",
 				"stillimage",
-				"-c:a",
-				"aac",
 			);
 			break;
 		}

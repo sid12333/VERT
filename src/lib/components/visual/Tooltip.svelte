@@ -4,15 +4,47 @@
 	interface Props {
 		children: () => any;
 		text: string;
+		className?: string;
 		position?: "top" | "bottom" | "left" | "right";
 	}
 
-	let { children, text, position = "top" }: Props = $props();
+	let { children, text, className, position = "top" }: Props = $props();
 	let showTooltip = $state(false);
 	let timeout: number = 0;
+	let triggerElement: HTMLElement;
+	let tooltipPosition = $state({ x: 0, y: 0 });
 
 	function show() {
 		timeout = setTimeout(() => {
+			if (!triggerElement) return;
+			const rect = triggerElement.getBoundingClientRect();
+
+			switch (position) {
+				case "top":
+					tooltipPosition = {
+						x: rect.left + rect.width / 2,
+						y: rect.top - 10,
+					};
+					break;
+				case "bottom":
+					tooltipPosition = {
+						x: rect.left + rect.width / 2,
+						y: rect.bottom + 10,
+					};
+					break;
+				case "left":
+					tooltipPosition = {
+						x: rect.left - 10,
+						y: rect.top + rect.height / 2,
+					};
+					break;
+				case "right":
+					tooltipPosition = {
+						x: rect.right + 10,
+						y: rect.top + rect.height / 2,
+					};
+					break;
+			}
 			showTooltip = true;
 		}, 500);
 	}
@@ -24,7 +56,8 @@
 </script>
 
 <div
-	class="relative inline-block"
+	bind:this={triggerElement}
+	class="relative inline-block {className}"
 	onmouseenter={show}
 	onmouseleave={hide}
 	onfocusin={show}
@@ -34,26 +67,28 @@
 	role="tooltip"
 >
 	{@render children()}
-	{#if showTooltip}
-		<div
-			class="tooltip tooltip-{position}"
-			transition:fade={{
-				duration: 100,
-			}}
-		>
-			{text}
-		</div>
-	{/if}
 </div>
+
+{#if showTooltip}
+	<div
+		class="tooltip tooltip-{position}"
+		style="left: {tooltipPosition.x}px; top: {tooltipPosition.y}px;"
+		transition:fade={{
+			duration: 100,
+		}}
+	>
+		{text}
+	</div>
+{/if}
 
 <style>
 	.tooltip {
 		--border-size: 1px;
-		@apply absolute z-10 bg-panel-alt text-foreground border border-stone-400 dynadark:border-white drop-shadow-lg text-xs px-4 py-2 rounded-full whitespace-nowrap pointer-events-none;
+		@apply fixed bg-panel-alt text-foreground border border-stone-400 dynadark:border-white drop-shadow-lg text-xs px-4 py-2 rounded-full whitespace-nowrap pointer-events-none z-[999];
 	}
 
 	.tooltip-top {
-		@apply bottom-full left-1/2 -translate-x-1/2 mb-3;
+		transform: translate(-50%, -100%);
 	}
 
 	.tooltip-top::after {
@@ -67,7 +102,7 @@
 	}
 
 	.tooltip-bottom {
-		@apply top-full left-1/2 -translate-x-1/2 mt-3;
+		transform: translate(-50%, 20%);
 	}
 
 	.tooltip-bottom::after {
@@ -81,7 +116,7 @@
 	}
 
 	.tooltip-left {
-		@apply right-full top-1/2 -translate-y-1/2 mr-3;
+		transform: translate(-100%, -50%);
 	}
 
 	.tooltip-left::after {
@@ -89,7 +124,7 @@
 	}
 
 	.tooltip-right {
-		@apply left-full top-1/2 -translate-y-1/2 ml-3;
+		transform: translate(0%, -50%);
 	}
 
 	.tooltip-right::after {

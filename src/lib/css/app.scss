@@ -335,6 +335,44 @@ body {
 	@apply bg-accent-purple !text-black;
 }
 
+// firefox
+* {
+	scrollbar-width: thin;
+	scrollbar-color: var(--bg-separator) transparent;
+}
+
+// other browsers
+*::-webkit-scrollbar {
+	width: 6px;
+	height: 6px;
+}
+
+*::-webkit-scrollbar-track {
+	background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+	background-color: var(--bg-separator);
+	border-radius: 3px;
+	border: none;
+	opacity: 0.7;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+	background-color: var(--bg-separator);
+	opacity: 1;
+}
+
+*::-webkit-scrollbar-corner {
+	background: transparent;
+}
+
+*::-webkit-scrollbar-button {
+	display: none;
+	width: 0;
+	height: 0;
+}
+
 @layer components {
 	select {
 		@apply appearance-none;
