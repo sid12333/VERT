@@ -65,7 +65,10 @@
 
 	const shouldInclude = (format: string, category: string): boolean => {
 		// if converting from audio to video, dont show gifs
-		if (categories["audio"]?.formats.includes(from ?? "") && format === ".gif") {
+		if (
+			categories["audio"]?.formats.includes(from ?? "") &&
+			format === ".gif"
+		) {
 			return false;
 		}
 
@@ -256,7 +259,9 @@
 		{disabled}
 	>
 		<!-- <p>{selected}</p> -->
-		<div class="grid grid-cols-1 grid-rows-1 w-fit flex-grow-0">
+		<div
+			class="grid grid-cols-1 grid-rows-1 w-fit flex-grow-0 max-h-[2.5rem] overflow-hidden"
+		>
 			{#key selected}
 				<p
 					in:fade={{
@@ -267,7 +272,7 @@
 						duration,
 						easing: quintOut,
 					}}
-					class="col-start-1 row-start-1 text-center font-body font-medium"
+					class="col-start-1 row-start-1 text-center font-body font-medium truncate text-ellipsis max-w-[8rem] mx-auto"
 				>
 					{selected}
 				</p>
@@ -275,7 +280,7 @@
 			{#if currentCategory}
 				{#each categories[currentCategory].formats as option}
 					<p
-						class="col-start-1 row-start-1 invisible pointer-events-none"
+						class="col-start-1 row-start-1 invisible pointer-events-none truncate text-ellipsis max-w-[8rem] mx-auto"
 					>
 						{option}
 					</p>
