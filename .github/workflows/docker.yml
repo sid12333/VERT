@@ -56,3 +56,5 @@ jobs:
           PUB_HOSTNAME=${{ vars.PUB_HOSTNAME || '' }}
           PUB_PLAUSIBLE_URL=${{ vars.PUB_PLAUSIBLE_URL || '' }}
           PUB_VERTD_URL=https://vertd.vert.sh
+          PUB_DONATION_URL=https://donations.vert.sh
+          PUB_STRIPE_KEY=${{ vars.PUB_STRIPE_KEY || '' }}
