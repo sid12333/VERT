@@ -24,7 +24,7 @@ export class MagickConverter extends Converter {
 		new FormatInfo("jpg", true, true),
 		new FormatInfo("webp", true, true),
 		new FormatInfo("gif", true, true),
-		new FormatInfo("svg", false, true), // converting from SVG unsupported my magick-wasm - suggested to let browser draw with canvas and read image to "convert" (gh issues)
+		new FormatInfo("svg", true, true),
 		new FormatInfo("jxl", true, true),
 		new FormatInfo("avif", true, true),
 		new FormatInfo("heic", true, false), // seems to be unreliable? HEIC/HEIF is very weird if it will actually work
@@ -75,10 +75,7 @@ export class MagickConverter extends Converter {
 					["converters", this.name],
 					`error in worker: ${message.error}`,
 				);
-				addToast(
-					"error",
-					m["workers.errors.magick"](),
-				);
+				addToast("error", m["workers.errors.magick"]());
 				throw new Error(message.error);
 			}
 		};
@@ -92,6 +89,27 @@ export class MagickConverter extends Converter {
 	): Promise<VertFile> {
 		const compression: number | undefined = args.at(0);
 		log(["converters", this.name], `converting ${input.name} to ${to}`);
+
+		// handle converting from SVG manually because magick-wasm doesn't support it
+		if (input.from === ".svg") {
+			try {
+				const blob = await this.svgToImage(input);
+				const pngFile = new VertFile(
+					new File([blob], input.name.replace(/\.svg$/i, ".png")),
+					input.to,
+				);
+				if (to === ".png") return pngFile; // if target is png, return it directly
+				return await this.convert(pngFile, to, ...args); // otherwise, recursively convert png to user's target format
+			} catch (err) {
+				error(
+					["converters", this.name],
+					`SVG conversion failed: ${err}`,
+				);
+				throw err;
+			}
+		}
+
+		// every other format handled by magick worker
 		const msg = {
 			type: "convert",
 			input: {
@@ -148,6 +166,69 @@ export class MagickConverter extends Converter {
 			} catch (e) {
 				error(["converters", this.name], e);
 			}
+		});
+	}
+
+	private async svgToImage(input: VertFile): Promise<Blob> {
+		log(["converters", this.name], `converting SVG to image (PNG)`);
+
+		const svgText = await input.file.text();
+		const svgBlob = new Blob([svgText], { type: "image/svg+xml" });
+		const svgUrl = URL.createObjectURL(svgBlob);
+
+		const canvas = document.createElement("canvas");
+		const ctx = canvas.getContext("2d");
+		if (!ctx) throw new Error("Failed to get canvas context");
+
+		const img = new Image();
+
+		// try to extract dimensions from SVG, and if not fallback to default
+		let width = 512;
+		let height = 512;
+		const widthMatch = svgText.match(/width=["'](\d+)["']/);
+		const heightMatch = svgText.match(/height=["'](\d+)["']/);
+		const viewBoxMatch = svgText.match(
+			/viewBox=["'][^"']*\s+(\d+)\s+(\d+)["']/,
+		);
+
+		if (widthMatch && heightMatch) {
+			width = parseInt(widthMatch[1]);
+			height = parseInt(heightMatch[1]);
+		} else if (viewBoxMatch) {
+			width = parseInt(viewBoxMatch[1]);
+			height = parseInt(viewBoxMatch[2]);
+		}
+
+		return new Promise((resolve, reject) => {
+			img.onload = () => {
+				try {
+					canvas.width = img.naturalWidth || width;
+					canvas.height = img.naturalHeight || height;
+
+					ctx.drawImage(img, 0, 0);
+
+					canvas.toBlob((blob) => {
+						URL.revokeObjectURL(svgUrl);
+						if (blob) {
+							resolve(blob);
+						} else {
+							reject(
+								new Error("Failed to convert canvas to Blob"),
+							);
+						}
+					}, "image/png");
+				} catch (err) {
+					URL.revokeObjectURL(svgUrl);
+					reject(err);
+				}
+			};
+
+			img.onerror = () => {
+				URL.revokeObjectURL(svgUrl);
+				reject(new Error("Failed to load SVG image"));
+			};
+
+			img.src = svgUrl;
 		});
 	}
 }
