@@ -26,7 +26,7 @@
 			"audio": "Audio",
 			"documents": "Documents",
 			"video": "Video",
-			"video_server_processing": "Video uploads to a server for processing by default, learn how to set it up locally [wiki_link]here[/wiki_link].",
+			"video_server_processing": "Server supported",
 			"local_supported": "Local fully supported",
 			"status": {
 				"text": "<b>Status:</b> {status}",
@@ -38,7 +38,8 @@
 		"tooltip": {
 			"partial_support": "This format can only be converted as {direction}.",
 			"direction_input": "input (from)",
-			"direction_output": "output (to)"
+			"direction_output": "output (to)",
+			"video_server_processing": "Video uploads to a server for processing by default, learn how to set it up locally here."
 		}
 	},
 	"convert": {

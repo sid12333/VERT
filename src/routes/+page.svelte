@@ -171,14 +171,31 @@
 						>
 							<div class="flex flex-col gap-4">
 								{#if key === "Video"}
-									<p>
-										{@html link(
-											"wiki_link",
-											m[
-												"upload.cards.video_server_processing"
-											](),
-											"https://github.com/VERT-sh/VERT/wiki/How-to-convert-video-with-VERT",
-										)}
+									<p
+										class="flex tems-center justify-center gap-2"
+									>
+										<Check size="20" />
+										<Tooltip
+											text={m[
+												"upload.tooltip.video_server_processing"
+											]()}
+										>
+											<span>
+												<a
+													href="https://github.com/VERT-sh/VERT/blob/main/docs/VIDEO_CONVERSION.md"
+													target="_blank"
+													rel="noopener noreferrer"
+												>
+													{m[
+														"upload.cards.video_server_processing"
+													]()}
+												</a>
+												<span
+													class="text-red-500 -ml-0.5"
+													>*</span
+												>
+											</span>
+										</Tooltip>
 									</p>
 								{:else}
 									<p
