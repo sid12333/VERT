@@ -241,6 +241,7 @@
 					placeholder={m["about.donate.custom"]()}
 					prefix="$"
 					type="number"
+					class="h-full"
 				/>
 			</div>
 		</div>
