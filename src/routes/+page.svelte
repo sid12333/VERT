@@ -78,16 +78,35 @@
 	// svelte-ignore state_referenced_locally
 	let showBlur = $state(Array(Object.keys(status).length).fill(false));
 
-	const checkScrollable = (index: number) => {
-		const container = scrollContainers[index];
-		if (!container) return;
-		showBlur[index] = container.scrollHeight > container.clientHeight;
-	};
-
 	onMount(() => {
+		const isFirefox = /firefox/i.test(navigator.userAgent);
+
 		const handleResize = () => {
-			for (let i = 0; i < scrollContainers.length; i++)
-				checkScrollable(i);
+			for (let i = 0; i < scrollContainers.length; i++) {
+				// show bottom blur if scrollable
+				const container = scrollContainers[i];
+				if (!container) return;
+				showBlur[i] = container.scrollHeight > container.clientHeight;
+
+				// if not on firefox, add ml-2 to card content if scrollable
+				// doing this because i can't figure out how to make the scrollbar *not* take up DOM space (shifting the contents to the left)
+				if (!isFirefox && scrollContainers[i]) {
+					const card = scrollContainers[i].closest(
+						".file-category-card",
+					);
+					const cardContent = card?.querySelector(
+						".file-category-card-content",
+					);
+					if (cardContent) {
+						const hasML2 = cardContent.classList.contains("ml-2");
+						if (showBlur[i] && !hasML2) {
+							cardContent.classList.add("ml-2");
+						} else if (!showBlur[i] && hasML2) {
+							cardContent.classList.remove("ml-2");
+						}
+					}
+				}
+			}
 		};
 
 		handleResize();

@@ -55,7 +55,7 @@
 	}
 </script>
 
-<div
+<span
 	bind:this={triggerElement}
 	class="relative inline-block {className}"
 	onmouseenter={show}
@@ -67,10 +67,10 @@
 	role="tooltip"
 >
 	{@render children()}
-</div>
+</span>
 
 {#if showTooltip}
-	<div
+	<span
 		class="tooltip tooltip-{position}"
 		style="left: {tooltipPosition.x}px; top: {tooltipPosition.y}px;"
 		transition:fade={{
@@ -78,7 +78,7 @@
 		}}
 	>
 		{text}
-	</div>
+	</span>
 {/if}
 
 <style>
