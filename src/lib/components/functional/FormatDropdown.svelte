@@ -23,7 +23,6 @@
 		disabled,
 	}: Props = $props();
 	let open = $state(false);
-	let hover = $state(false);
 	let dropdown = $state<HTMLDivElement>();
 	let currentCategory = $state<string | null>();
 	let searchQuery = $state("");
@@ -254,8 +253,6 @@
 		class="relative flex items-center justify-center w-full font-display px-3 py-3.5 bg-button rounded-full overflow-hidden cursor-pointer focus:!outline-none
 		{disabled ? 'opacity-50 cursor-auto' : 'cursor-pointer'}"
 		onclick={() => clickDropdown()}
-		onmouseenter={() => (hover = true)}
-		onmouseleave={() => (hover = false)}
 		{disabled}
 	>
 		<!-- <p>{selected}</p> -->
@@ -272,7 +269,7 @@
 						duration,
 						easing: quintOut,
 					}}
-					class="col-start-1 row-start-1 text-center font-body font-medium truncate text-ellipsis max-w-[8rem] mx-auto"
+					class="col-start-1 row-start-1 text-center font-body font-medium truncate max-w-[8rem]"
 				>
 					{selected}
 				</p>
@@ -280,7 +277,7 @@
 			{#if currentCategory}
 				{#each categories[currentCategory].formats as option}
 					<p
-						class="col-start-1 row-start-1 invisible pointer-events-none truncate text-ellipsis max-w-[8rem] mx-auto"
+						class="col-start-1 row-start-1 invisible pointer-events-none truncate max-w-[4rem]"
 					>
 						{option}
 					</p>
