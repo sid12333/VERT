@@ -72,7 +72,6 @@ export const imageFormats = [
 	new FormatInfo("mng", true, true),
 	new FormatInfo("mono", false, true),
 	new FormatInfo("mpc", true, true), // not ideal (literally empty lol)
-	new FormatInfo("msvg", false, true),
 	new FormatInfo("mtv", true, true),
 	new FormatInfo("o", false, true),
 	new FormatInfo("otb", true, true), // not ideal (completely black and white - maybe format is like that)

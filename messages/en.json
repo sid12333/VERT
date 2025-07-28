@@ -27,7 +27,7 @@
 			"documents": "Documents",
 			"video": "Video",
 			"video_server_processing": "Server supported",
-			"local_supported": "Local fully supported",
+			"local_supported": "Local supported",
 			"status": {
 				"text": "<b>Status:</b> {status}",
 				"ready": "ready",

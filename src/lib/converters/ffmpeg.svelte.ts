@@ -6,6 +6,7 @@ import { error, log } from "$lib/logger";
 import { addToast } from "$lib/store/ToastProvider";
 import { m } from "$lib/paraglide/messages";
 
+// TODO: differentiate in UI? (not native formats)
 const videoFormats = [
 	"mkv",
 	"mp4",
@@ -28,6 +29,7 @@ export class FFmpegConverter extends Converter {
 		new FormatInfo("wav", true, true),
 		new FormatInfo("flac", true, true),
 		new FormatInfo("ogg", true, true),
+		new FormatInfo("mogg", true, false),
 		new FormatInfo("oga", true, true),
 		new FormatInfo("opus", true, true),
 		new FormatInfo("aac", true, true),
@@ -38,6 +40,14 @@ export class FFmpegConverter extends Converter {
 		new FormatInfo("alac", true, true),
 		new FormatInfo("aiff", true, true),
 		new FormatInfo("aif", true, true),
+		new FormatInfo("mp1", true, false),
+		new FormatInfo("mp2", true, true),
+		new FormatInfo("mpc", true, false), // unknown if it works, can't find sample file but ffmpeg should support i think?
+		new FormatInfo("raw", true, false), // usually pcm
+		new FormatInfo("dsd", true, false), // dsd
+		new FormatInfo("dsf", true, false), // dsd
+		new FormatInfo("dff", true, false), // dsd
+		new FormatInfo("mqa", true, false),
 		...videoFormats.map((f) => new FormatInfo(f, true, true, false)),
 	];
 
