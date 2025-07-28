@@ -57,4 +57,4 @@ jobs:
           PUB_PLAUSIBLE_URL=${{ vars.PUB_PLAUSIBLE_URL || '' }}
           PUB_VERTD_URL=https://vertd.vert.sh
           PUB_DONATION_URL=https://donations.vert.sh
-          PUB_STRIPE_KEY=${{ vars.PUB_STRIPE_KEY || '' }}
+          PUB_STRIPE_KEY=pk_live_51RDVmAGSxPVad6bQwzVNnbc28nlmzA30krLWk1fefCMpUPiSRPkavMMbGqa8A3lUaOCMlsUEVy2CWDYg0ip3aPpL00ZJlsMkf2
