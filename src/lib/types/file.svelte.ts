@@ -126,7 +126,8 @@ export class VertFile {
 
 		const blob = URL.createObjectURL(
 			new Blob([await this.result.file.arrayBuffer()], {
-				type: to.slice(1),
+				// type: to.slice(1),
+				type: "application/octet-stream", // use generic type to prevent browsers changing extension
 			}),
 		);
 		const a = document.createElement("a");
