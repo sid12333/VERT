@@ -17,6 +17,19 @@ const videoFormats = [
 	"mts",
 	"m2ts",
 	"wmv",
+	"mpg",
+	"mpeg",
+	"flv",
+	"f4v",
+	"vob",
+	"m4v",
+	"3gp",
+	"3g2",
+	"mxf",
+	"ogv",
+	"rm",
+	"rmvb",
+	"divx",
 ];
 
 export class FFmpegConverter extends Converter {
@@ -165,6 +178,7 @@ export class FFmpegConverter extends Converter {
 					["converters", this.name],
 					"Using album art as video background",
 				);
+				const codecArgs = toArgs(to);
 				return [
 					"-loop",
 					"1",
@@ -174,18 +188,17 @@ export class FFmpegConverter extends Converter {
 					"input",
 					"-vf",
 					"scale=trunc(iw/2)*2:trunc(ih/2)*2",
-					"-c:a",
-					"aac",
 					"-shortest",
 					"-pix_fmt",
 					"yuv420p",
 					"-r",
 					"1",
-					...toArgs(to),
+					...codecArgs,
 					"output" + to,
 				];
 			} else {
 				log(["converters", this.name], "Using solid color background");
+				const codecArgs = toArgs(to);
 				return [
 					"-f",
 					"lavfi",
@@ -193,14 +206,12 @@ export class FFmpegConverter extends Converter {
 					"color=c=black:s=640x480:rate=1",
 					"-i",
 					"input",
-					"-c:a",
-					"aac",
 					"-shortest",
 					"-pix_fmt",
 					"yuv420p",
 					"-r",
 					"1",
-					...toArgs(to),
+					...codecArgs,
 					"output" + to,
 				];
 			}
@@ -221,6 +232,8 @@ export class FFmpegConverter extends Converter {
 				"0:1",
 				"-c:v",
 				"copy",
+				"-update",
+				"1",
 				"cover.jpg",
 			])
 		) {
@@ -239,6 +252,8 @@ export class FFmpegConverter extends Converter {
 				"-an",
 				"-c:v",
 				"copy",
+				"-update",
+				"1",
 				"cover.jpg",
 			])
 		) {
@@ -276,9 +291,10 @@ export class FFmpegConverter extends Converter {
 // i hate you SO much.
 // - love, maddie
 const toArgs = (ext: string): string[] => {
-	const encoder = getEncoder(ext);
-	const args = ["-c:v", encoder];
-	switch (encoder) {
+	const codecs = getCodecs(ext);
+	const args = ["-c:v", codecs.video];
+
+	switch (codecs.video) {
 		case "libx264": {
 			args.push(
 				"-preset",
@@ -292,24 +308,80 @@ const toArgs = (ext: string): string[] => {
 		}
 
 		case "libvpx": {
-			args.push("-c:v", "libvpx-vp9", "-c:a", "libvorbis");
+			args.push("-c:v", "libvpx-vp9");
+			break;
+		}
+
+		case "mpeg4": {
+			// for avi and divx
+			break;
+		}
+
+		case "mpeg2video": {
+			// for mpeg, mpg, vob, mxf
+			if (ext === ".mxf") args.push("-ar", "48000"); // force 48kHz sample rate
+			break;
+		}
+
+		case "libtheora": {
+			// for ogv
+			break;
+		}
+
+		case "wmv2": {
+			// for wmv
 			break;
 		}
 	}
 
+	args.push("-c:a", codecs.audio);
+
+	if (codecs.audio === "aac") args.push("-strict", "experimental");
+
+	if (ext === ".divx") args.unshift("-f", "avi");
+	if (ext === ".mxf") args.push("-strict", "unofficial");
+
 	return args;
 };
 
-const getEncoder = (ext: string): string => {
+const getCodecs = (ext: string): { video: string; audio: string } => {
 	switch (ext) {
-		case ".mkv":
 		case ".mp4":
-		case ".avi":
+		case ".mkv":
 		case ".mov":
-			return "libx264";
+		case ".mts":
+		case ".ts":
+		case ".m2ts":
+		case ".flv":
+		case ".f4v":
+		case ".m4v":
+		case ".3gp":
+		case ".3g2":
+			return { video: "libx264", audio: "aac" };
+
+		case ".wmv":
+			return { video: "wmv2", audio: "wmav2" };
+
 		case ".webm":
-			return "libvpx";
+		case ".ogv":
+			return {
+				video: ext === ".webm" ? "libvpx" : "libtheora",
+				audio: "libvorbis",
+			};
+
+		case ".avi":
+		case ".divx":
+			return { video: "mpeg4", audio: "libmp3lame" };
+
+		case ".mpg":
+		case ".mpeg":
+		case ".vob":
+			return { video: "mpeg2video", audio: "mp2" };
+
+		case ".mxf":
+			return { video: "mpeg2video", audio: "pcm_s16le" };
+
 		default:
-			return "copy";
+			return { video: "libx264", audio: "aac" };
 	}
 };
