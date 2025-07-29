@@ -145,7 +145,7 @@
 							</div>
 						{/if}
 					</div>
-					<p class="font-medium hidden md:flex">
+					<p class="font-medium hidden md:flex min-w-0">
 						{item.name}
 					</p>
 				</div>
