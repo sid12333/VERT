@@ -71,7 +71,6 @@ export const imageFormats = [
 	new FormatInfo("miff", true, true),
 	new FormatInfo("mng", true, true),
 	new FormatInfo("mono", false, true),
-	new FormatInfo("mpc", true, true), // not ideal (literally empty lol)
 	new FormatInfo("mtv", true, true),
 	new FormatInfo("o", false, true),
 	new FormatInfo("otb", true, true), // not ideal (completely black and white - maybe format is like that)
@@ -84,8 +83,8 @@ export const imageFormats = [
 	new FormatInfo("pct", true, true),
 	new FormatInfo("pcx", true, true),
 	new FormatInfo("pdb", true, true), // not ideal (completely black and white - maybe format is like that)
-	new FormatInfo("pdf", false, true),
-	new FormatInfo("pdfa", false, true),
+	// new FormatInfo("pdf", false, true),
+	// new FormatInfo("pdfa", false, true),
 	new FormatInfo("pgx", true, true), // not ideal (grayscale - maybe format is like that)
 	new FormatInfo("phm", true, true),
 	new FormatInfo("picon", true, true), // not ideal (smudged out colours - format probably)
