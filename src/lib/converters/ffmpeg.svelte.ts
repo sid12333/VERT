@@ -203,7 +203,7 @@ export class FFmpegConverter extends Converter {
 					"-f",
 					"lavfi",
 					"-i",
-					"color=c=black:s=640x480:rate=1",
+					"color=c=black:s=512x512:rate=1",
 					"-i",
 					"input",
 					"-shortest",
