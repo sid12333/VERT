@@ -52,6 +52,7 @@ export class FFmpegConverter extends Converter {
 		new FormatInfo("ac3", true, true),
 		new FormatInfo("alac", true, true),
 		new FormatInfo("aiff", true, true),
+		new FormatInfo("aifc", true, true),
 		new FormatInfo("aif", true, true),
 		new FormatInfo("mp1", true, false),
 		new FormatInfo("mp2", true, true),
@@ -61,6 +62,11 @@ export class FFmpegConverter extends Converter {
 		new FormatInfo("dsf", true, false), // dsd
 		new FormatInfo("dff", true, false), // dsd
 		new FormatInfo("mqa", true, false),
+		new FormatInfo("au", true, true),
+		new FormatInfo("caf", true, true),
+		new FormatInfo("m4b", true, true),
+		new FormatInfo("voc", true, true),
+		new FormatInfo("weba", true, true),
 		...videoFormats.map((f) => new FormatInfo(f, true, true, false)),
 	];
 
