@@ -78,7 +78,7 @@
 							}
 						})}
 					{categories}
-					dropdownWidth={"300%"}
+					dropdownSize={"large"}
 				/>
 			{:else}
 				<Dropdown options={[m["convert.panel.na"]()]} disabled />

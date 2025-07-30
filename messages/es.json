@@ -3,7 +3,7 @@
 	"navbar": {
 		"upload": "Subir",
 		"convert": "Convertir",
-		"settings": "Configuración",
+		"settings": "Ajustes",
 		"about": "Acerca de",
 		"toggle_theme": "Cambiar tema"
 	},
@@ -14,7 +14,7 @@
 	},
 	"upload": {
 		"title": "El convertor de archivos que te encantará.",
-		"subtitle": "Todo el procesamiento de imágenes, audio y documentos es hecho en tu dispositivo. Los videos son convertidos en nuestros servidores extremadamente rápidos. Sin límite de tamaño de archivo, sin anuncios y de código abierto.",
+		"subtitle": "Todo el procesamiento de imágenes, audio y documentos es hecho en tu dispositivo. Los videos son convertidos en nuestros servidores ultra rápidos. Sin límite de tamaño de archivo, sin anuncios y de código abierto.",
 		"uploader": {
 			"text": "Arrastra o haz clic para {action}",
 			"convert": "convertir",
@@ -44,18 +44,18 @@
 	},
 	"convert": {
 		"panel": {
-			"convert_all": "Convertir todos",
+			"convert_all": "Convertir todo",
 			"download_all": "Comprimir todo",
 			"remove_all": "Quitar todos los archivos",
-			"set_all_to": "Marcar todos como",
+			"set_all_to": "Marcar todos:",
 			"na": "N/A"
 		},
 		"tooltips": {
 			"unknown_file": "Formato de archivo desconocido",
-			"audio_file": "Archivo de audio",
-			"video_file": "Archivo de video",
-			"document_file": "Archivo de documento",
-			"image_file": "Archivo de imagen",
+			"audio_file": "Audio",
+			"video_file": "Video",
+			"document_file": "Documento",
+			"image_file": "Imagen",
 			"convert_file": "Convertir este archivo",
 			"download_file": "Descargar este archivo"
 		},
@@ -67,9 +67,9 @@
 		}
 	},
 	"settings": {
-		"title": "Configuración",
+		"title": "Ajustes",
 		"errors": {
-			"save_failed": "¡No se pudo guardar la configuración!"
+			"save_failed": "¡No se han podido guardar los ajustes!"
 		},
 		"appearance": {
 			"title": "Apariencia",
@@ -77,7 +77,7 @@
 			"brightness_description": "¿Prefieres una flash-bang soleada o una silenciosa y solitaria noche?",
 			"light": "Claro",
 			"dark": "Oscuro",
-			"effect_settings": "Configuración de efectos",
+			"effect_settings": "Efectos",
 			"effect_description": "¿Prefieres efectos en la interfaz o una experiencia más estática?",
 			"enable": "Habilitar",
 			"disable": "Deshabilitar"
@@ -125,7 +125,7 @@
 		"title": "Acerca de",
 		"why": {
 			"title": "¿Por qué VERT?",
-			"description": "<b>File converters have always disappointed us.</b> They're ugly, riddled with ads, and most importantly; slow. We decided to solve this problem once and for all by making an alternative that solves all those problems, and more.<br/><br/>All non-video files are converted completely on-device; this means that there's no delay between sending and receiving the files from a server, and we never get to snoop on the files you convert.<br/><br/>Video files get uploaded to our lightning-fast RTX 4000 Ada server. Your videos stay on there for an hour if you do not convert them. If you do convert the file, the video will stay on the server for an hour, or until it is downloaded. The file will then be deleted from our server."
+			"description": "<b>Los conversores de archivos siempre nos han decepcionado.</b> Son feos, están llenos de anuncios y, lo más importante, son lentos. Decidimos solucionar este problema de una vez por todas creando una alternativa que resuelve todo eso, y más.<br/><br/>Todos los archivos (exceptuando videos) se convierten directamente en tu dispositivo; esto significa que no hay demoras por subir o bajar archivos de un servidor, y nunca tenemos acceso a los archivos que conviertes.<br/><br/>Los videos se suben a nuestro servidor ultra rápido equipado con una RTX 4000 Ada. Tus videos permanecen allí durante una hora si no los conviertes. Si los conviertes, el archivo se guarda durante una hora, o hasta que lo descargues. Luego, el archivo se elimina del servidor."
 		},
 		"sponsors": {
 			"title": "Patrocinadores",

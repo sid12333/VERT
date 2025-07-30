@@ -3,6 +3,7 @@
 	import { m } from "$lib/paraglide/messages";
 	import { isMobile, files } from "$lib/store/index.svelte";
 	import type { Categories } from "$lib/types";
+	import clsx from "clsx";
 	import { ChevronDown, SearchIcon } from "lucide-svelte";
 	import { onMount } from "svelte";
 	import { quintOut } from "svelte/easing";
@@ -13,7 +14,7 @@
 		selected?: string;
 		onselect?: (option: string) => void;
 		disabled?: boolean;
-		dropdownWidth?: string;
+		dropdownSize?: "default" | "large" | "small";
 	};
 
 	let {
@@ -22,7 +23,7 @@
 		selected = $bindable(""),
 		onselect,
 		disabled,
-		dropdownWidth = "250%",
+		dropdownSize = "default",
 	}: Props = $props();
 	let open = $state(false);
 	let dropdown = $state<HTMLDivElement>();
@@ -300,9 +301,16 @@
 				duration,
 				easing: quintOut,
 			}}
-			class={$isMobile
-				? "fixed inset-x-0 bottom-0 w-full z-[200] shadow-xl bg-panel-alt shadow-black/25 rounded-t-2xl overflow-hidden"
-				: `w-[${dropdownWidth}] min-w-full shadow-xl bg-panel-alt shadow-black/25 absolute -translate-x-1/2 top-full mt-2 z-50 rounded-2xl overflow-hidden`}
+			class={clsx(
+				$isMobile
+					? "fixed inset-x-0 bottom-0 w-full z-[200] shadow-xl bg-panel-alt shadow-black/25 rounded-t-2xl overflow-hidden"
+					: "min-w-full shadow-xl bg-panel-alt shadow-black/25 absolute -translate-x-1/2 top-full mt-2 z-50 rounded-2xl overflow-hidden",
+				!$isMobile && {
+					"w-[320%]": dropdownSize === "large",
+					"w-[250%]": dropdownSize === "default",
+					"w-[150%]": dropdownSize === "small",
+				},
+			)}
 		>
 			<!-- search box -->
 			<div class="p-3 w-full">
