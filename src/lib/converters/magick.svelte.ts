@@ -19,6 +19,7 @@ export class MagickConverter extends Converter {
 	public ready = $state(false);
 
 	public supportedFormats = [
+		// manually tested formats
 		new FormatInfo("png", true, true),
 		new FormatInfo("jpeg", true, true),
 		new FormatInfo("jpg", true, true),
@@ -40,19 +41,39 @@ export class MagickConverter extends Converter {
 		new FormatInfo("cr2", true, false),
 		new FormatInfo("hdr", true, true),
 		new FormatInfo("jpe", true, true),
-		new FormatInfo("dng", true, false),
 		new FormatInfo("mat", true, true),
 		new FormatInfo("pbm", true, true),
 		new FormatInfo("pfm", true, true),
 		new FormatInfo("pgm", true, true),
 		new FormatInfo("pnm", true, true),
 		new FormatInfo("ppm", true, true),
-		new FormatInfo("tif", true, true),
 		new FormatInfo("tiff", true, true),
 		new FormatInfo("jfif", true, true),
 		new FormatInfo("eps", false, true),
-		new FormatInfo("arw", true, false),
 		new FormatInfo("psd", true, true),
+
+		// raw camera formats
+		new FormatInfo("arw", true, false),
+		new FormatInfo("tif", true, true),
+		new FormatInfo("dng", true, false),
+		new FormatInfo("xcf", true, false),
+		new FormatInfo("rw2", true, false),
+		new FormatInfo("raf", true, false),
+		new FormatInfo("orf", true, false),
+		new FormatInfo("pef", true, false),
+		new FormatInfo("mos", true, false),
+		new FormatInfo("raw", true, false),
+		new FormatInfo("dcr", true, false),
+		new FormatInfo("crw", true, false),
+		new FormatInfo("cr3", true, false),
+		new FormatInfo("3fr", true, false),
+		new FormatInfo("erf", true, false),
+		new FormatInfo("mrw", true, false),
+		new FormatInfo("mef", true, false),
+		new FormatInfo("nrw", true, false),
+		new FormatInfo("srw", true, false),
+		new FormatInfo("sr2", true, false),
+		new FormatInfo("srf", true, false),
 
 		// formats added from maya's somewhat automated testing
 		...imageFormats,

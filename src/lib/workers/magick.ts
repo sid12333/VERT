@@ -28,13 +28,9 @@ const handleMessage = async (message: any): Promise<any> => {
 		case "convert": {
 			if (!message.to.startsWith(".")) message.to = `.${message.to}`;
 			message.to = message.to.toLowerCase();
-			if (message.to === ".jfif") {
-				message.to = ".jpeg";
-			}
-
-			if (message.input.from === ".jfif") {
-				message.input.from = ".jpeg";
-			}
+			if (message.to === ".jfif") message.to = ".jpeg";
+			if (message.input.from === ".jfif") message.input.from = ".jpeg";
+			if (message.input.from === ".fit") message.input.from = ".fits";
 
 			const buffer = await message.input.file.arrayBuffer();
 			// only wait when we need to

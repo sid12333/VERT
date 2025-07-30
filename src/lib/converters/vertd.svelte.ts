@@ -226,6 +226,7 @@ export class VertdConverter extends Converter {
 		new FormatInfo("rmvb", true, false),
 		new FormatInfo("h264", true, true),
 		new FormatInfo("divx", true, true),
+		new FormatInfo("swf", true, true),
 	];
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any

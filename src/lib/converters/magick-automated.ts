@@ -41,6 +41,7 @@ export const imageFormats = [
 	new FormatInfo("farbfeld", true, true),
 	new FormatInfo("fax", true, true), // not ideal (image became super long for some reason)
 	new FormatInfo("ff", true, true),
+	new FormatInfo("fit", true, true), // not ideal (grayscale)
 	new FormatInfo("fits", true, true), // not ideal (grayscale)
 	new FormatInfo("fl32", true, true),
 	new FormatInfo("fts", true, true), // not ideal (grayscale)
