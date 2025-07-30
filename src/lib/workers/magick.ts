@@ -175,6 +175,32 @@ const handleMessage = async (message: any): Promise<any> => {
 				};
 			}
 
+			// build frames of animated formats (webp/gif)
+			// APNG does not work on magick-wasm since it needs ffmpeg built-in (not in magick-wasm) - handle in ffmpeg
+			if (
+				(message.input.from === ".webp" ||
+					message.input.from === ".gif") &&
+				(message.to === ".gif" || message.to === ".webp")
+			) {
+				const collection = MagickImageCollection.create(
+					new Uint8Array(buffer),
+				);
+				const format =
+					message.to === ".gif"
+						? MagickFormat.Gif
+						: MagickFormat.WebP;
+				const result = await new Promise<Uint8Array>((resolve) => {
+					collection.write(format, (output) => {
+						resolve(structuredClone(output));
+					});
+				});
+				collection.dispose();
+				return {
+					type: "finished",
+					output: result,
+				};
+			}
+
 			const img = MagickImage.create(
 				new Uint8Array(buffer),
 				new MagickReadSettings({
