@@ -288,7 +288,7 @@
 			{/if}
 		</div>
 		<ChevronDown
-			class="w-4 h-4 ml-4 mt-0.5 flex-shrink-0"
+			class="w-4 h-4 ml-3 mt-0.5 flex-shrink-0"
 			style="transform: rotate({open
 				? 180
 				: 0}deg); transition: transform {duration}ms {transition};"
@@ -364,8 +364,11 @@
 					{#each filteredData.formats as format}
 						<button
 							class="w-full p-2 text-center rounded-xl
-							{format === selected ? 'bg-accent text-black' : 'hover:bg-panel'}
-						{format === from ? 'bg-separator' : ''}"
+							{format === selected
+								? 'bg-accent text-black'
+								: format === from
+									? 'bg-separator'
+									: 'hover:bg-panel'}"
 							onclick={() => selectOption(format)}
 						>
 							{format}
