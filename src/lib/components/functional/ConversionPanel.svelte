@@ -52,7 +52,10 @@
 					<p>{m["convert.panel.remove_all"]()}</p>
 				</button>
 			{:else}
-				<Tooltip text={m["convert.panel.remove_all"]()} position="right">
+				<Tooltip
+					text={m["convert.panel.remove_all"]()}
+					position="right"
+				>
 					<button
 						class="btn p-4 {$effects
 							? ''
@@ -67,8 +70,11 @@
 		</div>
 		<div class="w-full bg-separator h-0.5 flex md:hidden"></div>
 		<div class="flex items-center gap-2">
-			<p class="whitespace-nowrap text-xl">{m["convert.panel.set_all_to"]()}</p>
-			{#if files.requiredConverters.length === 1}
+			<p class="whitespace-nowrap text-xl">
+				{m["convert.panel.set_all_to"]()}
+			</p>
+			<!-- video and audio together still have this dropdown disabled because audio has just ffmpeg (video has vertd & ffmpeg), even tho it can convert between video and audio  -->
+			{#if files.files.length > 0 && files.files.every((f) => JSON.stringify(f.converters) === JSON.stringify(files.files[0].converters))}
 				<FormatDropdown
 					onselect={(r) =>
 						files.files.forEach((f) => {
