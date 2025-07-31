@@ -317,7 +317,7 @@
 				<div class="relative">
 					<input
 						type="text"
-						placeholder="Search format"
+						placeholder={m["convert.dropdown.placeholder"]()}
 						class="flex-grow w-full !pl-11 !pr-3 rounded-lg bg-panel text-foreground"
 						bind:value={searchQuery}
 						oninput={handleSearch}
@@ -354,7 +354,7 @@
 							: 'border-b-separator text-muted'}"
 						onclick={() => selectCategory(category)}
 					>
-						{(m as any)[`upload.cards.${category}`]?.() || category}
+						{(m as any)[`convert.dropdown.${category}`]?.()}
 					</button>
 				{/each}
 			</div>

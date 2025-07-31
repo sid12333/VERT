@@ -25,7 +25,7 @@ export const categories: Categories = {
 	image: { formats: [""], canConvertTo: [] },
 	video: { formats: [""], canConvertTo: ["audio"] },
 	audio: { formats: [""], canConvertTo: ["video"] },
-	docs: { formats: [""], canConvertTo: [] },
+	doc: { formats: [""], canConvertTo: [] },
 };
 
 categories.audio.formats =
@@ -42,7 +42,7 @@ categories.image.formats =
 	converters
 		.find((c) => c.name === "imagemagick")
 		?.formatStrings((f) => f.toSupported) || [];
-categories.docs.formats =
+categories.doc.formats =
 	converters
 		.find((c) => c.name === "pandoc")
 		?.supportedFormats.filter((f) => f.toSupported && f.isNative)

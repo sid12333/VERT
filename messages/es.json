@@ -50,6 +50,13 @@
 			"set_all_to": "Cambiar todos a",
 			"na": "N/A"
 		},
+		"dropdown": {
+			"audio": "Audio",
+			"video": "Video",
+			"doc": "Documento",
+			"image": "Imagen",
+			"placeholder": "Buscar formato"
+		},
 		"tooltips": {
 			"unknown_file": "Formato de archivo desconocido",
 			"audio_file": "Audio",
