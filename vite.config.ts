@@ -10,7 +10,7 @@ export default defineConfig(({ command }) => {
 		paraglideVitePlugin({
 			project: "./project.inlang",
 			outdir: "./src/lib/paraglide",
-			strategy: ["globalVariable", "preferredLanguage", "baseLocale"],
+			strategy: ["localStorage", "preferredLanguage", "baseLocale"],
 		}),
 		svg({
 			includePaths: ["./src/lib/assets"],

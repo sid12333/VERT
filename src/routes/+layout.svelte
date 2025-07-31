@@ -71,8 +71,6 @@
 		theme.set(
 			(localStorage.getItem("theme") as "light" | "dark") || "light",
 		);
-		updateLocale(localStorage.getItem("locale") || "en");
-
 		Settings.instance.load();
 
 		fetch(`${Settings.instance.settings.vertdURL}/api/version`).then(

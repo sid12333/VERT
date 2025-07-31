@@ -304,7 +304,6 @@ export const availableLocales = {
 
 export function updateLocale(newLocale: string) {
 	log(["locale"], `set to ${newLocale}`);
-	localStorage.setItem("locale", newLocale);
 	// @ts-expect-error shush
 	setLocale(newLocale, { reload: false });
 	// @ts-expect-error shush
