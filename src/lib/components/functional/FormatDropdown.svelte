@@ -30,39 +30,43 @@
 	let currentCategory = $state<string | null>();
 	let searchQuery = $state("");
 	let dropdownMenu: HTMLElement | undefined = $state();
+	let rootCategory: string | null = null;
 
 	// initialize current category
 	$effect(() => {
-		if (!currentCategory) {
-			if (selected) {
-				const foundCat = Object.keys(categories).find((cat) =>
-					categories[cat].formats.includes(selected),
-				);
-				currentCategory =
-					foundCat || Object.keys(categories)[0] || null;
-			} else {
-				// find category based on file types
-				const fileFormats = files.files.map((f) => f.from);
-				const foundCat = Object.keys(categories).find((cat) =>
-					fileFormats.some((format) =>
-						categories[cat].formats.includes(format),
-					),
-				);
-				currentCategory =
-					foundCat || Object.keys(categories)[0] || null;
-			}
+		if (currentCategory) return;
+		let foundCat: string | undefined;
+
+		if (selected) {
+			foundCat = Object.keys(categories).find((cat) =>
+				categories[cat].formats.includes(selected),
+			);
+		} else {
+			// find category based on file types
+			const fileFormats = files.files.map((f) => f.from);
+			foundCat = Object.keys(categories).find((cat) =>
+				fileFormats.some((format) =>
+					categories[cat].formats.includes(format),
+				),
+			);
 		}
+
+		currentCategory = foundCat || Object.keys(categories)[0] || null;
+		rootCategory = currentCategory;
 	});
 
 	// other available categories based on current category (e.g. converting between video and audio)
 	const availableCategories = $derived.by(() => {
-		if (!currentCategory) return Object.keys(categories);
+		if (!rootCategory) return Object.keys(categories);
 
-		return Object.keys(categories).filter(
+		let finalCategories = Object.keys(categories).filter(
 			(cat) =>
-				cat === currentCategory ||
-				categories[cat].canConvertTo?.includes(currentCategory || ""),
+				cat === rootCategory ||
+				categories[rootCategory!]?.canConvertTo?.includes(cat),
 		);
+		if (from === ".gif") finalCategories.push("video");
+
+		return finalCategories;
 	});
 
 	const shouldInclude = (format: string, category: string): boolean => {
