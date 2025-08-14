@@ -16,7 +16,6 @@
 		dropping,
 		vertdLoaded,
 		locale,
-		updateLocale,
 	} from "$lib/store/index.svelte";
 	import "$lib/css/app.scss";
 	import { browser } from "$app/environment";

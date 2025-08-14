@@ -2,11 +2,13 @@
 	import Uploader from "$lib/components/functional/Uploader.svelte";
 	import Tooltip from "$lib/components/visual/Tooltip.svelte";
 	import { converters } from "$lib/converters";
-	import { theme, vertdLoaded } from "$lib/store/index.svelte";
+	import { vertdLoaded } from "$lib/store/index.svelte";
 	import clsx from "clsx";
 	import { AudioLines, BookText, Check, Film, Image } from "lucide-svelte";
 	import { m } from "$lib/paraglide/messages";
-	import { link } from "$lib/store/index.svelte";
+	import { OverlayScrollbarsComponent } from "overlayscrollbars-svelte";
+	import { browser } from "$app/environment";
+	import "overlayscrollbars/overlayscrollbars.css";
 	import { onMount } from "svelte";
 
 	const getSupportedFormats = (name: string) =>
@@ -79,33 +81,12 @@
 	let showBlur = $state(Array(Object.keys(status).length).fill(false));
 
 	onMount(() => {
-		const isFirefox = /firefox/i.test(navigator.userAgent);
-
 		const handleResize = () => {
 			for (let i = 0; i < scrollContainers.length; i++) {
 				// show bottom blur if scrollable
 				const container = scrollContainers[i];
 				if (!container) return;
 				showBlur[i] = container.scrollHeight > container.clientHeight;
-
-				// if not on firefox, add ml-2 to card content if scrollable
-				// doing this because i can't figure out how to make the scrollbar *not* take up DOM space (shifting the contents to the left)
-				if (!isFirefox && scrollContainers[i]) {
-					const card = scrollContainers[i].closest(
-						".file-category-card",
-					);
-					const cardContent = card?.querySelector(
-						".file-category-card-content",
-					);
-					if (cardContent) {
-						const hasML2 = cardContent.classList.contains("ml-2");
-						if (showBlur[i] && !hasML2) {
-							cardContent.classList.add("ml-2");
-						} else if (!showBlur[i] && hasML2) {
-							cardContent.classList.remove("ml-2");
-						}
-					}
-				}
 			}
 		};
 
@@ -147,124 +128,140 @@
 		<h2 class="text-center text-4xl">{m["upload.cards.title"]()}</h2>
 
 		<div class="flex gap-4 mt-8 md:flex-row flex-col">
-			{#each Object.entries(status) as [key, s], i}
-				{@const Icon = s.icon}
-				<div class="file-category-card w-full flex flex-col gap-4">
-					<div class="file-category-card-inner">
-						<div
-							class={clsx("icon-container", {
-								"bg-accent-blue": key === "Images",
-								"bg-accent-purple": key === "Audio",
-								"bg-accent-green": key === "Documents",
-								"bg-accent-red": key === "Video",
-							})}
-						>
-							<Icon size="20" />
-						</div>
-						<span>{s.title}</span>
-					</div>
-
-					<div class="file-category-card-content flex-grow relative">
-						<div
-							class="h-[12.25rem] overflow-y-auto overflow-x-hidden"
-							bind:this={scrollContainers[i]}
-						>
-							<div class="flex flex-col gap-4">
-								{#if key === "Video"}
-									<p
-										class="flex tems-center justify-center gap-2"
-									>
-										<Check size="20" />
-										<Tooltip
-											text={m[
-												"upload.tooltip.video_server_processing"
-											]()}
-										>
-											<span>
-												<a
-													href="https://github.com/VERT-sh/VERT/blob/main/docs/VIDEO_CONVERSION.md"
-													target="_blank"
-													rel="noopener noreferrer"
-												>
-													{m[
-														"upload.cards.video_server_processing"
-													]()}
-												</a>
-												<span
-													class="text-red-500 -ml-0.5"
-													>*</span
-												>
-											</span>
-										</Tooltip>
-									</p>
-								{:else}
-									<p
-										class="flex tems-center justify-center gap-2"
-									>
-										<Check size="20" />
-										{m["upload.cards.local_supported"]()}
-									</p>
-								{/if}
-								<p>
-									{@html m["upload.cards.status.text"]({
-										status: s.ready
-											? m["upload.cards.status.ready"]()
-											: m[
-													"upload.cards.status.not_ready"
-												](),
-									})}
-								</p>
-								<div class="flex flex-col items-center">
-									<b
-										>{m[
-											"upload.cards.supported_formats"
-										]()}&nbsp;</b
-									>
-									<p
-										class="flex flex-wrap justify-center leading-tight px-2"
-									>
-										{#each s.formats.split(", ") as format, index}
-											{@const isPartial =
-												format.endsWith("*")}
-											{@const formatName = isPartial
-												? format.slice(0, -1)
-												: format}
-											<span
-												class="text-sm font-normal flex items-center"
-											>
-												{#if isPartial}
-													<Tooltip
-														text={getTooltip(
-															formatName,
-														)}
-													>
-														{formatName}<span
-															class="text-red-500"
-															>*</span
-														>
-													</Tooltip>
-												{:else}
-													{formatName}
-												{/if}
-												{#if index < s.formats.split(", ").length - 1}
-													<span>,&nbsp;</span>
-												{/if}
-											</span>
-										{/each}
-									</p>
-								</div>
-							</div>
-						</div>
-						<!-- blur at bottom if scrollable -->
-						{#if showBlur[i]}
+			{#if browser}
+				{#each Object.entries(status) as [key, s], i}
+					{@const Icon = s.icon}
+					<div class="file-category-card w-full flex flex-col gap-4">
+						<div class="file-category-card-inner">
 							<div
-								class="absolute left-0 bottom-0 w-full h-10 pointer-events-none"
-								style={`background: linear-gradient(to top, var(--bg-panel), transparent 100%);`}
-							></div>
-						{/if}
+								class={clsx("icon-container", {
+									"bg-accent-blue": key === "Images",
+									"bg-accent-purple": key === "Audio",
+									"bg-accent-green": key === "Documents",
+									"bg-accent-red": key === "Video",
+								})}
+							>
+								<Icon size="20" />
+							</div>
+							<span>{s.title}</span>
+						</div>
+
+						<div
+							class="file-category-card-content flex-grow relative"
+						>
+							<OverlayScrollbarsComponent
+								options={{
+									scrollbars: {
+										autoHide: "move",
+										autoHideDelay: 1500,
+									},
+								}}
+								defer
+							>
+								<div
+									class="flex flex-col gap-4 h-[12.25rem]"
+									bind:this={scrollContainers[i]}
+								>
+									{#if key === "Video"}
+										<p
+											class="flex tems-center justify-center gap-2"
+										>
+											<Check size="20" />
+											<Tooltip
+												text={m[
+													"upload.tooltip.video_server_processing"
+												]()}
+											>
+												<span>
+													<a
+														href="https://github.com/VERT-sh/VERT/blob/main/docs/VIDEO_CONVERSION.md"
+														target="_blank"
+														rel="noopener noreferrer"
+													>
+														{m[
+															"upload.cards.video_server_processing"
+														]()}
+													</a>
+													<span
+														class="text-red-500 -ml-0.5"
+														>*</span
+													>
+												</span>
+											</Tooltip>
+										</p>
+									{:else}
+										<p
+											class="flex tems-center justify-center gap-2"
+										>
+											<Check size="20" />
+											{m[
+												"upload.cards.local_supported"
+											]()}
+										</p>
+									{/if}
+									<p>
+										{@html m["upload.cards.status.text"]({
+											status: s.ready
+												? m[
+														"upload.cards.status.ready"
+													]()
+												: m[
+														"upload.cards.status.not_ready"
+													](),
+										})}
+									</p>
+									<div class="flex flex-col items-center">
+										<b
+											>{m[
+												"upload.cards.supported_formats"
+											]()}&nbsp;</b
+										>
+										<p
+											class="flex flex-wrap justify-center leading-tight px-2"
+										>
+											{#each s.formats.split(", ") as format, index}
+												{@const isPartial =
+													format.endsWith("*")}
+												{@const formatName = isPartial
+													? format.slice(0, -1)
+													: format}
+												<span
+													class="text-sm font-normal flex items-center"
+												>
+													{#if isPartial}
+														<Tooltip
+															text={getTooltip(
+																formatName,
+															)}
+														>
+															{formatName}<span
+																class="text-red-500"
+																>*</span
+															>
+														</Tooltip>
+													{:else}
+														{formatName}
+													{/if}
+													{#if index < s.formats.split(", ").length - 1}
+														<span>,&nbsp;</span>
+													{/if}
+												</span>
+											{/each}
+										</p>
+									</div>
+									<!-- blur at bottom if scrollable -->
+									{#if showBlur[i]}
+										<div
+											class="absolute left-0 bottom-0 w-full h-10 pointer-events-none"
+											style={`background: linear-gradient(to top, var(--bg-panel), transparent 100%);`}
+										></div>
+									{/if}
+								</div>
+							</OverlayScrollbarsComponent>
+						</div>
 					</div>
-				</div>
-			{/each}
+				{/each}
+			{/if}
 		</div>
 	</div>
 </div>
