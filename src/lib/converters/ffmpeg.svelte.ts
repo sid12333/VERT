@@ -121,7 +121,8 @@ export class FFmpegConverter extends Converter {
 		);
 		ffmpeg.terminate();
 
-		return new VertFile(new File([output], input.name), to);
+		const outBuf = new Uint8Array(output).buffer.slice(0);
+		return new VertFile(new File([outBuf], outputFileName), to);
 	}
 
 	private async setupFFmpeg(input: VertFile): Promise<FFmpeg> {
@@ -153,6 +154,46 @@ export class FFmpegConverter extends Converter {
 		return ffmpeg;
 	}
 
+	private async detectAudioBitrate(ffmpeg: FFmpeg): Promise<number | null> {
+		const args = [
+			"-v",
+			"quiet",
+			"-select_streams",
+			"a:0",
+			"-show_entries",
+			"stream=bit_rate",
+			"-of",
+			"default=noprint_wrappers=1:nokey=1",
+			"input",
+		];
+
+		try {
+			let bitrate: number | null = null;
+
+			const bitrateListener = (event: { message: string }) => {
+				if (bitrate !== null) return;
+				const n = parseInt(event.message.trim(), 10);
+				if (!n) return null;
+				bitrate = Math.round(n / 1000);
+				log(
+					["converters", this.name],
+					`Detected stream audio bitrate: ${bitrate} kbps`,
+				);
+			};
+
+			ffmpeg.on("log", bitrateListener);
+
+			try {
+				await ffmpeg.ffprobe.call(ffmpeg, args);
+				return bitrate;
+			} finally {
+				ffmpeg.off("log", bitrateListener);
+			}
+		} catch {
+			return null;
+		}
+	}
+
 	private async buildConversionCommand(
 		ffmpeg: FFmpeg,
 		input: VertFile,
@@ -161,13 +202,32 @@ export class FFmpegConverter extends Converter {
 		const inputFormat = input.from.slice(1);
 		const outputFormat = to.slice(1);
 
+		const lossless = ["flac", "alac", "wav"];
+		let audioBitrateArgs: string[];
+		if (
+			lossless.includes(inputFormat) &&
+			!lossless.includes(outputFormat)
+		) {
+			audioBitrateArgs = ["-b:a", "320k"];
+		} else {
+			const inputBitrate = await this.detectAudioBitrate(ffmpeg);
+			audioBitrateArgs = inputBitrate ? ["-b:a", `${inputBitrate}k`] : [];
+		}
+
 		// video to audio
 		if (videoFormats.includes(inputFormat)) {
 			log(
 				["converters", this.name],
 				`Converting video ${input.from} to audio ${to}`,
 			);
-			return ["-i", "input", "-map", "0:a:0", "output" + to];
+			return [
+				"-i",
+				"input",
+				"-map",
+				"0:a:0",
+				...audioBitrateArgs,
+				"output" + to,
+			];
 		}
 
 		// audio to video
@@ -178,13 +238,13 @@ export class FFmpegConverter extends Converter {
 			);
 
 			const hasAlbumArt = await this.extractAlbumArt(ffmpeg);
+			const codecArgs = toArgs(to);
 
 			if (hasAlbumArt) {
 				log(
 					["converters", this.name],
 					"Using album art as video background",
 				);
-				const codecArgs = toArgs(to);
 				return [
 					"-loop",
 					"1",
@@ -200,11 +260,11 @@ export class FFmpegConverter extends Converter {
 					"-r",
 					"1",
 					...codecArgs,
+					...audioBitrateArgs,
 					"output" + to,
 				];
 			} else {
 				log(["converters", this.name], "Using solid color background");
-				const codecArgs = toArgs(to);
 				return [
 					"-f",
 					"lavfi",
@@ -218,14 +278,26 @@ export class FFmpegConverter extends Converter {
 					"-r",
 					"1",
 					...codecArgs,
+					...audioBitrateArgs,
 					"output" + to,
 				];
 			}
 		}
 
-		// fallback
-		log(["converters", this.name], `Converting ${input.from} to ${to}`);
-		return ["-i", "input", "output" + to];
+		// audio to audio
+		log(
+			["converters", this.name],
+			`Converting audio ${input.from} to audio ${to}`,
+		);
+		const { audio: audioCodec } = getCodecs(to);
+		return [
+			"-i",
+			"input",
+			"-c:a",
+			audioCodec,
+			...audioBitrateArgs,
+			"output" + to,
+		];
 	}
 
 	private async extractAlbumArt(ffmpeg: FFmpeg): Promise<boolean> {
@@ -318,24 +390,9 @@ const toArgs = (ext: string): string[] => {
 			break;
 		}
 
-		case "mpeg4": {
-			// for avi and divx
-			break;
-		}
-
 		case "mpeg2video": {
 			// for mpeg, mpg, vob, mxf
 			if (ext === ".mxf") args.push("-ar", "48000"); // force 48kHz sample rate
-			break;
-		}
-
-		case "libtheora": {
-			// for ogv
-			break;
-		}
-
-		case "wmv2": {
-			// for wmv
 			break;
 		}
 	}
@@ -352,6 +409,7 @@ const toArgs = (ext: string): string[] => {
 
 const getCodecs = (ext: string): { video: string; audio: string } => {
 	switch (ext) {
+		// video <-> audio
 		case ".mp4":
 		case ".mkv":
 		case ".mov":
@@ -364,28 +422,44 @@ const getCodecs = (ext: string): { video: string; audio: string } => {
 		case ".3gp":
 		case ".3g2":
 			return { video: "libx264", audio: "aac" };
-
 		case ".wmv":
 			return { video: "wmv2", audio: "wmav2" };
-
 		case ".webm":
 		case ".ogv":
 			return {
 				video: ext === ".webm" ? "libvpx" : "libtheora",
 				audio: "libvorbis",
 			};
-
 		case ".avi":
 		case ".divx":
 			return { video: "mpeg4", audio: "libmp3lame" };
-
 		case ".mpg":
 		case ".mpeg":
 		case ".vob":
 			return { video: "mpeg2video", audio: "mp2" };
-
 		case ".mxf":
 			return { video: "mpeg2video", audio: "pcm_s16le" };
+
+		// audio
+		case ".mp3":
+			return { video: "libx264", audio: "libmp3lame" };
+		case ".flac":
+			return { video: "libx264", audio: "flac" };
+		case ".wav":
+			return { video: "libx264", audio: "pcm_s16le" };
+		case ".ogg":
+		case ".oga":
+			return { video: "libx264", audio: "libvorbis" };
+		case ".opus":
+			return { video: "libx264", audio: "libopus" };
+		case ".aac":
+			return { video: "libx264", audio: "aac" };
+		case ".m4a":
+			return { video: "libx264", audio: "aac" };
+		case ".alac":
+			return { video: "libx264", audio: "alac" };
+		case ".wma":
+			return { video: "libx264", audio: "wmav2" };
 
 		default:
 			return { video: "libx264", audio: "aac" };
