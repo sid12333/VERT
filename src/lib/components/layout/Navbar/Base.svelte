@@ -64,6 +64,7 @@
 	let links = $state<HTMLAnchorElement[]>([]);
 	let container = $state<HTMLDivElement>();
 	let containerRect = $derived(container?.getBoundingClientRect());
+	let isInitialized = $state(false);
 
 	const linkRects = $derived(links.map((l) => l.getBoundingClientRect()));
 
@@ -72,6 +73,16 @@
 	);
 
 	const isSecretPage = $derived(selectedIndex === -1);
+
+	$effect(() => {
+		if (containerRect && linkRects.length > 0 && links.length > 0) {
+			setTimeout(() => {
+				isInitialized = true;
+			}, 10);
+		} else {
+			isInitialized = false;
+		}
+	});
 
 	beforeNavigate((e) => {
 		const oldIndex = items.findIndex((i) =>
@@ -157,7 +168,7 @@
 <div bind:this={container}>
 	<Panel class="max-w-[778px] w-screen h-20 flex items-center gap-3 relative">
 		{@const linkRect = linkRects.at(selectedIndex) || linkRects[0]}
-		{#if linkRect}
+		{#if linkRect && isInitialized}
 			<div
 				class="absolute bg-panel-highlight rounded-xl"
 				style="width: {linkRect.width}px; height: {linkRect.height}px; top: {linkRect.top -
