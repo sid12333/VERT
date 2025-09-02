@@ -23,8 +23,11 @@
 	import Panel from "$lib/components/visual/Panel.svelte";
 	import { effects } from "$lib/store/index.svelte";
 	import { addToast } from "$lib/store/ToastProvider";
-	import { loadStripe } from "@stripe/stripe-js/pure";
-	import { type Stripe, type StripeElements } from "@stripe/stripe-js";
+	import {
+		loadStripe,
+		type Stripe,
+		type StripeElements,
+	} from "@stripe/stripe-js";
 	import clsx from "clsx";
 	import {
 		CalendarHeartIcon,
@@ -64,7 +67,10 @@
 
 		if (!res.ok) {
 			paymentState = "prepay";
-			addToast("error", m["about.donate.payment_error"]());
+			addToast(
+				"error",
+				m["about.donate.payment_error"](),
+			);
 			return;
 		}
 
@@ -82,6 +88,10 @@
 	const payDuration = 400;
 	const transition = "cubic-bezier(0.23, 1, 0.320, 1)";
 
+	onMount(async () => {
+		stripe = await loadStripe(PUB_STRIPE_KEY);
+	});
+
 	const donate = async () => {
 		if (!stripe || !clientSecret || !elements) return;
 
@@ -92,9 +102,9 @@
 			const period = submitResult.error.message?.endsWith(".") ? "" : ".";
 			addToast(
 				"error",
-				m["about.donate.payment_failed"]({
+				m["about.donate.payment_failed"]({ 
 					message: submitResult.error.message || "",
-					period,
+					period 
 				}),
 			);
 			enablePay = true;
@@ -114,9 +124,9 @@
 			const period = res.error.message?.endsWith(".") ? "" : ".";
 			addToast(
 				"error",
-				m["about.donate.payment_failed"]({
+				m["about.donate.payment_failed"]({ 
 					message: res.error.message || "",
-					period,
+					period 
 				}),
 			);
 		} else {
@@ -142,7 +152,10 @@
 					addToast("success", m["about.donate.thank_you"]());
 					break;
 				default:
-					addToast("error", m["about.donate.donation_error"]());
+					addToast(
+						"error",
+						m["about.donate.donation_error"](),
+					);
 			}
 
 			goto("/about");
@@ -285,9 +298,7 @@
 								class="btn w-full h-12 bg-accent-red text-black rounded-full mt-4"
 								onclick={donate}
 							>
-								{m["about.donate.donate_amount"]({
-									amount: amount.toFixed(2),
-								})}
+								{m["about.donate.donate_amount"]({ amount: amount.toFixed(2) })}
 							</button>
 						</div>
 					</div>
