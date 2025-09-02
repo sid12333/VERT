@@ -465,3 +465,15 @@ const getCodecs = (ext: string): { video: string; audio: string } => {
 			return { video: "libx264", audio: "aac" };
 	}
 };
+
+export const CONVERSION_BITRATES = [
+    "auto",
+    320,
+    256,
+    192,
+    128,
+    96,
+    64,
+    32,
+] as const;
+export type ConversionBitrate = (typeof CONVERSION_BITRATES)[number];

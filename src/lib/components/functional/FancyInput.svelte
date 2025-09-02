@@ -8,6 +8,7 @@
 		prefix?: string;
 		type?: string;
 		min?: number;
+		max?: number;
 	};
 
 	let {
@@ -19,6 +20,7 @@
 		prefix,
 		type = "text",
 		min = 0,
+		max = 100,
 	}: Props = $props();
 </script>
 
@@ -26,6 +28,7 @@
 	<input
 		{type}
 		{min}
+		{max}
 		bind:value
 		{placeholder}
 		{disabled}

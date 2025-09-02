@@ -1,4 +1,5 @@
 import { PUB_VERTD_URL } from "$env/static/public";
+import type { ConversionBitrate } from "$lib/converters/ffmpeg.svelte";
 import type { ConversionSpeed } from "$lib/converters/vertd.svelte";
 
 export { default as Appearance } from "./Appearance.svelte";
@@ -10,7 +11,9 @@ export interface ISettings {
 	filenameFormat: string;
 	plausible: boolean;
 	vertdURL: string;
-	vertdSpeed: ConversionSpeed;
+	vertdSpeed: ConversionSpeed; // videos
+	magickQuality: number; // images
+	ffmpegQuality: ConversionBitrate; // audio (or audio <-> video)
 }
 
 export class Settings {
@@ -21,6 +24,8 @@ export class Settings {
 		plausible: true,
 		vertdURL: PUB_VERTD_URL,
 		vertdSpeed: "slow",
+		magickQuality: 100,
+		ffmpegQuality: "auto",
 	});
 
 	public save() {
