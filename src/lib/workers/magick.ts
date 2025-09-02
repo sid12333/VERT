@@ -26,15 +26,12 @@ magickPromise
 const handleMessage = async (message: any): Promise<any> => {
 	switch (message.type) {
 		case "convert": {
+			const compression: number | undefined = message.compression;
 			if (!message.to.startsWith(".")) message.to = `.${message.to}`;
 			message.to = message.to.toLowerCase();
-			if (message.to === ".jfif") {
-				message.to = ".jpeg";
-			}
-
-			if (message.input.from === ".jfif") {
-				message.input.from = ".jpeg";
-			}
+			if (message.to === ".jfif") message.to = ".jpeg";
+			if (message.input.from === ".jfif") message.input.from = ".jpeg";
+			if (message.input.from === ".fit") message.input.from = ".fits";
 
 			const buffer = await message.input.file.arrayBuffer();
 			// only wait when we need to
@@ -70,7 +67,7 @@ const handleMessage = async (message: any): Promise<any> => {
 				const convertedImgs: Uint8Array[] = [];
 				await Promise.all(
 					imgs.map(async (img, i) => {
-						const output = await magickConvert(img, message.to);
+						const output = await magickConvert(img, message.to, compression);
 						convertedImgs[i] = output;
 					}),
 				);
@@ -78,7 +75,10 @@ const handleMessage = async (message: any): Promise<any> => {
 				const zip = makeZip(
 					convertedImgs.map(
 						(img, i) =>
-							new File([img], `image${i}.${message.to.slice(1)}`),
+							new File(
+								[new Uint8Array(img)],
+								`image${i}.${message.to.slice(1)}`,
+							),
 					),
 					"images.zip",
 				);
@@ -108,9 +108,13 @@ const handleMessage = async (message: any): Promise<any> => {
 									}),
 								),
 								message.to,
+								compression
 							);
 							files.push(
-								new File([blob], `image${i}${message.to}`),
+								new File(
+									[new Uint8Array(blob)],
+									`image${i}${message.to}`,
+								),
 							);
 						}),
 					);
@@ -154,6 +158,7 @@ const handleMessage = async (message: any): Promise<any> => {
 							const converted = await magickConvert(
 								img,
 								message.to,
+								compression
 							);
 							outputs.push(converted);
 							break;
@@ -167,7 +172,10 @@ const handleMessage = async (message: any): Promise<any> => {
 				const zip = makeZip(
 					outputs.map(
 						(img, i) =>
-							new File([img], `image${i}.${message.to.slice(1)}`),
+							new File(
+								[new Uint8Array(img)],
+								`image${i}.${message.to.slice(1)}`,
+							),
 					),
 					"images.zip",
 				);
@@ -176,6 +184,32 @@ const handleMessage = async (message: any): Promise<any> => {
 					type: "finished",
 					output: zipBytes,
 					zip: true,
+				};
+			}
+
+			// build frames of animated formats (webp/gif)
+			// APNG does not work on magick-wasm since it needs ffmpeg built-in (not in magick-wasm) - handle in ffmpeg
+			if (
+				(message.input.from === ".webp" ||
+					message.input.from === ".gif") &&
+				(message.to === ".gif" || message.to === ".webp")
+			) {
+				const collection = MagickImageCollection.create(
+					new Uint8Array(buffer),
+				);
+				const format =
+					message.to === ".gif"
+						? MagickFormat.Gif
+						: MagickFormat.WebP;
+				const result = await new Promise<Uint8Array>((resolve) => {
+					collection.write(format, (output) => {
+						resolve(structuredClone(output));
+					});
+				});
+				collection.dispose();
+				return {
+					type: "finished",
+					output: result,
 				};
 			}
 
@@ -188,7 +222,7 @@ const handleMessage = async (message: any): Promise<any> => {
 				}),
 			);
 
-			const converted = await magickConvert(img, message.to);
+			const converted = await magickConvert(img, message.to, compression);
 
 			return {
 				type: "finished",
@@ -206,7 +240,10 @@ const readToEnd = async (reader: ReadableStreamDefaultReader<Uint8Array>) => {
 		if (value) chunks.push(value);
 		done = d;
 	}
-	const blob = new Blob(chunks, { type: "application/zip" });
+	const blob = new Blob(
+		chunks.map((chunk) => new Uint8Array(chunk)),
+		{ type: "application/zip" },
+	);
 	const arrayBuffer = await blob.arrayBuffer();
 	return new Uint8Array(arrayBuffer);
 };
@@ -250,8 +287,12 @@ const magickToBlob = async (img: IMagickImage): Promise<Blob> => {
 				return;
 			}
 
+			if (!data) {
+				reject(new Error("Pixel data is null"));
+				return;
+			}
 			const imageData = new ImageData(
-				new Uint8ClampedArray(data?.buffer || new ArrayBuffer(0)),
+				new Uint8ClampedArray(data),
 				img.width,
 				img.height,
 			);
@@ -266,7 +307,11 @@ const magickToBlob = async (img: IMagickImage): Promise<Blob> => {
 	);
 };
 
-const magickConvert = async (img: IMagickImage, to: string) => {
+const magickConvert = async (
+	img: IMagickImage,
+	to: string,
+	compression?: number,
+) => {
 	const intermediary = await magickToBlob(img);
 	const buf = new Uint8Array(await intermediary.arrayBuffer());
 	let fmt = to.slice(1).toUpperCase();
@@ -274,6 +319,8 @@ const magickConvert = async (img: IMagickImage, to: string) => {
 
 	const result = await new Promise<Uint8Array>((resolve) => {
 		ImageMagick.read(buf, MagickFormat.Png, (image) => {
+			// magick-wasm automatically clamps (https://github.com/dlemstra/magick-wasm/blob/76fc6f2b0c0497d2ddc251bbf6174b4dc92ac3ea/src/magick-image.ts#L2480)
+			if (compression) image.quality = compression;
 			image.write(fmt as unknown as MagickFormat, (o) => {
 				resolve(structuredClone(o));
 			});

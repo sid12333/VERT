@@ -2,11 +2,7 @@
 	import { onMount } from "svelte";
 	import { goto, beforeNavigate, afterNavigate } from "$app/navigation";
 
-	import {
-		PUB_PLAUSIBLE_URL,
-		PUB_HOSTNAME,
-		PUB_DONATION_URL,
-	} from "$env/static/public";
+	import { PUB_PLAUSIBLE_URL, PUB_HOSTNAME } from "$env/static/public";
 	import { VERT_NAME } from "$lib/consts";
 	import * as Layout from "$lib/components/layout";
 	import * as Navbar from "$lib/components/layout/Navbar";
@@ -19,11 +15,13 @@
 		theme,
 		dropping,
 		vertdLoaded,
+		locale,
 	} from "$lib/store/index.svelte";
 	import "$lib/css/app.scss";
 	import { browser } from "$app/environment";
 	import { page } from "$app/state";
 	import { initStores as initAnimStores } from "$lib/animation/index.js";
+	import { locales, localizeHref } from "$lib/paraglide/runtime";
 
 	let { children, data } = $props();
 	let enablePlausible = $state(false);
@@ -72,7 +70,6 @@
 		theme.set(
 			(localStorage.getItem("theme") as "light" | "dark") || "light",
 		);
-
 		Settings.instance.load();
 
 		fetch(`${Settings.instance.settings.vertdURL}/api/version`).then(
@@ -83,7 +80,6 @@
 	});
 
 	$effect(() => {
-		// Enable plausible if enabled
 		enablePlausible =
 			!!PUB_PLAUSIBLE_URL && Settings.instance.settings.plausible;
 		if (!enablePlausible && browser) {
@@ -142,35 +138,44 @@
 </svelte:head>
 
 <!-- FIXME: if user resizes between desktop/mobile, highlight of page disappears (only shows on original size) -->
-<div
-	class="flex flex-col min-h-screen h-full w-full overflow-x-hidden"
-	ondrop={dropFiles}
-	ondragenter={(e) => handleDrag(e, true)}
-	ondragover={(e) => handleDrag(e, true)}
-	ondragleave={(e) => handleDrag(e, false)}
-	role="region"
->
-	<Layout.UploadRegion />
+{#key $locale}
+	<div
+		class="flex flex-col min-h-screen h-full w-full overflow-x-hidden"
+		ondrop={dropFiles}
+		ondragenter={(e) => handleDrag(e, true)}
+		ondragover={(e) => handleDrag(e, true)}
+		ondragleave={(e) => handleDrag(e, false)}
+		role="region"
+	>
+		<Layout.UploadRegion />
 
-	<div>
-		<Layout.MobileLogo />
-		<Navbar.Desktop />
-	</div>
+		<div>
+			<Layout.MobileLogo />
+			<Navbar.Desktop />
+		</div>
 
-	<!-- 
+		<!-- 
 		SvelteKit throws the following warning when developing - safe to ignore as we render the children in this component:
 		`<slot />` or `{@render ...}` tag missing — inner content will not be rendered
 	-->
-	<Layout.PageContent {children} />
+		<Layout.PageContent {children} />
+		<div style="display:none">
+			{#each locales as locale}
+				<a href={localizeHref(page.url.pathname, { locale })}
+					>{locale}</a
+				>
+			{/each}
+		</div>
 
-	<Layout.Toasts />
-	<Layout.Dialogs />
+		<Layout.Toasts />
+		<Layout.Dialogs />
 
-	<div>
-		<Layout.Footer />
-		<Navbar.Mobile />
+		<div>
+			<Layout.Footer />
+			<Navbar.Mobile />
+		</div>
 	</div>
-</div>
+{/key}
 
 <!-- Gradients placed here to prevent it overlapping in transitions -->
 <Layout.Gradients />

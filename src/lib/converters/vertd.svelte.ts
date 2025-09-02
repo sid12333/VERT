@@ -212,6 +212,21 @@ export class VertdConverter extends Converter {
 		new FormatInfo("mts", true, true),
 		new FormatInfo("ts", true, true),
 		new FormatInfo("m2ts", true, true),
+		new FormatInfo("mpg", true, true),
+		new FormatInfo("mpeg", true, true),
+		new FormatInfo("flv", true, true),
+		new FormatInfo("f4v", true, true),
+		new FormatInfo("vob", true, true),
+		new FormatInfo("m4v", true, true),
+		new FormatInfo("3gp", true, true),
+		new FormatInfo("3g2", true, true),
+		new FormatInfo("mxf", true, true),
+		new FormatInfo("ogv", true, true),
+		new FormatInfo("rm", true, false),
+		new FormatInfo("rmvb", true, false),
+		new FormatInfo("h264", true, true),
+		new FormatInfo("divx", true, true),
+		new FormatInfo("swf", true, true),
 	];
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any

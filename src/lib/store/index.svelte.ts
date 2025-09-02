@@ -1,11 +1,12 @@
 import { browser } from "$app/environment";
-import { converters } from "$lib/converters";
+import { byNative, converters } from "$lib/converters";
 import { error, log } from "$lib/logger";
 import { VertFile } from "$lib/types";
 import { parseBlob, selectCover } from "music-metadata";
 import { writable } from "svelte/store";
 import { addDialog } from "./DialogProvider";
 import PQueue from "p-queue";
+import { getLocale, setLocale } from "$lib/paraglide/runtime";
 
 class Files {
 	public files = $state<VertFile[]>([]);
@@ -32,11 +33,13 @@ class Files {
 		this.thumbnailQueue.add(async () => {
 			const isAudio = converters
 				.find((c) => c.name === "ffmpeg")
-				?.formatStrings()
+				?.supportedFormats.filter((f) => f.isNative)
+				.map((f) => f.name)
 				?.includes(file.from.toLowerCase());
 			const isVideo = converters
 				.find((c) => c.name === "vertd")
-				?.formatStrings()
+				?.supportedFormats.filter((f) => f.isNative)
+				.map((f) => f.name)
 				?.includes(file.from.toLowerCase());
 
 			try {
@@ -120,11 +123,11 @@ class Files {
 				log(["files"], `no extension found for ${file.name}`);
 				return;
 			}
-			const converter = converters.find((c) =>
-				c
-					.formatStrings()
-					.includes(format || ".somenonexistentextension"),
-			);
+			const converter = converters
+				.sort(byNative(format))
+				.find((converter) =>
+					converter.formatStrings().includes(format),
+				);
 			if (!converter) {
 				log(["files"], `no converter found for ${file.name}`);
 				this.files.push(new VertFile(file, format));
@@ -292,3 +295,47 @@ export const vertdLoaded = writable(false);
 export const isMobile = writable(false);
 export const effects = writable(true);
 export const theme = writable<"light" | "dark">("light");
+export const locale = writable(getLocale());
+export const availableLocales = {
+	"en": "English",
+	"es": "Español",
+}
+
+export function updateLocale(newLocale: string) {
+	log(["locale"], `set to ${newLocale}`);
+	localStorage.setItem("locale", newLocale);
+	// @ts-expect-error shush
+	setLocale(newLocale, { reload: false });
+	// @ts-expect-error shush
+	locale.set(newLocale);
+}
+
+export function link(
+	tag: string | string[],
+	text: string,
+	links: string | string[],
+	newTab?: boolean | boolean[],
+	className?: string | string[]
+) {
+	if (!text) return "";
+
+	const tags = Array.isArray(tag) ? tag : [tag];
+	const linksArr = Array.isArray(links) ? links : [links];
+	const newTabArr = Array.isArray(newTab) ? newTab : [newTab];
+	const classArr = Array.isArray(className) ? className : [className];
+
+	let result = text;
+
+	tags.forEach((t, i) => {
+		const link = linksArr[i] ?? "#";
+		const target = newTabArr[i] ? 'target="_blank" rel="noopener noreferrer"' : "";
+		const cls = classArr[i] ? `class="${classArr[i]}"` : "";
+
+		const regex = new RegExp(`\\[${t}\\](.*?)\\[\\/${t}\\]`, "g");
+		result = result.replace(regex, (_, inner) => 
+			`<a href="${link}" ${target} ${cls} >${inner}</a>`
+		);
+	});
+
+	return result;
+}

@@ -374,6 +374,17 @@ body {
 		@apply w-full p-3 rounded-lg bg-panel border-2 border-button pl-3 pr-[4rem];
 	}
 
+	input[type="number"]::-webkit-inner-spin-button,
+	input[type="number"]::-webkit-outer-spin-button {
+		-webkit-appearance: none;
+		margin: 0;
+	}
+
+	input[type="number"] {
+		-moz-appearance: textfield;
+		appearance: textfield;
+	}
+
 	input[type="text"]::placeholder {
 		@apply text-muted font-normal;
 	}

@@ -5,6 +5,7 @@
 	import { files } from "$lib/store/index.svelte";
 	import { quintOut } from "svelte/easing";
 	import { blur } from "svelte/transition";
+	import { m } from "$lib/paraglide/messages";
 
 	const images = $derived(
 		files.files.filter((f) =>
@@ -31,9 +32,9 @@
 </script>
 
 <div class="mx-auto w-full max-w-[778px] flex flex-col gap-8">
-	<h1 class="text-5xl text-center">SECRET JPEGIFY!!!</h1>
+	<h1 class="text-5xl text-center">{m["jpegify.title"]()}</h1>
 	<p class="text-muted text-center -mt-4 font-normal italic">
-		(shh... don't tell anyone!)
+		{m["jpegify.subtitle"]()}
 	</p>
 	<Uploader class="w-full h-64" jpegify={true} />
 	<input
@@ -49,7 +50,7 @@
 		onclick={jpegify}
 		disabled={processing}
 		class="btn bg-accent text-black rounded-2xl text-2xl w-full mx-auto"
-		>JPEGIFY {compressionInverted}%!!!</button
+		>{m["jpegify.button"]({ compression: compressionInverted })}</button
 	>
 	<div class="flex flex-wrap flex-row justify-center gap-4">
 		{#each images as file, i (file.id)}
@@ -89,7 +90,7 @@
 							disabled={!!!file.result}
 							class="btn bg-accent text-black rounded-2xl text-2xl w-full mx-auto"
 						>
-							Download
+							{m["jpegify.download"]()}
 						</button>
 						<button
 							onclick={() => {
@@ -103,7 +104,7 @@
 							}}
 							class="btn border-accent-red border-2 bg-transparent text-black dynadark:text-white rounded-2xl text-2xl w-full mx-auto"
 						>
-							Delete
+							{m["jpegify.delete"]()}
 						</button>
 					</div>
 				</Panel>

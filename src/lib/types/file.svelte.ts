@@ -1,6 +1,7 @@
-import { converters } from "$lib/converters";
+import { byNative, converters } from "$lib/converters";
 import type { Converter } from "$lib/converters/converter.svelte";
 import { error } from "$lib/logger";
+import { m } from "$lib/paraglide/messages";
 import { addToast } from "$lib/store/ToastProvider";
 
 export class VertFile {
@@ -27,18 +28,35 @@ export class VertFile {
 	public converters: Converter[] = [];
 
 	public findConverters(supportedFormats: string[] = [this.from]) {
-		const converter = this.converters.filter((converter) =>
-			converter.formatStrings().map((f) => supportedFormats.includes(f)),
-		);
+		const converter = this.converters
+			.filter((converter) =>
+				converter
+					.formatStrings()
+					.map((f) => supportedFormats.includes(f)),
+			)
+			.sort(byNative(this.from));
 		return converter;
 	}
 
 	public findConverter() {
-		const converter = this.converters.find(
-			(converter) =>
-				converter.formatStrings().includes(this.from) &&
-				converter.formatStrings().includes(this.to),
-		);
+		const converter = this.converters.find((converter) => {
+			if (
+				!converter.formatStrings().includes(this.from) ||
+				!converter.formatStrings().includes(this.to)
+			) {
+				return false;
+			}
+
+			const theirFrom = converter.supportedFormats.find(
+				(f) => f.name === this.from,
+			);
+			const theirTo = converter.supportedFormats.find(
+				(f) => f.name === this.to,
+			);
+			if (!theirFrom || !theirTo) return false;
+			if (!theirFrom.isNative && !theirTo.isNative) return false;
+			return true;
+		});
 		return converter;
 	}
 
@@ -75,7 +93,10 @@ export class VertFile {
 			error(["files"], castedErr.message);
 			addToast(
 				"error",
-				`Error converting file ${this.file.name}: ${castedErr.message || castedErr}`,
+				m["workers.errors.general"]({
+					file: this.file.name,
+					message: castedErr.message || castedErr,
+				}),
 			);
 			this.result = null;
 		}
@@ -105,7 +126,8 @@ export class VertFile {
 
 		const blob = URL.createObjectURL(
 			new Blob([await this.result.file.arrayBuffer()], {
-				type: to.slice(1),
+				// type: to.slice(1),
+				type: "application/octet-stream", // use generic type to prevent browsers changing extension
 			}),
 		);
 		const a = document.createElement("a");

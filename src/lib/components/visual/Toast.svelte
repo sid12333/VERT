@@ -51,7 +51,7 @@
 </script>
 
 <div
-	class="flex items-center justify-between max-w-sm p-4 gap-4 bg-accent-{color} border-accent-{color}-alt border-l-4 rounded-lg shadow-md"
+	class="flex items-center justify-between max-w-[100%] md:max-w-md p-4 gap-4 bg-accent-{color} border-accent-{color}-alt border-l-4 rounded-lg shadow-md"
 	in:fly={{
 		duration: durations.enter,
 		easing: quintOut,
@@ -70,7 +70,9 @@
 			stroke="2"
 			fill="none"
 		/>
-		<p class="text-black font-normal whitespace-pre-wrap">{message}</p>
+		<p class="text-black font-normal whitespace-pre-wrap break-all">
+			{message}
+		</p>
 	</div>
 	<button
 		class="text-gray-600 hover:text-black flex-shrink-0"

@@ -101,7 +101,7 @@
 			{/each}
 		</div>
 		<ChevronDown
-			class="w-4 h-4 ml-4 mt-0.5 flex-shrink-0"
+			class="w-4 h-4 ml-3 mt-0.5 flex-shrink-0"
 			style="transform: rotate({open
 				? 180
 				: 0}deg); transition: transform {duration}ms {transition};"

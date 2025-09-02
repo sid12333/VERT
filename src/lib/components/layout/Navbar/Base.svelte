@@ -22,6 +22,7 @@
 	import Logo from "../../visual/svg/Logo.svelte";
 	import { beforeNavigate } from "$app/navigation";
 	import Tooltip from "$lib/components/visual/Tooltip.svelte";
+	import { m } from "$lib/paraglide/messages";
 
 	const items = $derived<
 		{
@@ -33,13 +34,13 @@
 		}[]
 	>([
 		{
-			name: "Upload",
+			name: m["navbar.upload"](),
 			url: "/",
 			activeMatch: (pathname) => pathname === "/",
 			icon: UploadIcon,
 		},
 		{
-			name: "Convert",
+			name: m["navbar.convert"](),
 			url: "/convert/",
 			activeMatch: (pathname) =>
 				pathname === "/convert/" || pathname === "/convert",
@@ -47,13 +48,13 @@
 			badge: files.files.length,
 		},
 		{
-			name: "Settings",
+			name: m["navbar.settings"](),
 			url: "/settings/",
 			activeMatch: (pathname) => pathname.startsWith("/settings"),
 			icon: SettingsIcon,
 		},
 		{
-			name: "About",
+			name: m["navbar.about"](),
 			url: "/about/",
 			activeMatch: (pathname) => pathname.startsWith("/about"),
 			icon: InfoIcon,
@@ -63,6 +64,7 @@
 	let links = $state<HTMLAnchorElement[]>([]);
 	let container = $state<HTMLDivElement>();
 	let containerRect = $derived(container?.getBoundingClientRect());
+	let isInitialized = $state(false);
 
 	const linkRects = $derived(links.map((l) => l.getBoundingClientRect()));
 
@@ -71,6 +73,16 @@
 	);
 
 	const isSecretPage = $derived(selectedIndex === -1);
+
+	$effect(() => {
+		if (containerRect && linkRects.length > 0 && links.length > 0) {
+			setTimeout(() => {
+				isInitialized = true;
+			}, 10);
+		} else {
+			isInitialized = false;
+		}
+	});
 
 	beforeNavigate((e) => {
 		const oldIndex = items.findIndex((i) =>
@@ -144,7 +156,7 @@
 							</div>
 						{/if}
 					</div>
-					<p class="font-medium hidden md:flex">
+					<p class="font-medium hidden md:flex min-w-0">
 						{item.name}
 					</p>
 				</div>
@@ -156,7 +168,7 @@
 <div bind:this={container}>
 	<Panel class="max-w-[778px] w-screen h-20 flex items-center gap-3 relative">
 		{@const linkRect = linkRects.at(selectedIndex) || linkRects[0]}
-		{#if linkRect}
+		{#if linkRect && isInitialized}
 			<div
 				class="absolute bg-panel-highlight rounded-xl"
 				style="width: {linkRect.width}px; height: {linkRect.height}px; top: {linkRect.top -
@@ -180,7 +192,7 @@
 			{@render link(item, i)}
 		{/each}
 		<div class="w-0.5 bg-separator h-full hidden md:flex"></div>
-		<Tooltip text="Toggle theme" position="right">
+		<Tooltip text={m["navbar.toggle_theme"]()} position="right">
 			<button
 				onclick={() => {
 					const isDark =
