@@ -64,6 +64,7 @@
 							type="number"
 							min={1}
 							max={100}
+							placeholder={"100"}
 							extension={"%"}
 						/>
 					</div>
@@ -106,6 +107,7 @@
 							}
 							type="number"
 							min={1}
+							placeholder={"44100"}
 							extension={"Hz"}
 							disabled={settings.ffmpegSampleRate !== "custom"}
 						/>

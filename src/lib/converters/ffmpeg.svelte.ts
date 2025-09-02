@@ -283,7 +283,7 @@ export class FFmpegConverter extends Converter {
 		const userSetting = Settings.instance.settings.ffmpegQuality;
 		const userSampleRate = Settings.instance.settings.ffmpegSampleRate;
 		const customSampleRate =
-			Settings.instance.settings.ffmpegCustomSampleRate;
+			Settings.instance.settings.ffmpegCustomSampleRate ?? 44100;
 		let audioBitrateArgs: string[] = [];
 		let sampleRateArgs: string[] = [];
 
