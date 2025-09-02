@@ -319,14 +319,14 @@ export class FFmpegConverter extends Converter {
 
 		// sample rate setting
 		if (userSampleRate !== "auto") {
-			if (userSampleRate === "custom") {
-				sampleRateArgs = ["-ar", customSampleRate.toString()];
-			} else {
-				sampleRateArgs = ["-ar", userSampleRate];
-			}
+			const rate =
+				userSampleRate === "custom"
+					? customSampleRate.toString()
+					: userSampleRate;
+			sampleRateArgs = ["-ar", rate];
 			log(
 				["converters", this.name],
-				`using user setting for sample rate: ${userSampleRate}`,
+				`using user setting for sample rate: ${rate}`,
 			);
 		} else {
 			// detect sample rate of original file and use

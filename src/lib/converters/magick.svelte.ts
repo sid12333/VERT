@@ -110,8 +110,8 @@ export class MagickConverter extends Converter {
 		...args: any[]
 	): Promise<VertFile> {
 		let compression: number | undefined = args.at(0);
-		if (compression == null) {
-			compression = Settings.instance.settings.magickQuality;
+		if (!compression) {
+			compression = Settings.instance.settings.magickQuality ?? 100;
 			log(["converters", this.name], `using user setting for quality: ${compression}%`);
 		}
 		log(["converters", this.name], `converting ${input.name} to ${to}`);
