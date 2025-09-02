@@ -62,6 +62,7 @@
 							type="number"
 							min={1}
 							max={100}
+							extension={"%"}
 						/>
 					</div>
 					<div class="flex flex-col gap-2">

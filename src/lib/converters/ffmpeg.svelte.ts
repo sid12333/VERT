@@ -5,6 +5,7 @@ import { browser } from "$app/environment";
 import { error, log } from "$lib/logger";
 import { addToast } from "$lib/store/ToastProvider";
 import { m } from "$lib/paraglide/messages";
+import { Settings } from "$lib/sections/settings/index.svelte";
 
 // TODO: differentiate in UI? (not native formats)
 const videoFormats = [
@@ -203,15 +204,23 @@ export class FFmpegConverter extends Converter {
 		const outputFormat = to.slice(1);
 
 		const lossless = ["flac", "alac", "wav"];
-		let audioBitrateArgs: string[];
-		if (
-			lossless.includes(inputFormat) &&
-			!lossless.includes(outputFormat)
-		) {
-			audioBitrateArgs = ["-b:a", "320k"];
+		const userSetting = Settings.instance.settings.ffmpegQuality;
+		log(["converters", this.name], `using user setting for audio bitrate: ${userSetting}`);
+		let audioBitrateArgs: string[] = [];
+
+		if (userSetting !== "auto") {
+			// user's setting
+			audioBitrateArgs = ["-b:a", `${userSetting}k`];
 		} else {
-			const inputBitrate = await this.detectAudioBitrate(ffmpeg);
-			audioBitrateArgs = inputBitrate ? ["-b:a", `${inputBitrate}k`] : [];
+			// detect bitrate of original file and use
+			if (lossless.includes(inputFormat) && !lossless.includes(outputFormat)) {
+				audioBitrateArgs = ["-b:a", "320k"];
+				log(["converters", this.name], `using default audio bitrate: 320k`);
+			} else {
+				const inputBitrate = await this.detectAudioBitrate(ffmpeg);
+				audioBitrateArgs = inputBitrate ? ["-b:a", `${inputBitrate}k`] : [];
+				log(["converters", this.name], `using detected audio bitrate: ${inputBitrate}k`);
+			}
 		}
 
 		// video to audio

@@ -7,6 +7,7 @@ import { VertFile } from "$lib/types";
 import MagickWorker from "$lib/workers/magick?worker&url";
 import { Converter, FormatInfo } from "./converter.svelte";
 import { imageFormats } from "./magick-automated";
+import { Settings } from "$lib/sections/settings/index.svelte";
 
 export class MagickConverter extends Converter {
 	private worker: Worker = browser
@@ -108,7 +109,11 @@ export class MagickConverter extends Converter {
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		...args: any[]
 	): Promise<VertFile> {
-		const compression: number | undefined = args.at(0);
+		let compression: number | undefined = args.at(0);
+		if (compression == null) {
+			compression = Settings.instance.settings.magickQuality;
+			log(["converters", this.name], `using user setting for quality: ${compression}%`);
+		}
 		log(["converters", this.name], `converting ${input.name} to ${to}`);
 
 		// handle converting from SVG manually because magick-wasm doesn't support it
