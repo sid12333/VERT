@@ -76,7 +76,7 @@
 		return "";
 	};
 
-	let scrollContainers: HTMLElement[] = [];
+	let scrollContainers: HTMLElement[] = $state([]);
 	// svelte-ignore state_referenced_locally
 	let showBlur = $state(Array(Object.keys(status).length).fill(false));
 
@@ -159,7 +159,7 @@
 								defer
 							>
 								<div
-									class="flex flex-col gap-4 h-[12.25rem]"
+									class="flex flex-col gap-4 h-[12.25rem] relative"
 									bind:this={scrollContainers[i]}
 								>
 									{#if key === "Video"}
@@ -210,7 +210,7 @@
 													](),
 										})}
 									</p>
-									<div class="flex flex-col items-center">
+									<div class="flex flex-col items-center relative">
 										<b
 											>{m[
 												"upload.cards.supported_formats"
@@ -226,7 +226,7 @@
 													? format.slice(0, -1)
 													: format}
 												<span
-													class="text-sm font-normal flex items-center"
+													class="text-sm font-normal flex items-center relative"
 												>
 													{#if isPartial}
 														<Tooltip
@@ -249,15 +249,15 @@
 											{/each}
 										</p>
 									</div>
-									<!-- blur at bottom if scrollable -->
-									{#if showBlur[i]}
-										<div
-											class="absolute left-0 bottom-0 w-full h-10 pointer-events-none"
-											style={`background: linear-gradient(to top, var(--bg-panel), transparent 100%);`}
-										></div>
-									{/if}
 								</div>
 							</OverlayScrollbarsComponent>
+							<!-- blur at bottom if scrollable - positioned relative to the card container -->
+							{#if showBlur[i]}
+								<div
+									class="absolute left-0 bottom-0 w-full h-10 pointer-events-none"
+									style={`background: linear-gradient(to top, var(--bg-panel), transparent 100%);`}
+								></div>
+							{/if}
 						</div>
 					</div>
 				{/each}

@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { fade } from "$lib/animation";
-
 	interface Props {
 		children: () => any;
 		text: string;
@@ -12,6 +11,7 @@
 	let showTooltip = $state(false);
 	let timeout: number = 0;
 	let triggerElement: HTMLElement;
+	let tooltipElement = $state<HTMLElement>();
 	let tooltipPosition = $state({ x: 0, y: 0 });
 
 	function show() {
@@ -53,6 +53,18 @@
 		showTooltip = false;
 		clearTimeout(timeout);
 	}
+
+	$effect(() => {
+		if (showTooltip && tooltipElement) {
+			document.body.appendChild(tooltipElement);
+		}
+
+		return () => {
+			if (tooltipElement && tooltipElement.parentNode === document.body) {
+				document.body.removeChild(tooltipElement);
+			}
+		};
+	});
 </script>
 
 <span
@@ -71,6 +83,7 @@
 
 {#if showTooltip}
 	<span
+		bind:this={tooltipElement}
 		class="tooltip tooltip-{position}"
 		style="left: {tooltipPosition.x}px; top: {tooltipPosition.y}px;"
 		transition:fade={{
