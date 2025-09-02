@@ -34,7 +34,8 @@
 		{disabled}
 		class="w-full p-3 rounded-lg bg-panel border-2 border-button
             {prefix ? 'pl-[2rem]' : 'pl-3'} 
-            {extension ? 'pr-[4rem]' : 'pr-3'}"
+            {extension ? 'pr-[4rem]' : 'pr-3'}
+			{disabled && 'opacity-50 cursor-not-allowed'}"
 	/>
 	{#if prefix}
 		<div class="absolute left-0 top-0 bottom-0 flex items-center px-2">

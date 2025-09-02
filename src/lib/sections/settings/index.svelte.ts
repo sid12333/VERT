@@ -14,6 +14,8 @@ export interface ISettings {
 	vertdSpeed: ConversionSpeed; // videos
 	magickQuality: number; // images
 	ffmpegQuality: ConversionBitrate; // audio (or audio <-> video)
+	ffmpegSampleRate: string; // audio (or audio <-> video)
+	ffmpegCustomSampleRate: number; // audio (or audio <-> video) - only used when ffmpegSampleRate is "custom"
 }
 
 export class Settings {
@@ -26,6 +28,8 @@ export class Settings {
 		vertdSpeed: "slow",
 		magickQuality: 100,
 		ffmpegQuality: "auto",
+		ffmpegSampleRate: "auto",
+		ffmpegCustomSampleRate: 44100,
 	});
 
 	public save() {

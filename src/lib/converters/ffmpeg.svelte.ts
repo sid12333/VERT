@@ -174,7 +174,7 @@ export class FFmpegConverter extends Converter {
 			const bitrateListener = (event: { message: string }) => {
 				if (bitrate !== null) return;
 				const n = parseInt(event.message.trim(), 10);
-				if (!n) return null;
+				if (!n) return;
 				bitrate = Math.round(n / 1000);
 				log(
 					["converters", this.name],
@@ -195,6 +195,48 @@ export class FFmpegConverter extends Converter {
 		}
 	}
 
+	private async detectAudioSampleRate(
+		ffmpeg: FFmpeg,
+	): Promise<number | null> {
+		const args = [
+			"-v",
+			"quiet",
+			"-select_streams",
+			"a:0",
+			"-show_entries",
+			"stream=sample_rate",
+			"-of",
+			"default=noprint_wrappers=1:nokey=1",
+			"input",
+		];
+
+		try {
+			let sampleRate: number | null = null;
+
+			const sampleRateListener = (event: { message: string }) => {
+				if (sampleRate !== null) return;
+				const n = parseInt(event.message.trim(), 10);
+				if (!n) return;
+				sampleRate = n;
+				log(
+					["converters", this.name],
+					`Detected stream audio sample rate: ${sampleRate} Hz`,
+				);
+			};
+
+			ffmpeg.on("log", sampleRateListener);
+
+			try {
+				await ffmpeg.ffprobe.call(ffmpeg, args);
+				return sampleRate;
+			} finally {
+				ffmpeg.off("log", sampleRateListener);
+			}
+		} catch {
+			return null;
+		}
+	}
+
 	private async buildConversionCommand(
 		ffmpeg: FFmpeg,
 		input: VertFile,
@@ -203,23 +245,74 @@ export class FFmpegConverter extends Converter {
 		const inputFormat = input.from.slice(1);
 		const outputFormat = to.slice(1);
 
-		const lossless = ["flac", "alac", "wav"];
+		const lossless = ["flac", "alac", "wav", "dsd", "dsf", "dff"];
 		const userSetting = Settings.instance.settings.ffmpegQuality;
-		log(["converters", this.name], `using user setting for audio bitrate: ${userSetting}`);
+		const userSampleRate = Settings.instance.settings.ffmpegSampleRate;
+		const customSampleRate =
+			Settings.instance.settings.ffmpegCustomSampleRate;
 		let audioBitrateArgs: string[] = [];
+		let sampleRateArgs: string[] = [];
 
+		const isLosslessToLossy =
+			lossless.includes(inputFormat) && !lossless.includes(outputFormat);
 		if (userSetting !== "auto") {
 			// user's setting
 			audioBitrateArgs = ["-b:a", `${userSetting}k`];
+			log(
+				["converters", this.name],
+				`using user setting for audio bitrate: ${userSetting}`,
+			);
 		} else {
 			// detect bitrate of original file and use
-			if (lossless.includes(inputFormat) && !lossless.includes(outputFormat)) {
-				audioBitrateArgs = ["-b:a", "320k"];
-				log(["converters", this.name], `using default audio bitrate: 320k`);
+			if (isLosslessToLossy) {
+				// use safe default
+				audioBitrateArgs = ["-b:a", "128k"];
+				log(
+					["converters", this.name],
+					`converting from lossless to lossy, using default audio bitrate: 128k`,
+				);
 			} else {
 				const inputBitrate = await this.detectAudioBitrate(ffmpeg);
-				audioBitrateArgs = inputBitrate ? ["-b:a", `${inputBitrate}k`] : [];
-				log(["converters", this.name], `using detected audio bitrate: ${inputBitrate}k`);
+				audioBitrateArgs = inputBitrate
+					? ["-b:a", `${inputBitrate}k`]
+					: [];
+				log(
+					["converters", this.name],
+					`using detected audio bitrate: ${inputBitrate}k`,
+				);
+			}
+		}
+
+		// sample rate setting
+		if (userSampleRate !== "auto") {
+			if (userSampleRate === "custom") {
+				sampleRateArgs = ["-ar", customSampleRate.toString()];
+			} else {
+				sampleRateArgs = ["-ar", userSampleRate];
+			}
+			log(
+				["converters", this.name],
+				`using user setting for sample rate: ${userSampleRate}`,
+			);
+		} else {
+			// detect sample rate of original file and use
+			if (isLosslessToLossy) {
+				// use safe default
+				sampleRateArgs = ["-ar", "44100"];
+				log(
+					["converters", this.name],
+					`converting from lossless to lossy, using default sample rate: 44100Hz`,
+				);
+			} else {
+				const inputSampleRate =
+					await this.detectAudioSampleRate(ffmpeg);
+				sampleRateArgs = inputSampleRate
+					? ["-ar", inputSampleRate.toString()]
+					: [];
+				log(
+					["converters", this.name],
+					`using detected audio sample rate: ${inputSampleRate}Hz`,
+				);
 			}
 		}
 
@@ -235,6 +328,7 @@ export class FFmpegConverter extends Converter {
 				"-map",
 				"0:a:0",
 				...audioBitrateArgs,
+				...sampleRateArgs,
 				"output" + to,
 			];
 		}
@@ -270,6 +364,7 @@ export class FFmpegConverter extends Converter {
 					"1",
 					...codecArgs,
 					...audioBitrateArgs,
+					...sampleRateArgs,
 					"output" + to,
 				];
 			} else {
@@ -288,6 +383,7 @@ export class FFmpegConverter extends Converter {
 					"1",
 					...codecArgs,
 					...audioBitrateArgs,
+					...sampleRateArgs,
 					"output" + to,
 				];
 			}
@@ -305,6 +401,7 @@ export class FFmpegConverter extends Converter {
 			"-c:a",
 			audioCodec,
 			...audioBitrateArgs,
+			...sampleRateArgs,
 			"output" + to,
 		];
 	}
@@ -476,13 +573,26 @@ const getCodecs = (ext: string): { video: string; audio: string } => {
 };
 
 export const CONVERSION_BITRATES = [
-    "auto",
-    320,
-    256,
-    192,
-    128,
-    96,
-    64,
-    32,
+	"auto",
+	320,
+	256,
+	192,
+	128,
+	96,
+	64,
+	32,
 ] as const;
 export type ConversionBitrate = (typeof CONVERSION_BITRATES)[number];
+
+export const SAMPLE_RATES = [
+	"auto",
+	"custom",
+	"48000",
+	"44100",
+	"32000",
+	"22050",
+	"16000",
+	"11025",
+	"8000",
+] as const;
+export type SampleRate = (typeof SAMPLE_RATES)[number];

@@ -6,6 +6,8 @@
 	import {
 		CONVERSION_BITRATES,
 		type ConversionBitrate,
+		SAMPLE_RATES,
+		type SampleRate,
 	} from "$lib/converters/ffmpeg.svelte";
 	import { m } from "$lib/paraglide/messages";
 	import Dropdown from "$lib/components/functional/Dropdown.svelte";
@@ -78,6 +80,34 @@
 								(settings.ffmpegQuality =
 									option as ConversionBitrate)}
 							settingsStyle
+						/>
+					</div>
+				</div>
+				<div class="grid grid-cols-2 gap-3">
+					<div class="flex flex-col gap-2">
+						<p class="text-sm font-bold">
+							{m["settings.conversion.rate"]()}
+						</p>
+						<Dropdown
+							options={SAMPLE_RATES.map((r) => r.toString())}
+							selected={settings.ffmpegSampleRate.toString()}
+							onselect={(option: string) => {
+								settings.ffmpegSampleRate =
+									option as SampleRate;
+							}}
+							settingsStyle
+						/>
+					</div>
+					<div class="flex flex-col gap-2">
+						<p class="text-sm font-bold select-none">&nbsp;&nbsp;</p>
+						<FancyInput
+							bind:value={
+								settings.ffmpegCustomSampleRate as unknown as string
+							}
+							type="number"
+							min={1}
+							extension={"Hz"}
+							disabled={settings.ffmpegSampleRate !== "custom"}
 						/>
 					</div>
 				</div>
