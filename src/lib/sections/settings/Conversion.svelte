@@ -39,7 +39,7 @@
 				<FancyTextInput
 					placeholder="VERT_%name%"
 					bind:value={settings.filenameFormat}
-					extension=".ext"
+					extension={".ext"}
 					type="text"
 				/>
 			</div>

@@ -188,9 +188,11 @@
 	},
 	"workers": {
 		"errors": {
-			"general": "Error converting file {file}: {message}",
-			"magick": "Error in Magick worker, image conversion may not work as expected.`",
-			"ffmpeg": "Error loading ffmpeg, some features may not work."
+			"general": "Error converting {file}: {message}",
+			"magick": "Error in Magick worker, image conversion may not work as expected.",
+			"ffmpeg": "Error loading ffmpeg, some features may not work.",
+			"no_audio": "No audio stream found.",
+			"invalid_rate": "Invalid sample rate specified: {rate}Hz"
 		}
 	},
 	"jpegify": {

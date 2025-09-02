@@ -98,7 +98,34 @@ export class FFmpegConverter extends Converter {
 	public async convert(input: VertFile, to: string): Promise<VertFile> {
 		if (!to.startsWith(".")) to = `.${to}`;
 
+		let conversionError: string | null = null;
 		const ffmpeg = await this.setupFFmpeg(input);
+
+		// listen for errors during conversion
+		const errorListener = (l: { message: string }) => {
+			const msg = l.message;
+			if (
+				msg.includes("Specified sample rate") &&
+				msg.includes("is not supported")
+			) {
+				const rate = Settings.instance.settings.ffmpegCustomSampleRate;
+				conversionError = m["workers.errors.invalid_rate"]({ rate });
+			} else if (msg.includes("Stream map '0:a:0' matches no streams.")) {
+				conversionError = m["workers.errors.no_audio"]();
+			} else if (
+				msg.includes("Error initializing output stream") ||
+				msg.includes("Error while opening encoder") ||
+				msg.includes("Error while opening decoder") ||
+				(msg.includes("Error") && msg.includes("stream")) ||
+				msg.includes("Conversion failed!")
+			) {
+				// other general errors
+				if (!conversionError) conversionError = msg;
+			}
+		};
+
+		ffmpeg.on("log", errorListener);
+
 		const buf = new Uint8Array(await input.file.arrayBuffer());
 		await ffmpeg.writeFile("input", buf);
 		log(
@@ -111,15 +138,30 @@ export class FFmpegConverter extends Converter {
 		await ffmpeg.exec(command);
 		log(["converters", this.name], "executed ffmpeg command");
 
+		if (conversionError) {
+			ffmpeg.off("log", errorListener);
+			ffmpeg.terminate();
+			throw new Error(conversionError);
+		}
+
 		const output = (await ffmpeg.readFile(
 			"output" + to,
 		)) as unknown as Uint8Array;
+
+		if (!output || output.length === 0) {
+			ffmpeg.off("log", errorListener);
+			ffmpeg.terminate();
+			throw new Error("empty file returned");
+		}
+
 		const outputFileName =
 			input.name.split(".").slice(0, -1).join(".") + to;
 		log(
 			["converters", this.name],
 			`read ${outputFileName} from ffmpeg virtual fs`,
 		);
+
+		ffmpeg.off("log", errorListener);
 		ffmpeg.terminate();
 
 		const outBuf = new Uint8Array(output).buffer.slice(0);
@@ -135,14 +177,6 @@ export class FFmpegConverter extends Converter {
 
 		ffmpeg.on("log", (l) => {
 			log(["converters", this.name], l.message);
-			if (l.message.includes("Stream map '0:a:0' matches no streams.")) {
-				const fileName = input.name;
-				error(
-					["converters", this.name],
-					`No audio stream found in ${fileName}.`,
-				);
-				addToast("error", `No audio stream found in ${fileName}.`);
-			}
 		});
 
 		const baseURL =
