@@ -237,7 +237,7 @@ export class VertdConverter extends Converter {
 		this.log = (msg) => log(["converters", this.name], msg);
 		this.log("created converter");
 		this.log("not rly sure how to implement this :P");
-		this.ready = true;
+		this.status = "ready";
 	}
 
 	public async convert(input: VertFile, to: string): Promise<VertFile> {

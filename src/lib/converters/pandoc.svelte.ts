@@ -2,6 +2,7 @@ import { VertFile } from "$lib/types";
 import { Converter, FormatInfo } from "./converter.svelte";
 import { browser } from "$app/environment";
 import PandocWorker from "$lib/workers/pandoc?worker&url";
+import { addToast } from "$lib/store/ToastProvider";
 
 export class PandocConverter extends Converter {
 	public name = "pandoc";
@@ -12,10 +13,17 @@ export class PandocConverter extends Converter {
 		super();
 		if (!browser) return;
 		(async () => {
-			this.wasm = await fetch("/pandoc.wasm").then((r) =>
-				r.arrayBuffer(),
-			);
-			this.ready = true;
+			try {
+				this.status = "downloading";
+				this.wasm = await fetch("/pandoc.wasm").then((r) =>
+					r.arrayBuffer(),
+				);
+
+				this.status = "ready";
+			} catch (err) {
+				this.status = "error";
+				addToast("error", `Failed to load Pandoc worker: ${err}`);
+			}
 		})();
 	}
 

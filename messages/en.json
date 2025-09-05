@@ -31,7 +31,11 @@
 			"status": {
 				"text": "<b>Status:</b> {status}",
 				"ready": "ready",
-				"not_ready": "not ready"
+				"not_ready": "not ready",
+				"not_initialized": "not initialized",
+				"downloading": "downloading...",
+				"initializing": "initializing...",
+				"unknown": "unknown status"
 			},
 			"supported_formats": "Supported formats:"
 		},

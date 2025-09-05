@@ -18,7 +18,7 @@ class Files {
 	public ready = $derived(
 		this.files.length === 0
 			? false
-			: this.requiredConverters.every((f) => f?.ready) &&
+			: this.requiredConverters.every((f) => f?.status === "ready") &&
 					this.files.every((f) => !f.processing),
 	);
 	public results = $derived(

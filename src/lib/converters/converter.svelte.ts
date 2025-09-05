@@ -1,5 +1,11 @@
 import type { VertFile } from "$lib/types";
 
+export type WorkerStatus =
+	| "not-ready"
+	| "downloading"
+	| "ready"
+	| "error";
+
 export class FormatInfo {
 	public name: string;
 
@@ -32,14 +38,15 @@ export class Converter {
 	 * List of supported formats.
 	 */
 	public supportedFormats: FormatInfo[] = [];
+
+	public status: WorkerStatus = $state("not-ready");
+	public readonly reportsProgress: boolean = false;
+
 	/**
 	 * Convert a file to a different format.
 	 * @param input The input file.
 	 * @param to The format to convert to. Includes the dot.
 	 */
-	public ready: boolean = $state(false);
-	public readonly reportsProgress: boolean = false;
-
 	public async convert(
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		input: VertFile,

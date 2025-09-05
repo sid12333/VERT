@@ -86,19 +86,22 @@ export class MagickConverter extends Converter {
 		super();
 		log(["converters", this.name], `created converter`);
 		if (!browser) return;
+		
+		this.status = "downloading";
+
 		log(["converters", this.name], `loading worker @ ${MagickWorker}`);
 		this.worker.onmessage = (e) => {
 			const message: WorkerMessage = e.data;
 			log(["converters", this.name], `received message ${message.type}`);
 			if (message.type === "loaded") {
-				this.ready = true;
+				this.status = "ready";
 			} else if (message.type === "error") {
 				error(
 					["converters", this.name],
 					`error in worker: ${message.error}`,
 				);
+				this.status = "error";
 				addToast("error", m["workers.errors.magick"]());
-				throw new Error(message.error);
 			}
 		};
 	}

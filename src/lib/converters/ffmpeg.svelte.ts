@@ -83,14 +83,19 @@ export class FFmpegConverter extends Converter {
 			(async () => {
 				const baseURL =
 					"https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.10/dist/esm";
+				
+				this.status = "downloading";
+				
 				await this.ffmpeg.load({
 					coreURL: `${baseURL}/ffmpeg-core.js`,
 					wasmURL: `${baseURL}/ffmpeg-core.wasm`,
 				});
-				this.ready = true;
+
+				this.status = "ready";
 			})();
 		} catch (err) {
 			error(["converters", this.name], `error loading ffmpeg: ${err}`);
+			this.status = "error";
 			addToast("error", m["workers.errors.ffmpeg"]());
 		}
 	}

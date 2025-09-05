@@ -8,6 +8,7 @@
 	import { vertdLoaded } from "$lib/store/index.svelte";
 	import { m } from "$lib/paraglide/messages";
 	import { link } from "$lib/store/index.svelte";
+	//import { converters } from "$lib/converters";
 
 	let vertdCommit = $state<string | null>(null);
 	let abortController: AbortController | null = null;
@@ -35,12 +36,16 @@
 					if (err.name !== "AbortError") {
 						vertdCommit = null;
 						vertdLoaded.set(false);
+						// const converter = converters.find((c) => c.name === "vertd");
+						// if (converter) converter.status = "not-ready";
 					}
 				});
 		} else {
 			if (abortController) abortController.abort();
 			vertdCommit = null;
 			vertdLoaded.set(false);
+			// const converter = converters.find((c) => c.name === "vertd");
+    		// if (converter) converter.status = "not-ready";
 		}
 
 		return () => {

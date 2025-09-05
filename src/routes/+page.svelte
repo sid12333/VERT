@@ -10,6 +10,7 @@
 	import { browser } from "$app/environment";
 	import "overlayscrollbars/overlayscrollbars.css";
 	import { onMount } from "svelte";
+	import type { WorkerStatus } from "$lib/converters/converter.svelte";
 
 	const getSupportedFormats = (name: string) =>
 		converters
@@ -20,41 +21,44 @@
 			)
 			.join(", ") || "none";
 
-	const status: {
+	const worker: {
 		[key: string]: {
-			ready: boolean;
 			formats: string;
 			icon: typeof Image;
 			title: string;
+			status: WorkerStatus;
 		};
 	} = $derived({
 		Images: {
-			ready:
-				converters.find((c) => c.name === "imagemagick")?.ready ||
-				false,
 			formats: getSupportedFormats("imagemagick"),
 			icon: Image,
 			title: m["upload.cards.images"](),
+			status:
+				converters.find((c) => c.name === "imagemagick")?.status ||
+				"not-ready",
 		},
 		Audio: {
-			ready: converters.find((c) => c.name === "ffmpeg")?.ready || false,
 			formats: getSupportedFormats("ffmpeg"),
 			icon: AudioLines,
 			title: m["upload.cards.audio"](),
+			status:
+				converters.find((c) => c.name === "ffmpeg")?.status ||
+				"not-ready",
 		},
 		Documents: {
-			ready: converters.find((c) => c.name === "pandoc")?.ready || false,
 			formats: getSupportedFormats("pandoc"),
 			icon: BookText,
 			title: m["upload.cards.documents"](),
+			status:
+				converters.find((c) => c.name === "pandoc")?.status ||
+				"not-ready",
 		},
 		Video: {
-			ready:
-				converters.find((c) => c.name === "vertd")?.ready ||
-				(false && $vertdLoaded),
 			formats: getSupportedFormats("vertd"),
 			icon: Film,
 			title: m["upload.cards.video"](),
+			status:
+				$vertdLoaded === true ? "ready" : "not-ready", // not using converter.status for this
 		},
 	});
 
@@ -76,9 +80,21 @@
 		return "";
 	};
 
+	const getStatusText = (status: WorkerStatus) => {
+		switch (status) {
+			case "downloading":
+				return m["upload.cards.status.downloading"]();
+			case "ready":
+				return m["upload.cards.status.ready"]();
+			default:
+				// "not-ready", "error" and other statuses (somehow)
+				return m["upload.cards.status.not_ready"]();
+		}
+	};
+
 	let scrollContainers: HTMLElement[] = $state([]);
 	// svelte-ignore state_referenced_locally
-	let showBlur = $state(Array(Object.keys(status).length).fill(false));
+	let showBlur = $state(Array(Object.keys(worker).length).fill(false));
 
 	onMount(() => {
 		const handleResize = () => {
@@ -129,7 +145,7 @@
 
 		<div class="flex gap-4 mt-8 md:flex-row flex-col">
 			{#if browser}
-				{#each Object.entries(status) as [key, s], i}
+				{#each Object.entries(worker) as [key, s], i}
 					{@const Icon = s.icon}
 					<div class="file-category-card w-full flex flex-col gap-4">
 						<div class="file-category-card-inner">
@@ -201,16 +217,12 @@
 									{/if}
 									<p>
 										{@html m["upload.cards.status.text"]({
-											status: s.ready
-												? m[
-														"upload.cards.status.ready"
-													]()
-												: m[
-														"upload.cards.status.not_ready"
-													](),
+											status: getStatusText(s.status),
 										})}
 									</p>
-									<div class="flex flex-col items-center relative">
+									<div
+										class="flex flex-col items-center relative"
+									>
 										<b
 											>{m[
 												"upload.cards.supported_formats"
