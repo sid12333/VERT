@@ -1,5 +1,4 @@
 import {
-	ImageMagick,
 	initializeImageMagick,
 	MagickFormat,
 	MagickImage,
@@ -11,6 +10,7 @@ import { makeZip } from "client-zip";
 import wasm from "@imagemagick/magick-wasm/magick.wasm?url";
 import { parseAni } from "$lib/parse/ani";
 import { parseIcns } from "vert-wasm";
+import { log } from "$lib/logger";
 
 const magickPromise = initializeImageMagick(new URL(wasm, import.meta.url));
 
@@ -67,7 +67,11 @@ const handleMessage = async (message: any): Promise<any> => {
 				const convertedImgs: Uint8Array[] = [];
 				await Promise.all(
 					imgs.map(async (img, i) => {
-						const output = await magickConvert(img, message.to, compression);
+						const output = await magickConvert(
+							img,
+							message.to,
+							compression,
+						);
 						convertedImgs[i] = output;
 					}),
 				);
@@ -94,7 +98,7 @@ const handleMessage = async (message: any): Promise<any> => {
 					zip: true,
 				};
 			} else if (message.input.from === ".ani") {
-				console.log("Parsing ANI file");
+				log(["workers", "imagemagick"], "Parsing ANI file")
 				try {
 					const parsedAni = parseAni(new Uint8Array(buffer));
 					const files: File[] = [];
@@ -108,7 +112,7 @@ const handleMessage = async (message: any): Promise<any> => {
 									}),
 								),
 								message.to,
-								compression
+								compression,
 							);
 							files.push(
 								new File(
@@ -158,7 +162,7 @@ const handleMessage = async (message: any): Promise<any> => {
 							const converted = await magickConvert(
 								img,
 								message.to,
-								compression
+								compression,
 							);
 							outputs.push(converted);
 							break;
@@ -222,7 +226,61 @@ const handleMessage = async (message: any): Promise<any> => {
 				}),
 			);
 
-			const converted = await magickConvert(img, message.to, compression);
+			// extract metadata
+			let metadata: Map<string, string> | undefined;
+			try {
+				metadata = new Map();
+
+				const exifProfile = img.getProfile("exif");
+				if (exifProfile) {
+					metadata.set("exif:profile", "true");
+				}
+
+				const iccProfile = img.getProfile("icc");
+				if (iccProfile) {
+					metadata.set("icc:profile", "true");
+				}
+
+				const attributeNames = img.attributeNames;
+				if (attributeNames && attributeNames.length > 0) {
+					for (const attrName of attributeNames) {
+						try {
+							if (
+								attrName.startsWith("exif:") ||
+								attrName.startsWith("icc:") ||
+								attrName.startsWith("date:") ||
+								attrName.startsWith("tiff:") ||
+								attrName.startsWith("xmp:") ||
+								attrName.startsWith("iptc:")
+							) {
+								const value = img.getAttribute(attrName);
+								if (value) {
+									metadata.set(attrName, value);
+								}
+							}
+						} catch { 
+							// do nothing 
+						}
+					}
+				}
+
+				if (metadata.size === 0) {
+					metadata = undefined;
+				}
+
+				log(["workers", "imagemagick"], `Parsed ${metadata.size} metadata values`)
+
+			} catch (e) {
+				console.warn("Failed to extract metadata:", e);
+				metadata = undefined;
+			}
+
+			const converted = await magickConvert(
+				img,
+				message.to,
+				compression,
+				metadata,
+			);
 
 			return {
 				type: "finished",
@@ -248,82 +306,31 @@ const readToEnd = async (reader: ReadableStreamDefaultReader<Uint8Array>) => {
 	return new Uint8Array(arrayBuffer);
 };
 
-const magickToBlob = async (img: IMagickImage): Promise<Blob> => {
-	const canvas = new OffscreenCanvas(img.width, img.height);
-	return new Promise<Blob>((resolve, reject) =>
-		img.getPixels(async (p) => {
-			// const area = p.getArea(0, 0, img.width, img.height);
-			// const chunkSize = img.hasAlpha ? 4 : 3;
-			// const chunks = Math.ceil(area.length / chunkSize);
-			// const data = new Uint8ClampedArray(chunks * 4);
-
-			// for (let j = 0, k = 0; j < area.length; j += chunkSize, k += 4) {
-			// 	data[k] = area[j];
-			// 	data[k + 1] = area[j + 1];
-			// 	data[k + 2] = area[j + 2];
-			// 	data[k + 3] = img.hasAlpha ? area[j + 3] : 255;
-			// }
-
-			// const ctx = canvas.getContext("2d");
-			// if (!ctx) {
-			// 	reject(new Error("Failed to get canvas context"));
-			// 	return;
-			// }
-
-			// console.log(img.width, img.height);
-
-			// console.log(data.length, img.width * img.height * 4);
-
-			// ctx.putImageData(new ImageData(data, img.width, img.height), 0, 0);
-
-			// const blob = await canvas.convertToBlob({
-			// 	type: "image/png",
-			// });
-
-			const data = p.toByteArray(0, 0, img.width, img.height, "RGBA");
-			const ctx = canvas.getContext("2d");
-			if (!ctx) {
-				reject(new Error("Failed to get canvas context"));
-				return;
-			}
-
-			if (!data) {
-				reject(new Error("Pixel data is null"));
-				return;
-			}
-			const imageData = new ImageData(
-				new Uint8ClampedArray(data),
-				img.width,
-				img.height,
-			);
-
-			ctx.putImageData(imageData, 0, 0);
-			const blob = await canvas.convertToBlob({
-				type: "image/png",
-			});
-
-			resolve(blob);
-		}),
-	);
-};
-
 const magickConvert = async (
 	img: IMagickImage,
 	to: string,
 	compression?: number,
+	originalMetadata?: Map<string, string>,
 ) => {
-	const intermediary = await magickToBlob(img);
-	const buf = new Uint8Array(await intermediary.arrayBuffer());
 	let fmt = to.slice(1).toUpperCase();
 	if (fmt === "JFIF") fmt = "JPEG";
 
 	const result = await new Promise<Uint8Array>((resolve) => {
-		ImageMagick.read(buf, MagickFormat.Png, (image) => {
-			// magick-wasm automatically clamps (https://github.com/dlemstra/magick-wasm/blob/76fc6f2b0c0497d2ddc251bbf6174b4dc92ac3ea/src/magick-image.ts#L2480)
-			if (compression) image.quality = compression;
-			image.write(fmt as unknown as MagickFormat, (o) => {
-				resolve(structuredClone(o));
+		// magick-wasm automatically clamps (https://github.com/dlemstra/magick-wasm/blob/76fc6f2b0c0497d2ddc251bbf6174b4dc92ac3ea/src/magick-image.ts#L2480)
+		if (compression) img.quality = compression;
+
+		if (originalMetadata) {
+			originalMetadata.forEach((value, key) => {
+				try {
+					if (!key.endsWith(":profile")) img.setAttribute(key, value);
+				} catch (e) {
+					console.warn(`Failed to set metadata ${key}: ${e}`);
+				}
 			});
+		}
+
+		img.write(fmt as unknown as MagickFormat, (o: Uint8Array) => {
+			resolve(structuredClone(o));
 		});
 	});
 
