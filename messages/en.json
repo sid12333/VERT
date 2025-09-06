@@ -74,7 +74,13 @@
 			"cant_convert": "We can't convert this file.",
 			"vertd_server": "what are you doing..? you're supposed to run the vertd server!",
 			"unsupported_format": "Only image, video, audio, and document files are supported",
-			"vertd_not_found": "Could not find the vertd instance to start video conversion. Are you sure the instance URL is set correctly?"
+			"vertd_not_found": "Could not find the vertd instance to start video conversion. Are you sure the instance URL is set correctly?",
+			"worker_downloading": "The {type} converter is currently being initialized, please wait a few moments.",
+			"worker_error": "The {type} converter had an error during initialization, please try again later.",
+			"worker_timeout": "The {type} converter is taking longer than expected to initialize, please wait a few moments.",
+			"audio": "audio",
+			"doc": "document",
+			"image": "image"
 		}
 	},
 	"settings": {

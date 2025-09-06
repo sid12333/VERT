@@ -1,10 +1,6 @@
 import type { VertFile } from "$lib/types";
 
-export type WorkerStatus =
-	| "not-ready"
-	| "downloading"
-	| "ready"
-	| "error";
+export type WorkerStatus = "not-ready" | "downloading" | "ready" | "error";
 
 export class FormatInfo {
 	public name: string;
@@ -41,6 +37,25 @@ export class Converter {
 
 	public status: WorkerStatus = $state("not-ready");
 	public readonly reportsProgress: boolean = false;
+
+	private timeoutId?: number;
+
+	constructor(public readonly timeout: number = 10) {
+		this.startTimeout();
+	}
+
+	private startTimeout() {
+		this.timeoutId = setTimeout(() => {
+			if (this.status !== "ready") this.status = "not-ready";
+		}, this.timeout * 1000);
+	}
+
+	protected clearTimeout() {
+		if (this.timeoutId) {
+			clearTimeout(this.timeoutId);
+			this.timeoutId = undefined;
+		}
+	}
 
 	/**
 	 * Convert a file to a different format.

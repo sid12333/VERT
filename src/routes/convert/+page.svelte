@@ -202,6 +202,57 @@
 					</p>
 				</div>
 			{/if}
+		{:else if currentConverter && currentConverter.status === "downloading"}
+			<div
+				class="h-full flex flex-col text-center justify-center text-failure"
+			>
+				<p class="font-body font-bold">{m["convert.errors.cant_convert"]()}</p>
+				<p class="font-normal">
+					{m["convert.errors.worker_downloading"]({ 
+						type: isAudio 
+							? m["convert.errors.audio"]() 
+							: isVideo 
+								? "Video" 
+								: isDocument 
+									? m["convert.errors.doc"]() 
+									: m["convert.errors.image"]()
+					})}
+				</p>
+			</div>
+		{:else if currentConverter && currentConverter.status === "error"}
+			<div
+				class="h-full flex flex-col text-center justify-center text-failure"
+			>
+				<p class="font-body font-bold">{m["convert.errors.cant_convert"]()}</p>
+				<p class="font-normal">
+					{m["convert.errors.worker_error"]({ 
+						type: isAudio 
+							? m["convert.errors.audio"]() 
+							: isVideo 
+								? "Video" 
+								: isDocument 
+									? m["convert.errors.doc"]() 
+									: m["convert.errors.image"]()
+					})}
+				</p>
+			</div>
+		{:else if currentConverter && currentConverter.status === "not-ready"}
+			<div
+				class="h-full flex flex-col text-center justify-center text-failure"
+			>
+				<p class="font-body font-bold">{m["convert.errors.cant_convert"]()}</p>
+				<p class="font-normal">
+					{m["convert.errors.worker_timeout"]({ 
+						type: isAudio 
+							? m["convert.errors.audio"]() 
+							: isVideo 
+								? "Video" 
+								: isDocument 
+									? m["convert.errors.doc"]() 
+									: m["convert.errors.image"]()
+					})}
+				</p>
+			</div>
 		{:else if isVideo && !isAudio && !isImage && !isDocument && !$vertdLoaded}
 			<div
 				class="h-full flex flex-col text-center justify-center text-failure"
