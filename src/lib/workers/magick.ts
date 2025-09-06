@@ -10,7 +10,6 @@ import { makeZip } from "client-zip";
 import wasm from "@imagemagick/magick-wasm/magick.wasm?url";
 import { parseAni } from "$lib/parse/ani";
 import { parseIcns } from "vert-wasm";
-import { log } from "$lib/logger";
 
 const magickPromise = initializeImageMagick(new URL(wasm, import.meta.url));
 
@@ -98,7 +97,7 @@ const handleMessage = async (message: any): Promise<any> => {
 					zip: true,
 				};
 			} else if (message.input.from === ".ani") {
-				log(["workers", "imagemagick"], "Parsing ANI file")
+				console.log("Parsing ANI file");
 				try {
 					const parsedAni = parseAni(new Uint8Array(buffer));
 					const files: File[] = [];
@@ -258,18 +257,15 @@ const handleMessage = async (message: any): Promise<any> => {
 									metadata.set(attrName, value);
 								}
 							}
-						} catch { 
-							// do nothing 
+						} catch {
+							// do nothing
 						}
 					}
 				}
 
-				if (metadata.size === 0) {
-					metadata = undefined;
-				}
+				console.log(`Parsed ${metadata.size} metadata values`);
 
-				log(["workers", "imagemagick"], `Parsed ${metadata.size} metadata values`)
-
+				if (metadata.size === 0) metadata = undefined;
 			} catch (e) {
 				console.warn("Failed to extract metadata:", e);
 				metadata = undefined;
