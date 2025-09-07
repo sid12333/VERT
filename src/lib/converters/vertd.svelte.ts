@@ -67,6 +67,7 @@ interface StartJobMessage {
 		jobId: string;
 		to: string;
 		speed: ConversionSpeed;
+		keepMetadata: boolean;
 	};
 }
 
@@ -254,6 +255,7 @@ export class VertdConverter extends Converter {
 			);
 			ws.onopen = () => {
 				const speed = Settings.instance.settings.vertdSpeed;
+				const keepMetadata = Settings.instance.settings.metadata;
 				this.log("opened ws connection to vertd");
 				const msg: StartJobMessage = {
 					type: "startJob",
@@ -262,6 +264,7 @@ export class VertdConverter extends Converter {
 						token: uploadRes.auth,
 						to,
 						speed,
+						keepMetadata
 					},
 				};
 				ws.send(JSON.stringify(msg));

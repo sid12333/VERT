@@ -100,7 +100,6 @@ export class MagickConverter extends Converter {
 					["converters", this.name],
 					`error in worker: ${message.error}`,
 				);
-				this.status = "error";
 				addToast("error", m["workers.errors.magick"]());
 			}
 		};
