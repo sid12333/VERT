@@ -83,9 +83,9 @@ export class FFmpegConverter extends Converter {
 			(async () => {
 				const baseURL =
 					"https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.10/dist/esm";
-				
+
 				this.status = "downloading";
-				
+
 				await this.ffmpeg.load({
 					coreURL: `${baseURL}/ffmpeg-core.js`,
 					wasmURL: `${baseURL}/ffmpeg-core.wasm`,
@@ -289,8 +289,23 @@ export class FFmpegConverter extends Converter {
 		const userSampleRate = Settings.instance.settings.ffmpegSampleRate;
 		const customSampleRate =
 			Settings.instance.settings.ffmpegCustomSampleRate ?? 44100;
+		const keepMetadata = Settings.instance.settings.metadata;
+
 		let audioBitrateArgs: string[] = [];
 		let sampleRateArgs: string[] = [];
+		let metadataArgs: string[] = [];
+
+		log(["converters", this.name], `keep metadata: ${keepMetadata}`);
+		if (!keepMetadata) {
+			metadataArgs = [
+				"-map_metadata", // remove metadata
+				"-1",
+				"-map_chapters", // remove chapters
+				"-1",
+				"-map", // remove cover art
+				"a",
+			];
+		}
 
 		const isLosslessToLossy =
 			lossless.includes(inputFormat) && !lossless.includes(outputFormat);
@@ -366,6 +381,7 @@ export class FFmpegConverter extends Converter {
 				"input",
 				"-map",
 				"0:a:0",
+				...metadataArgs,
 				...audioBitrateArgs,
 				...sampleRateArgs,
 				"output" + to,
@@ -379,7 +395,9 @@ export class FFmpegConverter extends Converter {
 				`Converting audio ${input.from} to video ${to}`,
 			);
 
-			const hasAlbumArt = await this.extractAlbumArt(ffmpeg);
+			const hasAlbumArt = keepMetadata
+				? await this.extractAlbumArt(ffmpeg)
+				: false;
 			const codecArgs = toArgs(to);
 
 			if (hasAlbumArt) {
@@ -402,6 +420,7 @@ export class FFmpegConverter extends Converter {
 					"-r",
 					"1",
 					...codecArgs,
+					...metadataArgs,
 					...audioBitrateArgs,
 					...sampleRateArgs,
 					"output" + to,
@@ -421,6 +440,7 @@ export class FFmpegConverter extends Converter {
 					"-r",
 					"1",
 					...codecArgs,
+					...metadataArgs,
 					...audioBitrateArgs,
 					...sampleRateArgs,
 					"output" + to,
@@ -439,6 +459,7 @@ export class FFmpegConverter extends Converter {
 			"input",
 			"-c:a",
 			audioCodec,
+			...metadataArgs,
 			...audioBitrateArgs,
 			...sampleRateArgs,
 			"output" + to,

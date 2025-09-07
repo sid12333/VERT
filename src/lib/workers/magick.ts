@@ -26,6 +26,7 @@ const handleMessage = async (message: any): Promise<any> => {
 	switch (message.type) {
 		case "convert": {
 			const compression: number | undefined = message.compression;
+			const keepMetadata: boolean = message.keepMetadata ?? true;
 			if (!message.to.startsWith(".")) message.to = `.${message.to}`;
 			message.to = message.to.toLowerCase();
 			if (message.to === ".jfif") message.to = ".jpeg";
@@ -69,6 +70,7 @@ const handleMessage = async (message: any): Promise<any> => {
 						const output = await magickConvert(
 							img,
 							message.to,
+							keepMetadata,
 							compression,
 						);
 						convertedImgs[i] = output;
@@ -111,6 +113,7 @@ const handleMessage = async (message: any): Promise<any> => {
 									}),
 								),
 								message.to,
+								keepMetadata,
 								compression,
 							);
 							files.push(
@@ -161,6 +164,7 @@ const handleMessage = async (message: any): Promise<any> => {
 							const converted = await magickConvert(
 								img,
 								message.to,
+								keepMetadata,
 								compression,
 							);
 							outputs.push(converted);
@@ -225,57 +229,11 @@ const handleMessage = async (message: any): Promise<any> => {
 				}),
 			);
 
-			// extract metadata
-			let metadata: Map<string, string> | undefined;
-			try {
-				metadata = new Map();
-
-				const exifProfile = img.getProfile("exif");
-				if (exifProfile) {
-					metadata.set("exif:profile", "true");
-				}
-
-				const iccProfile = img.getProfile("icc");
-				if (iccProfile) {
-					metadata.set("icc:profile", "true");
-				}
-
-				const attributeNames = img.attributeNames;
-				if (attributeNames && attributeNames.length > 0) {
-					for (const attrName of attributeNames) {
-						try {
-							if (
-								attrName.startsWith("exif:") ||
-								attrName.startsWith("icc:") ||
-								attrName.startsWith("date:") ||
-								attrName.startsWith("tiff:") ||
-								attrName.startsWith("xmp:") ||
-								attrName.startsWith("iptc:")
-							) {
-								const value = img.getAttribute(attrName);
-								if (value) {
-									metadata.set(attrName, value);
-								}
-							}
-						} catch {
-							// do nothing
-						}
-					}
-				}
-
-				console.log(`Parsed ${metadata.size} metadata values`);
-
-				if (metadata.size === 0) metadata = undefined;
-			} catch (e) {
-				console.warn("Failed to extract metadata:", e);
-				metadata = undefined;
-			}
-
 			const converted = await magickConvert(
 				img,
 				message.to,
+				keepMetadata,
 				compression,
-				metadata,
 			);
 
 			return {
@@ -305,8 +263,8 @@ const readToEnd = async (reader: ReadableStreamDefaultReader<Uint8Array>) => {
 const magickConvert = async (
 	img: IMagickImage,
 	to: string,
+	keepMetadata: boolean,
 	compression?: number,
-	originalMetadata?: Map<string, string>,
 ) => {
 	let fmt = to.slice(1).toUpperCase();
 	if (fmt === "JFIF") fmt = "JPEG";
@@ -314,16 +272,7 @@ const magickConvert = async (
 	const result = await new Promise<Uint8Array>((resolve) => {
 		// magick-wasm automatically clamps (https://github.com/dlemstra/magick-wasm/blob/76fc6f2b0c0497d2ddc251bbf6174b4dc92ac3ea/src/magick-image.ts#L2480)
 		if (compression) img.quality = compression;
-
-		if (originalMetadata) {
-			originalMetadata.forEach((value, key) => {
-				try {
-					if (!key.endsWith(":profile")) img.setAttribute(key, value);
-				} catch (e) {
-					console.warn(`Failed to set metadata ${key}: ${e}`);
-				}
-			});
-		}
+		if (!keepMetadata) img.strip();
 
 		img.write(fmt as unknown as MagickFormat, (o: Uint8Array) => {
 			resolve(structuredClone(o));

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import FancyTextInput from "$lib/components/functional/FancyInput.svelte";
 	import Panel from "$lib/components/visual/Panel.svelte";
-	import { RefreshCwIcon } from "lucide-svelte";
+	import { PauseIcon, PlayIcon, RefreshCwIcon } from "lucide-svelte";
 	import type { ISettings } from "./index.svelte";
 	import {
 		CONVERSION_BITRATES,
@@ -12,6 +12,7 @@
 	import { m } from "$lib/paraglide/messages";
 	import Dropdown from "$lib/components/functional/Dropdown.svelte";
 	import FancyInput from "$lib/components/functional/FancyInput.svelte";
+	import { effects } from "$lib/store/index.svelte";
 
 	const { settings }: { settings: ISettings } = $props();
 </script>
@@ -42,6 +43,43 @@
 					extension={".ext"}
 					type="text"
 				/>
+			</div>
+			<div class="flex flex-col gap-4">
+				<div class="flex flex-col gap-2">
+					<p class="text-base font-bold">
+						{m["settings.conversion.metadata"]()}
+					</p>
+					<p class="text-sm text-muted font-normal italic">
+						{m["settings.conversion.metadata_description"]()}
+					</p>
+				</div>
+				<div class="flex flex-col gap-3 w-full">
+					<div class="flex gap-3 w-full">
+						<button
+							onclick={() => (settings.metadata = true)}
+							class="btn {$effects
+								? ''
+								: '!scale-100'} {settings.metadata
+								? 'selected'
+								: ''} flex-1 p-4 rounded-lg text-black dynadark:text-white flex items-center justify-center"
+						>
+							<PlayIcon size="24" class="inline-block mr-2" />
+							{m["settings.conversion.keep"]()}
+						</button>
+
+						<button
+							onclick={() => (settings.metadata = false)}
+							class="btn {$effects
+								? ''
+								: '!scale-100'} {settings.metadata
+								? ''
+								: 'selected'} flex-1 p-4 rounded-lg text-black dynadark:text-white flex items-center justify-center"
+						>
+							<PauseIcon size="24" class="inline-block mr-2" />
+							{m["settings.conversion.remove"]()}
+						</button>
+					</div>
+				</div>
 			</div>
 			<div class="flex flex-col gap-4">
 				<div class="flex flex-col gap-2">
@@ -100,7 +138,9 @@
 						/>
 					</div>
 					<div class="flex flex-col gap-2">
-						<p class="text-sm font-bold select-none">&nbsp;&nbsp;</p>
+						<p class="text-sm font-bold select-none">
+							&nbsp;&nbsp;
+						</p>
 						<FancyInput
 							bind:value={
 								settings.ffmpegCustomSampleRate as unknown as string

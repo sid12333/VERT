@@ -5,6 +5,7 @@ interface ConvertMessage {
 	input: VertFile;
 	to: string;
 	compression: number | null;
+	keepMetadata?: boolean;
 }
 
 interface FinishedMessage {

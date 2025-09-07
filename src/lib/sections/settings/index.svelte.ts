@@ -7,8 +7,10 @@ export { default as Conversion } from "./Conversion.svelte";
 export { default as Vertd } from "./Vertd.svelte";
 export { default as Privacy } from "./Privacy.svelte";
 
+// TODO: clean up settings & button code (componetize)
 export interface ISettings {
 	filenameFormat: string;
+	metadata: boolean;
 	plausible: boolean;
 	vertdURL: string;
 	vertdSpeed: ConversionSpeed; // videos
@@ -23,6 +25,7 @@ export class Settings {
 
 	public settings: ISettings = $state({
 		filenameFormat: "VERT_%name%",
+		metadata: true,
 		plausible: true,
 		vertdURL: PUB_VERTD_URL,
 		vertdSpeed: "slow",

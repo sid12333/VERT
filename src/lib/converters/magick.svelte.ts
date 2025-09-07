@@ -139,6 +139,8 @@ export class MagickConverter extends Converter {
 		}
 
 		// every other format handled by magick worker
+		const keepMetadata: boolean = Settings.instance.settings.metadata ?? true;
+		log(["converters", this.name], `keep metadata: ${keepMetadata}`);
 		const msg = {
 			type: "convert",
 			input: {
@@ -149,6 +151,7 @@ export class MagickConverter extends Converter {
 			},
 			to,
 			compression,
+			keepMetadata,
 		} as WorkerMessage;
 		const res = await this.sendMessage(msg);
 
