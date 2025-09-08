@@ -8,8 +8,17 @@ export { default as Vertd } from "./Vertd.svelte";
 export { default as Privacy } from "./Privacy.svelte";
 
 // TODO: clean up settings & button code (componetize)
+
+export interface DefaultFormats {
+	image: string;
+	video: string;
+	audio: string;
+	document: string;
+}
 export interface ISettings {
 	filenameFormat: string;
+	defaultFormat: DefaultFormats;
+	useDefaultFormat: boolean;
 	metadata: boolean;
 	plausible: boolean;
 	vertdURL: string;
@@ -25,6 +34,13 @@ export class Settings {
 
 	public settings: ISettings = $state({
 		filenameFormat: "VERT_%name%",
+		defaultFormat: {
+			image: ".png",
+			video: ".mp4",
+			audio: ".mp3",
+			document: ".docx",
+		},
+		useDefaultFormat: false,
 		metadata: true,
 		plausible: true,
 		vertdURL: PUB_VERTD_URL,

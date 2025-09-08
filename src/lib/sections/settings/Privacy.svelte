@@ -6,7 +6,7 @@
 	import { m } from "$lib/paraglide/messages";
 	import { link } from "$lib/store/index.svelte";
 
-	const { settings }: { settings: ISettings } = $props();
+	const { settings = $bindable() }: { settings: ISettings } = $props();
 </script>
 
 <Panel class="flex flex-col gap-8 p-6">

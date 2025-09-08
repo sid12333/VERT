@@ -59,14 +59,14 @@
 		class="w-full max-w-[1280px] flex flex-col md:flex-row gap-4 p-4 md:px-4 md:py-0"
 	>
 		<div class="flex flex-col gap-4 flex-1">
-			<Settings.Conversion {settings} />
-			<Settings.Vertd {settings} />
+			<Settings.Conversion bind:settings />
+			<Settings.Vertd bind:settings />
 		</div>
 
 		<div class="flex flex-col gap-4 flex-1">
 			<Settings.Appearance />
 			{#if PUB_PLAUSIBLE_URL}
-				<Settings.Privacy {settings} />
+				<Settings.Privacy bind:settings />
 			{/if}
 		</div>
 	</div>

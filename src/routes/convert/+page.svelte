@@ -27,21 +27,79 @@
 		RotateCwIcon,
 		XIcon,
 	} from "lucide-svelte";
-	import { onMount } from "svelte";
 	import { m } from "$lib/paraglide/messages";
+	import { Settings } from "$lib/sections/settings/index.svelte";
 
-	onMount(() => {
-		// depending on format, select right category and format
+	let processedFileIds = $state(new Set<string>());
+
+	$effect(() => {
+		if (!Settings.instance.settings || files.files.length === 0) return;
+
 		files.files.forEach((file) => {
+			const settings = Settings.instance.settings;
+			if (processedFileIds.has(file.id)) return;
+
 			const converter = file.findConverter();
-			if (converter) {
-				const category = Object.keys(categories).find((cat) =>
-					categories[cat].formats.includes(file.to),
-				);
-				if (category) {
-					file.to = file.to || categories[category].formats[0];
+			if (!converter) return;
+
+			let category: string | undefined;
+			const isImage = converters
+				.find((c) => c.name === "imagemagick")
+				?.formatStrings((f) => f.fromSupported)
+				.includes(file.from);
+			const isAudio = converters
+				.find((c) => c.name === "ffmpeg")
+				?.supportedFormats.filter((f) => f.isNative)
+				.map((f) => f.name)
+				.includes(file.from);
+			const isVideo = converters
+				.find((c) => c.name === "vertd")
+				?.supportedFormats.filter((f) => f.isNative)
+				.map((f) => f.name)
+				.includes(file.from);
+			const isDocument = converters
+				.find((c) => c.name === "pandoc")
+				?.supportedFormats.filter((f) => f.isNative)
+				.map((f) => f.name)
+				.includes(file.from);
+
+			if (isImage) category = "image";
+			else if (isAudio) category = "audio";
+			else if (isVideo) category = "video";
+			else if (isDocument) category = "doc";
+			if (!category) return;
+
+			let targetFormat: string | undefined;
+
+			// use default format if enabled
+			if (settings.useDefaultFormat) {
+				let defaultFormat: string | undefined;
+				const df = settings.defaultFormat;
+				if (category === "image") defaultFormat = df.image;
+				else if (category === "audio") defaultFormat = df.audio;
+				else if (category === "video") defaultFormat = df.video;
+				else if (category === "doc") defaultFormat = df.document;
+
+				if (
+					defaultFormat &&
+					defaultFormat !== file.from &&
+					categories[category]?.formats.includes(defaultFormat)
+				) {
+					targetFormat = defaultFormat;
 				}
 			}
+
+			// else use first available format (or if default format is same as input)
+			if (!targetFormat) {
+				const firstDiff = categories[category]?.formats.find(
+					(f) => f !== file.from,
+				);
+				targetFormat =
+					firstDiff || categories[category]?.formats[0] || "";
+			}
+
+			file.to = targetFormat;
+			processedFileIds.add(file.id);
 		});
 	});
 
@@ -132,23 +190,38 @@
 	<Panel class="p-5 flex flex-col min-w-0 gap-4 relative">
 		<div class="flex-shrink-0 h-8 w-full flex items-center gap-2">
 			{#if !converters.length}
-				<Tooltip text={m["convert.tooltips.unknown_file"]()} position="bottom">
+				<Tooltip
+					text={m["convert.tooltips.unknown_file"]()}
+					position="bottom"
+				>
 					<FileQuestionIcon size="24" class="flex-shrink-0" />
 				</Tooltip>
 			{:else if isAudio}
-				<Tooltip text={m["convert.tooltips.audio_file"]()} position="bottom">
+				<Tooltip
+					text={m["convert.tooltips.audio_file"]()}
+					position="bottom"
+				>
 					<AudioLines size="24" class="flex-shrink-0" />
 				</Tooltip>
 			{:else if isVideo}
-				<Tooltip text={m["convert.tooltips.video_file"]()} position="bottom">
+				<Tooltip
+					text={m["convert.tooltips.video_file"]()}
+					position="bottom"
+				>
 					<FilmIcon size="24" class="flex-shrink-0" />
 				</Tooltip>
 			{:else if isDocument}
-				<Tooltip text={m["convert.tooltips.document_file"]()} position="bottom">
+				<Tooltip
+					text={m["convert.tooltips.document_file"]()}
+					position="bottom"
+				>
 					<BookText size="24" class="flex-shrink-0" />
 				</Tooltip>
 			{:else}
-				<Tooltip text={m["convert.tooltips.image_file"]()} position="bottom">
+				<Tooltip
+					text={m["convert.tooltips.image_file"]()}
+					position="bottom"
+				>
 					<ImageIcon size="24" class="flex-shrink-0" />
 				</Tooltip>
 			{/if}
@@ -206,16 +279,18 @@
 			<div
 				class="h-full flex flex-col text-center justify-center text-failure"
 			>
-				<p class="font-body font-bold">{m["convert.errors.cant_convert"]()}</p>
+				<p class="font-body font-bold">
+					{m["convert.errors.cant_convert"]()}
+				</p>
 				<p class="font-normal">
-					{m["convert.errors.worker_downloading"]({ 
-						type: isAudio 
-							? m["convert.errors.audio"]() 
-							: isVideo 
-								? "Video" 
-								: isDocument 
-									? m["convert.errors.doc"]() 
-									: m["convert.errors.image"]()
+					{m["convert.errors.worker_downloading"]({
+						type: isAudio
+							? m["convert.errors.audio"]()
+							: isVideo
+								? "Video"
+								: isDocument
+									? m["convert.errors.doc"]()
+									: m["convert.errors.image"](),
 					})}
 				</p>
 			</div>
@@ -223,16 +298,18 @@
 			<div
 				class="h-full flex flex-col text-center justify-center text-failure"
 			>
-				<p class="font-body font-bold">{m["convert.errors.cant_convert"]()}</p>
+				<p class="font-body font-bold">
+					{m["convert.errors.cant_convert"]()}
+				</p>
 				<p class="font-normal">
-					{m["convert.errors.worker_error"]({ 
-						type: isAudio 
-							? m["convert.errors.audio"]() 
-							: isVideo 
-								? "Video" 
-								: isDocument 
-									? m["convert.errors.doc"]() 
-									: m["convert.errors.image"]()
+					{m["convert.errors.worker_error"]({
+						type: isAudio
+							? m["convert.errors.audio"]()
+							: isVideo
+								? "Video"
+								: isDocument
+									? m["convert.errors.doc"]()
+									: m["convert.errors.image"](),
 					})}
 				</p>
 			</div>
@@ -240,16 +317,18 @@
 			<div
 				class="h-full flex flex-col text-center justify-center text-failure"
 			>
-				<p class="font-body font-bold">{m["convert.errors.cant_convert"]()}</p>
+				<p class="font-body font-bold">
+					{m["convert.errors.cant_convert"]()}
+				</p>
 				<p class="font-normal">
-					{m["convert.errors.worker_timeout"]({ 
-						type: isAudio 
-							? m["convert.errors.audio"]() 
-							: isVideo 
-								? "Video" 
-								: isDocument 
-									? m["convert.errors.doc"]() 
-									: m["convert.errors.image"]()
+					{m["convert.errors.worker_timeout"]({
+						type: isAudio
+							? m["convert.errors.audio"]()
+							: isVideo
+								? "Video"
+								: isDocument
+									? m["convert.errors.doc"]()
+									: m["convert.errors.image"](),
 					})}
 				</p>
 			</div>
@@ -257,7 +336,9 @@
 			<div
 				class="h-full flex flex-col text-center justify-center text-failure"
 			>
-				<p class="font-body font-bold">{m["convert.errors.cant_convert"]()}</p>
+				<p class="font-body font-bold">
+					{m["convert.errors.cant_convert"]()}
+				</p>
 				<p class="font-normal">
 					{m["convert.errors.vertd_not_found"]()}
 				</p>
@@ -311,7 +392,10 @@
 							onselect={(option) => handleSelect(option, file)}
 						/>
 						<div class="w-full flex items-center justify-between">
-							<Tooltip text={m["convert.tooltips.convert_file"]()} position="bottom">
+							<Tooltip
+								text={m["convert.tooltips.convert_file"]()}
+								position="bottom"
+							>
 								<button
 									class="btn {$effects
 										? ''

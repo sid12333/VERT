@@ -50,9 +50,10 @@ class Files {
 					});
 					const cover = selectCover(common.picture);
 					if (cover) {
-						const arrayBuffer = cover.data.buffer instanceof ArrayBuffer
-							? cover.data.buffer
-							: new Uint8Array(cover.data).buffer;
+						const arrayBuffer =
+							cover.data.buffer instanceof ArrayBuffer
+								? cover.data.buffer
+								: new Uint8Array(cover.data).buffer;
 						const blob = new Blob([new Uint8Array(arrayBuffer)], {
 							type: cover.format,
 						});
@@ -114,15 +115,23 @@ class Files {
 			? (mediaElement as HTMLVideoElement).videoHeight
 			: (mediaElement as HTMLImageElement).height;
 
-		if (width === 0 || height === 0) {
-			URL.revokeObjectURL(mediaElement.src);
-			return undefined;
-		}
-
 		const scale = Math.max(maxSize / width, maxSize / height);
 		canvas.width = width * scale;
 		canvas.height = height * scale;
 		ctx.drawImage(mediaElement, 0, 0, canvas.width, canvas.height);
+
+		// check if completely transparent
+		const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+		const isTransparent = Array.from(imageData.data).every(
+			(value, index) => {
+				return (index + 1) % 4 !== 0 || value === 0;
+			},
+		);
+		if (isTransparent) {
+			canvas.remove();
+			return undefined;
+		}
+
 		const url = canvas.toDataURL();
 		canvas.remove();
 		return url;
@@ -313,9 +322,9 @@ export const effects = writable(true);
 export const theme = writable<"light" | "dark">("light");
 export const locale = writable(getLocale());
 export const availableLocales = {
-	"en": "English",
-	"es": "Español",
-}
+	en: "English",
+	es: "Español",
+};
 
 export function updateLocale(newLocale: string) {
 	log(["locale"], `set to ${newLocale}`);
@@ -331,7 +340,7 @@ export function link(
 	text: string,
 	links: string | string[],
 	newTab?: boolean | boolean[],
-	className?: string | string[]
+	className?: string | string[],
 ) {
 	if (!text) return "";
 
@@ -344,12 +353,15 @@ export function link(
 
 	tags.forEach((t, i) => {
 		const link = linksArr[i] ?? "#";
-		const target = newTabArr[i] ? 'target="_blank" rel="noopener noreferrer"' : "";
+		const target = newTabArr[i]
+			? 'target="_blank" rel="noopener noreferrer"'
+			: "";
 		const cls = classArr[i] ? `class="${classArr[i]}"` : "";
 
 		const regex = new RegExp(`\\[${t}\\](.*?)\\[\\/${t}\\]`, "g");
-		result = result.replace(regex, (_, inner) => 
-			`<a href="${link}" ${target} ${cls} >${inner}</a>`
+		result = result.replace(
+			regex,
+			(_, inner) => `<a href="${link}" ${target} ${cls} >${inner}</a>`,
 		);
 	});
 

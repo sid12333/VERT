@@ -31,6 +31,7 @@
 	let searchQuery = $state("");
 	let dropdownMenu: HTMLElement | undefined = $state();
 	let rootCategory: string | null = null;
+	let dropdownPosition = $state<"left" | "center" | "right">("center");
 
 	// initialize current category
 	$effect(() => {
@@ -86,13 +87,15 @@
 
 		// if no query, return formats for current category
 		if (!searchQuery) {
+			let formats = currentCategory
+				? categories[currentCategory].formats.filter((format) =>
+						shouldInclude(format, currentCategory!),
+					)
+				: [];
+
 			return {
 				categories: availableCategories,
-				formats: currentCategory
-					? categories[currentCategory].formats.filter((format) =>
-							shouldInclude(format, currentCategory!),
-						)
-					: [],
+				formats,
 			};
 		}
 		const searchLower = normalize(searchQuery);
@@ -213,6 +216,34 @@
 	const clickDropdown = () => {
 		open = !open;
 		if (!open) return;
+
+		// keep within viewport
+		if (dropdown) {
+			const rect = dropdown.getBoundingClientRect();
+			const viewportWidth = window.innerWidth;
+
+			let dropdownWidth: number;
+			if (dropdownSize === "large") {
+				dropdownWidth = rect.width * 3.2;
+			} else if (dropdownSize === "default") {
+				dropdownWidth = rect.width * 2.5;
+			} else {
+				dropdownWidth = rect.width * 1.5;
+			}
+
+			const centerX = rect.left + rect.width / 2;
+			const leftEdge = centerX - dropdownWidth / 2;
+			const rightEdge = centerX + dropdownWidth / 2;
+
+			if (leftEdge < 0) {
+				dropdownPosition = "left";
+			} else if (rightEdge > viewportWidth) {
+				dropdownPosition = "right";
+			} else {
+				dropdownPosition = "center";
+			}
+		}
+
 		setTimeout(() => {
 			if (!dropdownMenu) return;
 			const searchInput = dropdownMenu.querySelector(
@@ -232,23 +263,20 @@
 			}
 		};
 
-		window.addEventListener("click", handleClickOutside);
-		return () => window.removeEventListener("click", handleClickOutside);
-	});
+		const handleResize = () => {
+			if (open) {
+				// recalculate dropdown position on resize
+				clickDropdown();
+				open = true;
+			}
+		};
 
-	// initialize selected format if none chosen
-	$effect(() => {
-		if (
-			!selected &&
-			currentCategory &&
-			categories[currentCategory]?.formats?.length > 0
-		) {
-			const from = files.files[0]?.from;
-			const firstDiff = categories[currentCategory].formats.find(
-				(f) => f !== from,
-			);
-			selected = firstDiff || categories[currentCategory].formats[0];
-		}
+		window.addEventListener("click", handleClickOutside);
+		window.addEventListener("resize", handleResize);
+		return () => {
+			window.removeEventListener("click", handleClickOutside);
+			window.removeEventListener("resize", handleResize);
+		};
 	});
 </script>
 
@@ -258,7 +286,7 @@
 >
 	<button
 		class="relative flex items-center justify-center w-full font-display px-3 py-3.5 bg-button rounded-full overflow-hidden cursor-pointer focus:!outline-none
-		{disabled ? 'opacity-50 cursor-auto' : 'cursor-pointer'}"
+		{disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}"
 		onclick={() => clickDropdown()}
 		{disabled}
 	>
@@ -278,7 +306,7 @@
 					}}
 					class="col-start-1 row-start-1 text-center font-body font-medium truncate max-w-[4rem]"
 				>
-					{selected}
+					{selected || "N/A"}
 				</p>
 			{/key}
 			{#if currentCategory}
@@ -308,11 +336,16 @@
 			class={clsx(
 				$isMobile
 					? "fixed inset-x-0 bottom-0 w-full z-[200] shadow-xl bg-panel-alt shadow-black/25 rounded-t-2xl overflow-hidden"
-					: "min-w-full shadow-xl bg-panel-alt shadow-black/25 absolute -translate-x-1/2 top-full mt-2 z-50 rounded-2xl overflow-hidden",
+					: "min-w-full shadow-xl bg-panel-alt shadow-black/25 absolute top-full mt-2 z-50 rounded-2xl overflow-hidden",
 				!$isMobile && {
 					"w-[320%]": dropdownSize === "large",
 					"w-[250%]": dropdownSize === "default",
 					"w-[150%]": dropdownSize === "small",
+				},
+				!$isMobile && {
+					"-translate-x-1/2 left-1/2": dropdownPosition === "center",
+					"left-0": dropdownPosition === "left",
+					"right-0": dropdownPosition === "right",
 				},
 			)}
 		>

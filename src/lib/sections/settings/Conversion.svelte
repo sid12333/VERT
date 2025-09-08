@@ -13,8 +13,10 @@
 	import Dropdown from "$lib/components/functional/Dropdown.svelte";
 	import FancyInput from "$lib/components/functional/FancyInput.svelte";
 	import { effects } from "$lib/store/index.svelte";
+	import FormatDropdown from "$lib/components/functional/FormatDropdown.svelte";
+	import { categories } from "$lib/converters";
 
-	const { settings }: { settings: ISettings } = $props();
+	const { settings = $bindable() }: { settings: ISettings } = $props();
 </script>
 
 <Panel class="flex flex-col gap-8 p-6">
@@ -43,6 +45,89 @@
 					extension={".ext"}
 					type="text"
 				/>
+			</div>
+			<div class="flex flex-col gap-4">
+				<div class="flex flex-col gap-2">
+					<p class="text-base font-bold">
+						{m["settings.conversion.default_format"]()}
+					</p>
+					<p class="text-sm text-muted font-normal">
+						{m["settings.conversion.default_format_description"]()}
+					</p>
+				</div>
+				<div class="flex flex-col gap-3 w-full">
+					<div class="flex gap-3 w-full">
+						<button
+							onclick={() => (settings.useDefaultFormat = true)}
+							class="btn {$effects
+								? ''
+								: '!scale-100'} {settings.useDefaultFormat
+								? 'selected'
+								: ''} flex-1 p-4 rounded-lg text-black dynadark:text-white flex items-center justify-center"
+						>
+							<PlayIcon size="24" class="inline-block mr-2" />
+							Enable
+						</button>
+
+						<button
+							onclick={() => (settings.useDefaultFormat = false)}
+							class="btn {$effects
+								? ''
+								: '!scale-100'} {settings.useDefaultFormat
+								? ''
+								: 'selected'} flex-1 p-4 rounded-lg text-black dynadark:text-white flex items-center justify-center"
+						>
+							<PauseIcon size="24" class="inline-block mr-2" />
+							Disable
+						</button>
+					</div>
+				</div>
+				<div class="grid gap-3 grid-cols-2 md:grid-cols-4" class:opacity-50={!settings.useDefaultFormat}>
+					<div class="flex flex-col gap-2">
+						<p class="text-sm font-bold">
+							{m["settings.conversion.default_format_image"]()}
+						</p>
+						<FormatDropdown
+							categories={{image: categories.image}}
+							from={".png"}
+							bind:selected={settings.defaultFormat.image}
+							disabled={!settings.useDefaultFormat}
+						/>
+					</div>
+					<div class="flex flex-col gap-2">
+						<p class="text-sm font-bold">
+							{m["settings.conversion.default_format_audio"]()}
+						</p>
+						<FormatDropdown
+							categories={{audio: categories.audio}}
+							from={".mp3"}
+							bind:selected={settings.defaultFormat.audio}
+							disabled={!settings.useDefaultFormat}
+						/>
+					</div>
+					<div class="flex flex-col gap-2">
+						<p class="text-sm font-bold">
+							{m["settings.conversion.default_format_video"]()}
+						</p>
+						<FormatDropdown
+							categories={{video: categories.video}}
+							from={".mp4"}
+							bind:selected={settings.defaultFormat.video}
+							disabled={!settings.useDefaultFormat}
+						/>
+					</div>
+					<div class="flex flex-col gap-2">
+						<p class="text-sm font-bold">
+							{m["settings.conversion.default_format_document"]()}
+						</p>
+						<FormatDropdown
+							categories={{doc: categories.doc}}
+							from={".docx"}
+							bind:selected={settings.defaultFormat.document}
+							disabled={!settings.useDefaultFormat}
+						/>
+					</div>
+				</div>
 			</div>
 			<div class="flex flex-col gap-4">
 				<div class="flex flex-col gap-2">

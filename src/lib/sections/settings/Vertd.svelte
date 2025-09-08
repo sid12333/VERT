@@ -13,7 +13,7 @@
 	let vertdCommit = $state<string | null>(null);
 	let abortController: AbortController | null = null;
 
-	const { settings }: { settings: ISettings } = $props();
+	const { settings = $bindable() }: { settings: ISettings } = $props();
 
 	$effect(() => {
 		if (settings.vertdURL) {
