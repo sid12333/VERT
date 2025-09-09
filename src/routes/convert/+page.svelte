@@ -43,25 +43,10 @@
 			if (!converter) return;
 
 			let category: string | undefined;
-			const isImage = converters
-				.find((c) => c.name === "imagemagick")
-				?.formatStrings((f) => f.fromSupported)
-				.includes(file.from);
-			const isAudio = converters
-				.find((c) => c.name === "ffmpeg")
-				?.supportedFormats.filter((f) => f.isNative)
-				.map((f) => f.name)
-				.includes(file.from);
-			const isVideo = converters
-				.find((c) => c.name === "vertd")
-				?.supportedFormats.filter((f) => f.isNative)
-				.map((f) => f.name)
-				.includes(file.from);
-			const isDocument = converters
-				.find((c) => c.name === "pandoc")
-				?.supportedFormats.filter((f) => f.isNative)
-				.map((f) => f.name)
-				.includes(file.from);
+			const isImage = converter.name === "imagemagick";
+			const isAudio = converter.name === "ffmpeg";
+			const isVideo = converter.name === "vertd";
+			const isDocument = converter.name === "pandoc";
 
 			if (isImage) category = "image";
 			else if (isAudio) category = "audio";
@@ -109,84 +94,38 @@
 
 	$effect(() => {
 		// Set gradient color depending on the file types
-		// TODO: if more file types added, add a "fileType" property to the file object
-		const allAudio = files.files.every((file) => {
-			const converter = file
-				.findConverters()
-				.sort(byNative(file.from))[0];
-			return converter?.name === "ffmpeg";
-		});
-		const allImages = files.files.every((file) => {
-			const converter = file
-				.findConverters()
-				.sort(byNative(file.from))[0];
-			return converter?.name === "libvips";
-		});
-		const allVideos = files.files.every((file) => {
-			const converter = file
-				.findConverters()
-				.sort(byNative(file.from))[0];
-			return converter?.name === "vertd";
-		});
-		const allDocuments = files.files.every((file) => {
-			const converter = file
-				.findConverters()
-				.sort(byNative(file.from))[0];
-			return converter?.name === "pandoc";
-		});
-
-		if (files.files.length === 1 && files.files[0].blobUrl && !allVideos) {
-			showGradient.set(false);
-		} else {
-			showGradient.set(true);
-		}
-
-		if (
-			files.files.length === 0 ||
-			(!allAudio && !allImages && !allVideos && !allDocuments)
-		) {
-			gradientColor.set("");
-		} else {
-			gradientColor.set(
-				allAudio
-					? "purple"
-					: allVideos
-						? "red"
-						: allDocuments
-							? "green"
-							: "blue",
+		let type = "";
+		if (files.files.length) {
+			const converters = files.files.map(
+				(file) => file.findConverter()?.name,
 			);
+			const uniqueTypes = new Set(converters);
+
+			if (uniqueTypes.size === 1) {
+				const onlyType = converters[0];
+				if (onlyType === "imagemagick") type = "blue";
+				else if (onlyType === "ffmpeg") type = "purple";
+				else if (onlyType === "vertd") type = "red";
+				else if (onlyType === "pandoc") type = "green";
+			}
 		}
+
+		if (files.files.length === 0 || !type) {
+			showGradient.set(false);
+		} else showGradient.set(true);
+
+		gradientColor.set(type);
 
 		// TODO: filter out categories that cant be converted between
 	});
 </script>
 
 {#snippet fileItem(file: VertFile, index: number)}
-	{@const currentConverter = converters.find(
-		(c) =>
-			c.formatStrings((f) => f.fromSupported).includes(file.from) &&
-			c.formatStrings((f) => f.toSupported).includes(file.to),
-	)}
-	{@const isAudio = converters
-		.find((c) => c.name === "ffmpeg")
-		?.supportedFormats.filter((f) => f.isNative)
-		.map((f) => f.name)
-		.includes(file.from)}
-	{@const isVideo = converters
-		.find((c) => c.name === "vertd")
-		?.supportedFormats.filter((f) => f.isNative)
-		.map((f) => f.name)
-		.includes(file.from)}
-	{@const isImage = converters
-		.find((c) => c.name === "imagemagick")
-		?.formatStrings((f) => f.fromSupported)
-		.includes(file.from)}
-	{@const isDocument = converters
-		.find((c) => c.name === "pandoc")
-		?.supportedFormats.filter((f) => f.isNative)
-		.map((f) => f.name)
-		.includes(file.from)}
+	{@const currentConverter = file.findConverter()}
+	{@const isImage = currentConverter?.name === "imagemagick"}
+	{@const isAudio = currentConverter?.name === "ffmpeg"}
+	{@const isVideo = currentConverter?.name === "vertd"}
+	{@const isDocument = currentConverter?.name === "pandoc"}
 	<Panel class="p-5 flex flex-col min-w-0 gap-4 relative">
 		<div class="flex-shrink-0 h-8 w-full flex items-center gap-2">
 			{#if !converters.length}
@@ -275,7 +214,7 @@
 					</p>
 				</div>
 			{/if}
-		{:else if currentConverter && currentConverter.status === "downloading"}
+		{:else if currentConverter.status === "downloading"}
 			<div
 				class="h-full flex flex-col text-center justify-center text-failure"
 			>
@@ -294,7 +233,7 @@
 					})}
 				</p>
 			</div>
-		{:else if currentConverter && currentConverter.status === "error"}
+		{:else if currentConverter.status === "error"}
 			<div
 				class="h-full flex flex-col text-center justify-center text-failure"
 			>
@@ -313,7 +252,7 @@
 					})}
 				</p>
 			</div>
-		{:else if currentConverter && currentConverter.status === "not-ready"}
+		{:else if currentConverter.status === "not-ready"}
 			<div
 				class="h-full flex flex-col text-center justify-center text-failure"
 			>
@@ -332,7 +271,7 @@
 					})}
 				</p>
 			</div>
-		{:else if isVideo && !isAudio && !isImage && !isDocument && !$vertdLoaded}
+		{:else if (isVideo && $vertdLoaded) && (!isAudio && !isImage && !isDocument)}
 			<div
 				class="h-full flex flex-col text-center justify-center text-failure"
 			>
