@@ -35,46 +35,46 @@
 				"not_initialized": "nije inicijalizirano",
 				"downloading": "preuzimanje...",
 				"initializing": "inicijaliziranje...",
-				"unknown": "nepoznati status"    #ovdje smo stali
+				"unknown": "nepoznati status"    
 			},
-			"supported_formats": "Supported formats:"
+			"supported_formats": "Podržani formati:"
 		},
 		"tooltip": {
-			"partial_support": "This format can only be converted as {direction}.",
-			"direction_input": "input (from)",
-			"direction_output": "output (to)",
-			"video_server_processing": "Video uploads to a server for processing by default, learn how to set it up locally here."
+			"partial_support": "Ovaj format se može pretvoriti u {direction}.",
+			"direction_input": "ulaz (iz)",
+			"direction_output": "izlaz (u)",
+			"video_server_processing": "Videozapisi se uobičajeno prenose na servere za obradu, nauči ovdje kako namjestiti da se događa lokalno."
 		}
 	},
 	"convert": {
 		"panel": {
-			"convert_all": "Convert all",
-			"download_all": "Download all as .zip",
-			"remove_all": "Remove all files",
-			"set_all_to": "Set all to",
+			"convert_all": "Pretvori sve",
+			"download_all": "Preuzmi sve kao .zip",
+			"remove_all": "Makni sve datoteke",
+			"set_all_to": "Stavi sve na",
 			"na": "N/A"
 		},
 		"dropdown": {
 			"audio": "Audio",
 			"video": "Video",
-			"doc": "Document",
-			"image": "Image",
-			"placeholder": "Search format"
+			"doc": "Dokument",
+			"image": "Slika",
+			"placeholder": "Potraži format"
 		},
 		"tooltips": {
-			"unknown_file": "Unknown file type",
-			"audio_file": "Audio file",
-			"video_file": "Video file",
-			"document_file": "Document file",
-			"image_file": "Image file",
-			"convert_file": "Convert this file",
-			"download_file": "Download this file"
+			"unknown_file": "Nepoznat tip datoteke",
+			"audio_file": "Audio datoteka",
+			"video_file": "Video datoteka",
+			"document_file": "Dokument",
+			"image_file": "Datoteka slike",
+			"convert_file": "Pretvori ovu datoteku",
+			"download_file": "Preuzmi ovu datoteku"
 		},
 		"errors": {
-			"cant_convert": "We can't convert this file.",
-			"vertd_server": "what are you doing..? you're supposed to run the vertd server!",
-			"unsupported_format": "Only image, video, audio, and document files are supported",
-			"vertd_not_found": "Could not find the vertd instance to start video conversion. Are you sure the instance URL is set correctly?",
+			"cant_convert": "Ne možemo pretvoriti ovu datoteku.",
+			"vertd_server": "Koji k**** ti radiš..? Moraš pokrenuti vertd server!",
+			"unsupported_format": "Podržane su samo slike, video, audio i dokumenti",
+			"vertd_not_found": "Nismo mogli pronači vertd da započnemo pretvaranje. Jeste li sigurni da je URL točno postavljen?",    #ovdje smo stali :3
 			"worker_downloading": "The {type} converter is currently being initialized, please wait a few moments.",
 			"worker_error": "The {type} converter had an error during initialization, please try again later.",
 			"worker_timeout": "The {type} converter is taking longer than expected to initialize, please wait a few more moments or refresh the page.",
