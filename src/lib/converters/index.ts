@@ -48,7 +48,6 @@ categories.doc.formats =
 		?.supportedFormats.filter((f) => f.toSupported && f.isNative)
 		.map((f) => f.name) || [];
 
-
 export const byNative = (format: string) => {
 	return (a: Converter, b: Converter) => {
 		const aFormat = a.supportedFormats.find((f) => f.name === format);

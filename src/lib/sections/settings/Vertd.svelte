@@ -45,7 +45,7 @@
 			vertdCommit = null;
 			vertdLoaded.set(false);
 			// const converter = converters.find((c) => c.name === "vertd");
-    		// if (converter) converter.status = "not-ready";
+			// if (converter) converter.status = "not-ready";
 		}
 
 		return () => {
@@ -71,7 +71,8 @@
 				"!text-muted": vertdCommit === "loading",
 			})}
 		>
-			{m["settings.vertd.status"]()} {vertdCommit
+			{m["settings.vertd.status"]()}
+			{vertdCommit
 				? vertdCommit === "loading"
 					? m["settings.vertd.loading"]()
 					: m["settings.vertd.available"]({ commitId: vertdCommit })
@@ -83,10 +84,16 @@
 					{@html m["settings.vertd.description"]()}
 				</p>
 				<p class="text-sm text-muted font-normal">
-					{@html link("vertd_link", m["settings.vertd.hosting_info"](), GITHUB_URL_VERTD)}
+					{@html link(
+						"vertd_link",
+						m["settings.vertd.hosting_info"](),
+						GITHUB_URL_VERTD,
+					)}
 				</p>
 				<div class="flex flex-col gap-2">
-					<p class="text-base font-bold">{m["settings.vertd.instance_url"]()}</p>
+					<p class="text-base font-bold">
+						{m["settings.vertd.instance_url"]()}
+					</p>
 					<input
 						type="text"
 						placeholder={m["settings.vertd.url_placeholder"]()}
@@ -95,7 +102,9 @@
 				</div>
 				<div class="flex flex-col gap-4">
 					<div class="flex flex-col gap-2">
-						<p class="text-base font-bold">{m["settings.vertd.conversion_speed"]()}</p>
+						<p class="text-base font-bold">
+							{m["settings.vertd.conversion_speed"]()}
+						</p>
 						<p class="text-sm text-muted font-normal">
 							{m["settings.vertd.speed_description"]()}
 						</p>
@@ -113,7 +122,9 @@
 						selected={(() => {
 							switch (settings.vertdSpeed) {
 								case "verySlow":
-									return m["settings.vertd.speeds.very_slow"]();
+									return m[
+										"settings.vertd.speeds.very_slow"
+									]();
 								case "slower":
 									return m["settings.vertd.speeds.slower"]();
 								case "slow":
@@ -123,7 +134,9 @@
 								case "fast":
 									return m["settings.vertd.speeds.fast"]();
 								case "ultraFast":
-									return m["settings.vertd.speeds.ultra_fast"]();
+									return m[
+										"settings.vertd.speeds.ultra_fast"
+									]();
 							}
 						})()}
 						onselect={(selected) => {

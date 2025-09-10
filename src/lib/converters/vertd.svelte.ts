@@ -264,7 +264,7 @@ export class VertdConverter extends Converter {
 						token: uploadRes.auth,
 						to,
 						speed,
-						keepMetadata
+						keepMetadata,
 					},
 				};
 				ws.send(JSON.stringify(msg));

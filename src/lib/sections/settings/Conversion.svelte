@@ -82,13 +82,16 @@
 						</button>
 					</div>
 				</div>
-				<div class="grid gap-3 grid-cols-2 md:grid-cols-4" class:opacity-50={!settings.useDefaultFormat}>
+				<div
+					class="grid gap-3 grid-cols-2 md:grid-cols-4"
+					class:opacity-50={!settings.useDefaultFormat}
+				>
 					<div class="flex flex-col gap-2">
 						<p class="text-sm font-bold">
 							{m["settings.conversion.default_format_image"]()}
 						</p>
 						<FormatDropdown
-							categories={{image: categories.image}}
+							categories={{ image: categories.image }}
 							from={".png"}
 							bind:selected={settings.defaultFormat.image}
 							disabled={!settings.useDefaultFormat}
@@ -99,7 +102,7 @@
 							{m["settings.conversion.default_format_audio"]()}
 						</p>
 						<FormatDropdown
-							categories={{audio: categories.audio}}
+							categories={{ audio: categories.audio }}
 							from={".mp3"}
 							bind:selected={settings.defaultFormat.audio}
 							disabled={!settings.useDefaultFormat}
@@ -110,7 +113,7 @@
 							{m["settings.conversion.default_format_video"]()}
 						</p>
 						<FormatDropdown
-							categories={{video: categories.video}}
+							categories={{ video: categories.video }}
 							from={".mp4"}
 							bind:selected={settings.defaultFormat.video}
 							disabled={!settings.useDefaultFormat}
@@ -121,7 +124,7 @@
 							{m["settings.conversion.default_format_document"]()}
 						</p>
 						<FormatDropdown
-							categories={{doc: categories.doc}}
+							categories={{ doc: categories.doc }}
 							from={".docx"}
 							bind:selected={settings.defaultFormat.document}
 							disabled={!settings.useDefaultFormat}

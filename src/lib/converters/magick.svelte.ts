@@ -86,7 +86,7 @@ export class MagickConverter extends Converter {
 		super();
 		log(["converters", this.name], `created converter`);
 		if (!browser) return;
-		
+
 		this.status = "downloading";
 
 		log(["converters", this.name], `loading worker @ ${MagickWorker}`);
@@ -114,7 +114,10 @@ export class MagickConverter extends Converter {
 		let compression: number | undefined = args.at(0);
 		if (!compression) {
 			compression = Settings.instance.settings.magickQuality ?? 100;
-			log(["converters", this.name], `using user setting for quality: ${compression}%`);
+			log(
+				["converters", this.name],
+				`using user setting for quality: ${compression}%`,
+			);
 		}
 		log(["converters", this.name], `converting ${input.name} to ${to}`);
 
@@ -138,7 +141,8 @@ export class MagickConverter extends Converter {
 		}
 
 		// every other format handled by magick worker
-		const keepMetadata: boolean = Settings.instance.settings.metadata ?? true;
+		const keepMetadata: boolean =
+			Settings.instance.settings.metadata ?? true;
 		log(["converters", this.name], `keep metadata: ${keepMetadata}`);
 		const msg = {
 			type: "convert",

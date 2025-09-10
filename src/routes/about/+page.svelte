@@ -90,7 +90,7 @@
 			const excludedNames = new Set([
 				...mainContribs.map((c) => c.github.split("/").pop()),
 				...notableContribs.map((c) => c.github.split("/").pop()),
-				"Z2r-YT"
+				"Z2r-YT",
 			]);
 
 			const filteredContribs = allContribs.filter(

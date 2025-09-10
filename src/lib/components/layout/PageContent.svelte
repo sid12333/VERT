@@ -5,7 +5,7 @@
 	import { quintOut } from "svelte/easing";
 	import { fly, fade } from "$lib/animation";
 
-    let { children } = $props();
+	let { children } = $props();
 </script>
 
 <div class="grid grid-rows-1 grid-cols-1 h-full flex-grow">

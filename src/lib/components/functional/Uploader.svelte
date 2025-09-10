@@ -102,7 +102,7 @@
 			{m["upload.uploader.text"]({
 				action: jpegify
 					? m["upload.uploader.jpegify"]()
-					: m["upload.uploader.convert"]()
+					: m["upload.uploader.convert"](),
 			})}
 		</h2>
 	</Panel>

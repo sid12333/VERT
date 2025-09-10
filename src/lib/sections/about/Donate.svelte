@@ -67,10 +67,7 @@
 
 		if (!res.ok) {
 			paymentState = "prepay";
-			addToast(
-				"error",
-				m["about.donate.payment_error"](),
-			);
+			addToast("error", m["about.donate.payment_error"]());
 			return;
 		}
 
@@ -102,9 +99,9 @@
 			const period = submitResult.error.message?.endsWith(".") ? "" : ".";
 			addToast(
 				"error",
-				m["about.donate.payment_failed"]({ 
+				m["about.donate.payment_failed"]({
 					message: submitResult.error.message || "",
-					period 
+					period,
 				}),
 			);
 			enablePay = true;
@@ -124,9 +121,9 @@
 			const period = res.error.message?.endsWith(".") ? "" : ".";
 			addToast(
 				"error",
-				m["about.donate.payment_failed"]({ 
+				m["about.donate.payment_failed"]({
 					message: res.error.message || "",
-					period 
+					period,
 				}),
 			);
 		} else {
@@ -152,10 +149,7 @@
 					addToast("success", m["about.donate.thank_you"]());
 					break;
 				default:
-					addToast(
-						"error",
-						m["about.donate.donation_error"](),
-					);
+					addToast("error", m["about.donate.donation_error"]());
 			}
 
 			goto("/about");
@@ -298,7 +292,9 @@
 								class="btn w-full h-12 bg-accent-red text-black rounded-full mt-4"
 								onclick={donate}
 							>
-								{m["about.donate.donate_amount"]({ amount: amount.toFixed(2) })}
+								{m["about.donate.donate_amount"]({
+									amount: amount.toFixed(2),
+								})}
 							</button>
 						</div>
 					</div>

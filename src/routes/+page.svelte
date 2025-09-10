@@ -57,8 +57,7 @@
 			formats: getSupportedFormats("vertd"),
 			icon: Film,
 			title: m["upload.cards.video"](),
-			status:
-				$vertdLoaded === true ? "ready" : "not-ready", // not using converter.status for this
+			status: $vertdLoaded === true ? "ready" : "not-ready", // not using converter.status for this
 		},
 	});
 

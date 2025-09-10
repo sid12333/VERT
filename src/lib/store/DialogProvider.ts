@@ -34,7 +34,7 @@ function addDialog(
 	};
 	dialogs.update((currentDialogs) => [...currentDialogs, newDialog]);
 
-    return id;
+	return id;
 }
 
 function removeDialog(id: number) {

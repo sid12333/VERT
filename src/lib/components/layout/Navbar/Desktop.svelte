@@ -3,5 +3,5 @@
 </script>
 
 <div class="hidden md:flex p-8 w-screen justify-center">
-    <Navbar />
+	<Navbar />
 </div>

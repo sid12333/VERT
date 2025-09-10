@@ -271,7 +271,7 @@
 					})}
 				</p>
 			</div>
-		{:else if (isVideo && $vertdLoaded) && (!isAudio && !isImage && !isDocument)}
+		{:else if isVideo && $vertdLoaded && !isAudio && !isImage && !isDocument}
 			<div
 				class="h-full flex flex-col text-center justify-center text-failure"
 			>

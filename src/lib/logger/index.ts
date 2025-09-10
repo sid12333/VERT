@@ -59,4 +59,4 @@ export const error = (prefix: string | string[], ...args: any[]) => {
 		),
 		...args,
 	);
-}
+};
