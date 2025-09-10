@@ -16,6 +16,7 @@
 		dropping,
 		vertdLoaded,
 		locale,
+		updateLocale,
 	} from "$lib/store/index.svelte";
 	import "$lib/css/app.scss";
 	import { browser } from "$app/environment";
@@ -58,18 +59,39 @@
 		dropping.set(drag);
 	};
 
+	const handlePaste = (e: ClipboardEvent) => {
+		const clipboardData = e.clipboardData;
+		if (!clipboardData || !clipboardData.files.length) return;
+		e.preventDefault();
+		
+		if (page.url.pathname !== "/jpegify/") {
+			const oldLength = files.files.length;
+			files.add(clipboardData.files);
+			if (oldLength !== files.files.length) goto("/convert");
+		} else {
+			files.add(clipboardData.files);
+		}
+	};
+
+	
+
 	onMount(() => {
 		initAnimStores();
 
-		isMobile.set(window.innerWidth <= 768);
-		window.addEventListener("resize", () => {
+		const handleResize = () => {
 			isMobile.set(window.innerWidth <= 768);
-		});
+		};
+
+		isMobile.set(window.innerWidth <= 768); // initial page load
+		window.addEventListener("resize", handleResize); // handle window resize
+		window.addEventListener("paste", handlePaste);
 
 		effects.set(localStorage.getItem("effects") !== "false"); // defaults to true if not set
 		theme.set(
 			(localStorage.getItem("theme") as "light" | "dark") || "light",
 		);
+		updateLocale(localStorage.getItem("locale") || "en");
+
 		Settings.instance.load();
 
 		fetch(`${Settings.instance.settings.vertdURL}/api/version`).then(
@@ -77,6 +99,11 @@
 				if (res.ok) $vertdLoaded = true;
 			},
 		);
+
+		return () => {
+			window.removeEventListener("paste", handlePaste);
+			window.removeEventListener("resize", handleResize);
+		};
 	});
 
 	$effect(() => {
