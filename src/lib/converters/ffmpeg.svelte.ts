@@ -47,11 +47,12 @@ export class FFmpegConverter extends Converter {
 		new FormatInfo("oga", true, true),
 		new FormatInfo("opus", true, true),
 		new FormatInfo("aac", true, true),
-		new FormatInfo("m4a", true, true),
+		new FormatInfo("alac", true, true), // outputted as m4a
+		new FormatInfo("m4a", true, true), // can be alac
+		new FormatInfo("caf", true, false), // can be alac
 		new FormatInfo("wma", true, true),
 		new FormatInfo("amr", true, true),
 		new FormatInfo("ac3", true, true),
-		new FormatInfo("alac", true, true),
 		new FormatInfo("aiff", true, true),
 		new FormatInfo("aifc", true, true),
 		new FormatInfo("aif", true, true),
@@ -64,7 +65,6 @@ export class FFmpegConverter extends Converter {
 		new FormatInfo("dff", true, false), // dsd
 		new FormatInfo("mqa", true, false),
 		new FormatInfo("au", true, true),
-		new FormatInfo("caf", true, true),
 		new FormatInfo("m4b", true, true),
 		new FormatInfo("voc", true, true),
 		new FormatInfo("weba", true, true),
@@ -103,6 +103,9 @@ export class FFmpegConverter extends Converter {
 	public async convert(input: VertFile, to: string): Promise<VertFile> {
 		if (!to.startsWith(".")) to = `.${to}`;
 
+		const isAlac = to === ".alac";
+		if (isAlac) to = ".m4a";
+
 		let conversionError: string | null = null;
 		const ffmpeg = await this.setupFFmpeg(input);
 
@@ -138,7 +141,12 @@ export class FFmpegConverter extends Converter {
 			`wrote ${input.name} to ffmpeg virtual fs`,
 		);
 
-		const command = await this.buildConversionCommand(ffmpeg, input, to);
+		const command = await this.buildConversionCommand(
+			ffmpeg,
+			input,
+			to,
+			isAlac,
+		);
 		log(["converters", this.name], `FFmpeg command: ${command.join(" ")}`);
 		await ffmpeg.exec(command);
 		log(["converters", this.name], "executed ffmpeg command");
@@ -280,11 +288,21 @@ export class FFmpegConverter extends Converter {
 		ffmpeg: FFmpeg,
 		input: VertFile,
 		to: string,
+		isAlac: boolean = false,
 	): Promise<string[]> {
 		const inputFormat = input.from.slice(1);
 		const outputFormat = to.slice(1);
 
-		const lossless = ["flac", "alac", "wav", "dsd", "dsf", "dff"];
+		const lossless = [
+			"flac",
+			"m4a",
+			"caf",
+			"alac",
+			"wav",
+			"dsd",
+			"dsf",
+			"dff",
+		];
 		const userSetting = Settings.instance.settings.ffmpegQuality;
 		const userSampleRate = Settings.instance.settings.ffmpegSampleRate;
 		const customSampleRate =
@@ -398,7 +416,7 @@ export class FFmpegConverter extends Converter {
 			const hasAlbumArt = keepMetadata
 				? await this.extractAlbumArt(ffmpeg)
 				: false;
-			const codecArgs = toArgs(to);
+			const codecArgs = toArgs(to, isAlac);
 
 			if (hasAlbumArt) {
 				log(
@@ -439,7 +457,7 @@ export class FFmpegConverter extends Converter {
 					"yuv420p",
 					"-r",
 					"1",
-					...codecArgs,
+					...toArgs(to, isAlac),
 					...metadataArgs,
 					...audioBitrateArgs,
 					...sampleRateArgs,
@@ -453,7 +471,7 @@ export class FFmpegConverter extends Converter {
 			["converters", this.name],
 			`Converting audio ${input.from} to audio ${to}`,
 		);
-		const { audio: audioCodec } = getCodecs(to);
+		const { audio: audioCodec } = getCodecs(to, isAlac);
 		return [
 			"-i",
 			"input",
@@ -534,8 +552,8 @@ export class FFmpegConverter extends Converter {
 //
 // i hate you SO much.
 // - love, maddie
-const toArgs = (ext: string): string[] => {
-	const codecs = getCodecs(ext);
+const toArgs = (ext: string, isAlac: boolean = false): string[] => {
+	const codecs = getCodecs(ext, isAlac);
 	const args = ["-c:v", codecs.video];
 
 	switch (codecs.video) {
@@ -573,7 +591,10 @@ const toArgs = (ext: string): string[] => {
 	return args;
 };
 
-const getCodecs = (ext: string): { video: string; audio: string } => {
+const getCodecs = (
+	ext: string,
+	isAlac: boolean = false,
+): { video: string; audio: string } => {
 	switch (ext) {
 		// video <-> audio
 		case ".mp4":
@@ -621,7 +642,10 @@ const getCodecs = (ext: string): { video: string; audio: string } => {
 		case ".aac":
 			return { video: "libx264", audio: "aac" };
 		case ".m4a":
-			return { video: "libx264", audio: "aac" };
+			return {
+				video: "libx264",
+				audio: isAlac ? "alac" : "aac",
+			};
 		case ".alac":
 			return { video: "libx264", audio: "alac" };
 		case ".wma":
