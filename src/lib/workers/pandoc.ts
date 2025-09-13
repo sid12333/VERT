@@ -1,3 +1,4 @@
+import type { WorkerMessage } from "$lib/types";
 import * as wasiShim from "@bjorn3/browser_wasi_shim";
 import * as zip from "client-zip";
 
@@ -37,18 +38,19 @@ type Format =
 	| ".markdown";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const handleMessage = async (message: any): Promise<any> => {
+const handleMessage = async (message: WorkerMessage): Promise<any> => {
 	switch (message.type) {
 		case "load": {
 			wasm = message.wasm;
-			postMessage({ type: "loaded" });
+			postMessage({ type: "loaded", id: "0" });
 			break;
 		}
 
 		case "convert": {
 			try {
-				// eslint-disable-next-line prefer-const
-				let { to, file }: { to: Format; file: File } = message;
+				const { to: ext, input } = message;
+				const file = input.file as File;
+				const to = ext as Format;
 				if (to === ".rtf") {
 					throw new Error(
 						"Converting into RTF is currently not supported.",

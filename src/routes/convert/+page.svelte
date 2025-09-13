@@ -184,8 +184,10 @@
 			</div>
 			<button
 				class="flex-shrink-0 w-8 rounded-full hover:bg-panel-alt h-full flex items-center justify-center"
-				onclick={() =>
-					(files.files = files.files.filter((_, i) => i !== index))}
+				onclick={async () => {
+					await file.cancel();
+					files.files = files.files.filter((_, i) => i !== index);
+				}}
 			>
 				<XIcon size="24" class="text-muted" />
 			</button>

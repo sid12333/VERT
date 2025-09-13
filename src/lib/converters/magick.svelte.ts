@@ -2,22 +2,19 @@ import { browser } from "$app/environment";
 import { error, log } from "$lib/logger";
 import { m } from "$lib/paraglide/messages";
 import { addToast } from "$lib/store/ToastProvider";
-import type { OmitBetterStrict, WorkerMessage } from "$lib/types";
-import { VertFile } from "$lib/types";
+import { VertFile, type WorkerMessage } from "$lib/types";
 import MagickWorker from "$lib/workers/magick?worker&url";
 import { Converter, FormatInfo } from "./converter.svelte";
 import { imageFormats } from "./magick-automated";
 import { Settings } from "$lib/sections/settings/index.svelte";
+import magickWasm from "@imagemagick/magick-wasm/magick.wasm?url";
 
 export class MagickConverter extends Converter {
-	private worker: Worker = browser
-		? new Worker(MagickWorker, {
-				type: "module",
-			})
-		: null!;
-	private id = 0;
 	public name = "imagemagick";
 	public ready = $state(false);
+	public wasm: ArrayBuffer = null!;
+
+	private activeConversions = new Map<string, Worker>();
 
 	public supportedFormats = [
 		// manually tested formats
@@ -86,23 +83,29 @@ export class MagickConverter extends Converter {
 		super();
 		log(["converters", this.name], `created converter`);
 		if (!browser) return;
+		this.initializeWasm();
+	}
 
-		this.status = "downloading";
-
-		log(["converters", this.name], `loading worker @ ${MagickWorker}`);
-		this.worker.onmessage = (e) => {
-			const message: WorkerMessage = e.data;
-			log(["converters", this.name], `received message ${message.type}`);
-			if (message.type === "loaded") {
-				this.status = "ready";
-			} else if (message.type === "error") {
-				error(
-					["converters", this.name],
-					`error in worker: ${message.error}`,
+	private async initializeWasm() {
+		try {
+			this.status = "downloading";
+			const response = await fetch(magickWasm);
+			if (!response.ok) {
+				throw new Error(
+					`Failed to fetch WASM: ${response.status} ${response.statusText}`,
 				);
-				addToast("error", m["workers.errors.magick"]());
 			}
-		};
+
+			this.wasm = await response.arrayBuffer();
+			this.status = "ready";
+		} catch (err) {
+			this.status = "error";
+			error(
+				["converters", this.name],
+				`Failed to load ImageMagick WASM: ${err}`,
+			);
+			addToast("error", m["workers.errors.magick"]());
+		}
 	}
 
 	public async convert(
@@ -140,67 +143,137 @@ export class MagickConverter extends Converter {
 			}
 		}
 
-		// every other format handled by magick worker
-		const keepMetadata: boolean =
-			Settings.instance.settings.metadata ?? true;
-		log(["converters", this.name], `keep metadata: ${keepMetadata}`);
-		const msg = {
-			type: "convert",
-			input: {
-				file: input.file,
-				name: input.name,
-				to: input.to,
-				from: input.from,
-			},
-			to,
-			compression,
-			keepMetadata,
-		} as WorkerMessage;
-		const res = await this.sendMessage(msg);
+		const worker = new Worker(MagickWorker, {
+			type: "module",
+		});
+		this.activeConversions.set(input.id, worker);
 
-		if (res.type === "finished") {
-			log(["converters", this.name], `converted ${input.name} to ${to}`);
-			return new VertFile(
-				new File([res.output as unknown as BlobPart], input.name),
-				res.zip ? ".zip" : to,
-			);
+		try {
+			await Promise.race([
+				this.waitForMessage(worker, "ready"),
+				new Promise((_, reject) =>
+					setTimeout(
+						() =>
+							reject(
+								new Error(
+									"Worker ready timeout after 5 seconds",
+								),
+							),
+						5000,
+					),
+				),
+			]);
+
+			const loadMsg: WorkerMessage = {
+				type: "load",
+				wasm: this.wasm,
+				id: input.id,
+			};
+			worker.postMessage(loadMsg);
+
+			await Promise.race([
+				this.waitForMessage(worker, "loaded"),
+				new Promise((_, reject) =>
+					setTimeout(
+						() =>
+							reject(
+								new Error(
+									"Worker initialization timeout after 30 seconds",
+								),
+							),
+						30000,
+					),
+				),
+			]);
+
+			// every other format handled by magick worker
+			const keepMetadata: boolean =
+				Settings.instance.settings.metadata ?? true;
+			log(["converters", this.name], `keep metadata: ${keepMetadata}`);
+			const convertMsg: WorkerMessage = {
+				type: "convert",
+				id: input.id,
+				input: {
+					file: input.file,
+					name: input.name,
+					from: input.from,
+					to: input.to,
+				},
+				to,
+				compression,
+				keepMetadata,
+			};
+			worker.postMessage(convertMsg);
+
+			const res = await this.waitForMessage(worker);
+			if (res.type === "finished") {
+				log(
+					["converters", this.name],
+					`converted ${input.name} to ${to}`,
+				);
+				return new VertFile(
+					new File([res.output as unknown as BlobPart], input.name),
+					res.zip ? ".zip" : to,
+				);
+			}
+
+			if (res.type === "error") {
+				throw new Error(res.error);
+			}
+
+			throw new Error("Unknown message type");
+		} finally {
+			this.activeConversions.delete(input.id);
+			worker.terminate();
 		}
-
-		if (res.type === "error") {
-			throw new Error(res.error);
-		}
-
-		throw new Error("Unknown message type");
 	}
 
-	private sendMessage(
-		message: OmitBetterStrict<WorkerMessage, "id">,
-	): Promise<OmitBetterStrict<WorkerMessage, "id">> {
-		const id = this.id++;
-		let resolved = false;
-		return new Promise((resolve) => {
+	public async cancel(input: VertFile): Promise<void> {
+		const worker = this.activeConversions.get(input.id);
+		if (!worker) {
+			log(
+				["converters", this.name],
+				`No active conversion found for file ${input.name}`,
+			);
+			return;
+		}
+
+		log(
+			["converters", this.name],
+			`Cancelling conversion for file ${input.name}`,
+		);
+
+		worker.terminate();
+		this.activeConversions.delete(input.id);
+	}
+
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	private waitForMessage(worker: Worker, type?: string): Promise<any> {
+		return new Promise((resolve, reject) => {
 			const onMessage = (e: MessageEvent) => {
-				if (e.data.id === id) {
-					this.worker.removeEventListener("message", onMessage);
+				if (type && e.data.type === type) {
+					worker.removeEventListener("message", onMessage);
+					worker.removeEventListener("error", onError);
 					resolve(e.data);
-					resolved = true;
+				} else if (!type) {
+					worker.removeEventListener("message", onMessage);
+					worker.removeEventListener("error", onError);
+					resolve(e.data);
+				} else if (e.data.type === "error") {
+					worker.removeEventListener("message", onMessage);
+					worker.removeEventListener("error", onError);
+					reject(new Error(e.data.error));
 				}
 			};
 
-			setTimeout(() => {
-				if (!resolved) {
-					this.worker.removeEventListener("message", onMessage);
-					throw new Error("Timeout");
-				}
-			}, 60000);
+			const onError = (e: ErrorEvent) => {
+				worker.removeEventListener("message", onMessage);
+				worker.removeEventListener("error", onError);
+				reject(new Error(`Worker error: ${e.message}`));
+			};
 
-			this.worker.addEventListener("message", onMessage);
-			const msg = { ...message, id, worker: null };
-			try {
-				this.worker.postMessage(msg);
-			} catch (e) {
-				error(["converters", this.name], e);
-			}
+			worker.addEventListener("message", onMessage);
+			worker.addEventListener("error", onError);
 		});
 	}
 

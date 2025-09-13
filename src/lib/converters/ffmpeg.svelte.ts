@@ -38,6 +38,8 @@ export class FFmpegConverter extends Converter {
 	public name = "ffmpeg";
 	public ready = $state(false);
 
+	private activeConversions = new Map<string, FFmpeg>();
+
 	public supportedFormats = [
 		new FormatInfo("mp3", true, true),
 		new FormatInfo("wav", true, true),
@@ -109,6 +111,8 @@ export class FFmpegConverter extends Converter {
 		let conversionError: string | null = null;
 		const ffmpeg = await this.setupFFmpeg(input);
 
+		this.activeConversions.set(input.id, ffmpeg);
+
 		// listen for errors during conversion
 		const errorListener = (l: { message: string }) => {
 			const msg = l.message;
@@ -117,7 +121,9 @@ export class FFmpegConverter extends Converter {
 				msg.includes("is not supported")
 			) {
 				const rate = Settings.instance.settings.ffmpegCustomSampleRate;
-				conversionError = m["workers.errors.invalid_rate"]({ rate });
+				conversionError = m["workers.errors.invalid_rate"]({
+					rate,
+				});
 			} else if (msg.includes("Stream map '0:a:0' matches no streams.")) {
 				conversionError = m["workers.errors.no_audio"]();
 			} else if (
@@ -179,6 +185,25 @@ export class FFmpegConverter extends Converter {
 
 		const outBuf = new Uint8Array(output).buffer.slice(0);
 		return new VertFile(new File([outBuf], outputFileName), to);
+	}
+
+	public async cancel(input: VertFile): Promise<void> {
+		const ffmpeg = this.activeConversions.get(input.id);
+		if (!ffmpeg) {
+			log(
+				["converters", this.name],
+				`No active conversion found for file ${input.name}`,
+			);
+			return;
+		}
+
+		log(
+			["converters", this.name],
+			`Cancelling conversion for file ${input.name}`,
+		);
+
+		ffmpeg.terminate();
+		this.activeConversions.delete(input.id);
 	}
 
 	private async setupFFmpeg(input: VertFile): Promise<FFmpeg> {

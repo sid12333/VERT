@@ -2,7 +2,12 @@ import { VertFile } from "./file.svelte";
 
 interface ConvertMessage {
 	type: "convert";
-	input: VertFile;
+	input: {
+		file: File;
+		name: string;
+		from: string;
+		to: string;
+	} | VertFile;
 	to: string;
 	compression: number | null;
 	keepMetadata?: boolean;
@@ -10,12 +15,21 @@ interface ConvertMessage {
 
 interface FinishedMessage {
 	type: "finished";
-	output: ArrayBufferLike;
+	output: ArrayBufferLike | Uint8Array;
 	zip?: boolean;
+}
+
+interface LoadMessage {
+	type: "load";
+	wasm: ArrayBuffer;
 }
 
 interface LoadedMessage {
 	type: "loaded";
+}
+
+interface ReadyMessage {
+	type: "ready";
 }
 
 interface ErrorMessage {
@@ -26,8 +40,10 @@ interface ErrorMessage {
 export type WorkerMessage = (
 	| ConvertMessage
 	| FinishedMessage
+	| LoadMessage
 	| LoadedMessage
+	| ReadyMessage
 	| ErrorMessage
 ) & {
-	id: number;
+	id: string; // unused? rn just using file id, probably meant to be incrementing w/ every message posted?
 };

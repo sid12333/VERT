@@ -1,13 +1,16 @@
-import { VertFile } from "$lib/types";
+import { VertFile, type WorkerMessage } from "$lib/types";
 import { Converter, FormatInfo } from "./converter.svelte";
 import { browser } from "$app/environment";
 import PandocWorker from "$lib/workers/pandoc?worker&url";
 import { addToast } from "$lib/store/ToastProvider";
+import { log } from "$lib/logger";
 
 export class PandocConverter extends Converter {
 	public name = "pandoc";
 	public ready = $state(false);
 	public wasm: ArrayBuffer = null!;
+
+	private activeConversions = new Map<string, Worker>();
 
 	constructor() {
 		super();
@@ -27,17 +30,33 @@ export class PandocConverter extends Converter {
 		})();
 	}
 
-	public async convert(input: VertFile, to: string): Promise<VertFile> {
+	public async convert(file: VertFile, to: string): Promise<VertFile> {
 		const worker = new Worker(PandocWorker, {
 			type: "module",
 		});
-		worker.postMessage({ type: "load", wasm: this.wasm });
+
+		this.activeConversions.set(file.id, worker);
+
+		const loadMsg: WorkerMessage = {
+			type: "load",
+			wasm: this.wasm,
+			id: file.id,
+		};
+		worker.postMessage(loadMsg);
 		await waitForMessage(worker, "loaded");
-		worker.postMessage({
+		const convertMsg: WorkerMessage = {
 			type: "convert",
 			to,
-			file: input.file,
-		});
+			input: {
+				file: file.file,
+				name: file.name,
+				from: file.from,
+				to,
+			},
+			compression: null,
+			id: file.id,
+		};
+		worker.postMessage(convertMsg);
 		const result = await waitForMessage(worker);
 		if (result.type === "error") {
 			worker.terminate();
@@ -46,7 +65,7 @@ export class PandocConverter extends Converter {
 			switch (result.errorKind) {
 				case "PandocUnknownReaderError": {
 					throw new Error(
-						`${input.from} is not a supported input format for documents.`,
+						`${file.from} is not a supported input format for documents.`,
 					);
 				}
 
@@ -73,12 +92,33 @@ export class PandocConverter extends Converter {
 					else throw new Error(result.error);
 			}
 		}
-		worker.terminate();
+
 		if (!to.startsWith(".")) to = `.${to}`;
+		this.activeConversions.delete(file.id);
+		worker.terminate();
 		return new VertFile(
-			new File([result.output], input.name),
+			new File([result.output], file.name),
 			result.isZip ? ".zip" : to,
 		);
+	}
+
+	public async cancel(input: VertFile): Promise<void> {
+		const worker = this.activeConversions.get(input.id);
+		if (!worker) {
+			log(
+				["converters", this.name],
+				`No active conversion found for file ${input.name}`,
+			);
+			return;
+		}
+
+		log(
+			["converters", this.name],
+			`Cancelling conversion for file ${input.name}`,
+		);
+
+		worker.terminate();
+		this.activeConversions.delete(input.id);
 	}
 
 	public supportedFormats = [

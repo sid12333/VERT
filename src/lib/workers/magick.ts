@@ -7,38 +7,58 @@ import {
 	type IMagickImage,
 } from "@imagemagick/magick-wasm";
 import { makeZip } from "client-zip";
-import wasm from "@imagemagick/magick-wasm/magick.wasm?url";
 import { parseAni } from "$lib/parse/ani";
 import { parseIcns } from "vert-wasm";
+import type { WorkerMessage } from "$lib/types";
 
-const magickPromise = initializeImageMagick(new URL(wasm, import.meta.url));
+let magickInitialized = false;
 
-magickPromise
-	.then(() => {
-		postMessage({ type: "loaded" });
-	})
-	.catch((error) => {
-		postMessage({ type: "error", error });
-	});
+self.postMessage({ type: "ready", id: "0" });
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const handleMessage = async (message: any): Promise<any> => {
+const handleMessage = async (
+	message: WorkerMessage,
+): Promise<Partial<WorkerMessage>> => {
 	switch (message.type) {
+		case "load": {
+			try {
+				if (!message.wasm || !(message.wasm instanceof ArrayBuffer)) {
+					throw new Error(
+						`Invalid WASM data: ${typeof message.wasm}`,
+					);
+				}
+
+				const wasmBytes = new Uint8Array(message.wasm);
+
+				await initializeImageMagick(wasmBytes);
+				magickInitialized = true;
+				return { type: "loaded" };
+			} catch (error) {
+				return {
+					type: "error",
+					error: `error loading magick-wasm: ${(error as Error).message}`,
+				};
+			}
+		}
 		case "convert": {
-			const compression: number | undefined = message.compression;
+			if (!magickInitialized) {
+				return { type: "error", error: "magick-wasm not initialized" };
+			}
+
+			const compression: number | undefined =
+				message.compression ?? undefined;
 			const keepMetadata: boolean = message.keepMetadata ?? true;
 			if (!message.to.startsWith(".")) message.to = `.${message.to}`;
 			message.to = message.to.toLowerCase();
 			if (message.to === ".jfif") message.to = ".jpeg";
-			if (message.input.from === ".jfif") message.input.from = ".jpeg";
-			if (message.input.from === ".fit") message.input.from = ".fits";
+
+			let from = message.input.from;
+			if (from === ".jfif") from = ".jpeg";
+			if (from === ".fit") from = ".fits";
 
 			const buffer = await message.input.file.arrayBuffer();
-			// only wait when we need to
-			await magickPromise;
 
 			// special ico handling to split them all into separate images
-			if (message.input.from === ".ico") {
+			if (from === ".ico") {
 				const imgs = MagickImageCollection.create();
 
 				while (true) {
@@ -98,7 +118,7 @@ const handleMessage = async (message: any): Promise<any> => {
 					output: zipBytes,
 					zip: true,
 				};
-			} else if (message.input.from === ".ani") {
+			} else if (from === ".ani") {
 				console.log("Parsing ANI file");
 				try {
 					const parsedAni = parseAni(new Uint8Array(buffer));
@@ -136,7 +156,7 @@ const handleMessage = async (message: any): Promise<any> => {
 				} catch (e) {
 					console.error(e);
 				}
-			} else if (message.input.from === ".icns") {
+			} else if (from === ".icns") {
 				const icns: Uint8Array[] = parseIcns(new Uint8Array(buffer));
 				if (typeof icns === "string") {
 					return {
@@ -187,6 +207,7 @@ const handleMessage = async (message: any): Promise<any> => {
 					"images.zip",
 				);
 				const zipBytes = await readToEnd(zip.getReader());
+
 				return {
 					type: "finished",
 					output: zipBytes,
@@ -197,8 +218,7 @@ const handleMessage = async (message: any): Promise<any> => {
 			// build frames of animated formats (webp/gif)
 			// APNG does not work on magick-wasm since it needs ffmpeg built-in (not in magick-wasm) - handle in ffmpeg
 			if (
-				(message.input.from === ".webp" ||
-					message.input.from === ".gif") &&
+				(from === ".webp" || from === ".gif") &&
 				(message.to === ".gif" || message.to === ".webp")
 			) {
 				const collection = MagickImageCollection.create(
@@ -214,6 +234,7 @@ const handleMessage = async (message: any): Promise<any> => {
 					});
 				});
 				collection.dispose();
+
 				return {
 					type: "finished",
 					output: result,
@@ -223,9 +244,7 @@ const handleMessage = async (message: any): Promise<any> => {
 			const img = MagickImage.create(
 				new Uint8Array(buffer),
 				new MagickReadSettings({
-					format: message.input.from
-						.slice(1)
-						.toUpperCase() as MagickFormat,
+					format: from.slice(1).toUpperCase() as MagickFormat,
 				}),
 			);
 
@@ -241,6 +260,11 @@ const handleMessage = async (message: any): Promise<any> => {
 				output: converted,
 			};
 		}
+		default:
+			return {
+				type: "error",
+				error: `Unknown message type: ${message.type}`,
+			};
 	}
 };
 
@@ -269,14 +293,18 @@ const magickConvert = async (
 	let fmt = to.slice(1).toUpperCase();
 	if (fmt === "JFIF") fmt = "JPEG";
 
-	const result = await new Promise<Uint8Array>((resolve) => {
-		// magick-wasm automatically clamps (https://github.com/dlemstra/magick-wasm/blob/76fc6f2b0c0497d2ddc251bbf6174b4dc92ac3ea/src/magick-image.ts#L2480)
-		if (compression) img.quality = compression;
-		if (!keepMetadata) img.strip();
+	const result = await new Promise<Uint8Array>((resolve, reject) => {
+		try {
+			// magick-wasm automatically clamps (https://github.com/dlemstra/magick-wasm/blob/76fc6f2b0c0497d2ddc251bbf6174b4dc92ac3ea/src/magick-image.ts#L2480)
+			if (compression) img.quality = compression;
+			if (!keepMetadata) img.strip();
 
-		img.write(fmt as unknown as MagickFormat, (o: Uint8Array) => {
-			resolve(structuredClone(o));
-		});
+			img.write(fmt as unknown as MagickFormat, (o: Uint8Array) => {
+				resolve(structuredClone(o));
+			});
+		} catch (error) {
+			reject(error);
+		}
 	});
 
 	return result;

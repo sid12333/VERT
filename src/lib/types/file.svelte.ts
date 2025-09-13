@@ -25,6 +25,8 @@ export class VertFile {
 
 	public processing = $state(false);
 
+	public cancelled = $state(false);
+
 	public converters: Converter[] = [];
 
 	public findConverters(supportedFormats: string[] = [this.from]) {
@@ -84,24 +86,49 @@ export class VertFile {
 		this.result = null;
 		this.progress = 0;
 		this.processing = true;
+		this.cancelled = false;
 		let res;
 		try {
 			res = await converter.convert(this, this.to, ...args);
 			this.result = res;
 		} catch (err) {
-			const castedErr = err as Error;
-			error(["files"], castedErr.message);
-			addToast(
-				"error",
-				m["workers.errors.general"]({
-					file: this.file.name,
-					message: castedErr.message || castedErr,
-				}),
-			);
+			if (!this.cancelled) {
+				const castedErr = err as Error;
+				error(["files"], castedErr.message);
+				addToast(
+					"error",
+					m["workers.errors.general"]({
+						file: this.file.name,
+						message: castedErr.message || castedErr,
+					}),
+				);
+			}
 			this.result = null;
 		}
 		this.processing = false;
 		return res;
+	}
+
+	public async cancel() {
+		if (!this.processing) return;
+		const converter = this.findConverter();
+		if (!converter) throw new Error("No converter found");
+		this.cancelled = true;
+		try {
+			await converter.cancel(this);
+			this.processing = false;
+			this.result = null;
+		} catch (err) {
+			const castedErr = err as Error;
+			error(["files"], castedErr.message);
+			addToast(
+				"error",
+				m["workers.errors.cancel"]({
+					file: this.file.name,
+					message: castedErr.message || castedErr,
+				}),
+			);
+		}
 	}
 
 	public async download() {

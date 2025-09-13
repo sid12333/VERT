@@ -63,7 +63,7 @@
 		const clipboardData = e.clipboardData;
 		if (!clipboardData || !clipboardData.files.length) return;
 		e.preventDefault();
-		
+
 		if (page.url.pathname !== "/jpegify/") {
 			const oldLength = files.files.length;
 			files.add(clipboardData.files);
@@ -72,8 +72,6 @@
 			files.add(clipboardData.files);
 		}
 	};
-
-	
 
 	onMount(() => {
 		initAnimStores();

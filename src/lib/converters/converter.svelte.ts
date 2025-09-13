@@ -73,6 +73,15 @@ export class Converter {
 		throw new Error("Not implemented");
 	}
 
+	/**
+	 * Cancel the active conversion of a file.
+	 * @param input The input file.
+	 */
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	public async cancel(input: VertFile): Promise<void> {
+		throw new Error("Not implemented");
+	}
+
 	public async valid(): Promise<boolean> {
 		return true;
 	}
