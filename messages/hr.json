@@ -14,9 +14,9 @@
 	},
 	"upload": {
 		"title": "Pretvarač datoteka koji ćeš obožavati.",
-		"subtitle": "Cijelokupna obrada slika, zvoka i dokumenata se odvija na vašem uređaju. Videozapisi se pretvaraju na našim izrazito brzim serverima. Nema nikakvih ograničenja veličine niti reklama i potpuno je open source.",
+		"subtitle": "Cijelokupna obrada slika, zvuka i dokumenata se odvija na vašem uređaju. Videozapisi se pretvaraju na našim izrazito brzim serverima. Nema nikakvih ograničenja veličine niti reklama i potpuno je open source.",
 		"uploader": {
-			"text": "Ubaci ili klinki da {action}",
+			"text": "Ubaci ili klikni da {action}",
 			"convert": "pretvori",
 			"jpegify": "jpegiraj"
 		},
@@ -72,10 +72,10 @@
 		},
 		"errors": {
 			"cant_convert": "Ne možemo pretvoriti ovu datoteku.",
-			"vertd_server": "Koji k**** ti radiš..? Moraš pokrenuti vertd server!",
-			"unsupported_format": "Podržane su samo slike, video, audio i dokumenti",
+			"vertd_server": "Sunce ti žarko, što ti radiš!? Moraš pokrenuti vertd server!",
+			"unsupported_format": "Podržane su samo slike, videozapisi, audio i dokumenti",
 			"vertd_not_found": "Nismo mogli pronači vertd da započnemo pretvaranje. Jeste li sigurni da je URL točno postavljen?",    
-			"worker_downloading": "{type} pretvarač se trenutno koristite, molimo pričekajte malo.",
+			"worker_downloading": "{type} pretvarač se trenutno koristi, molimo pričekajte malo.",
 			"worker_error": "{type} pretvaraču se javila pogreška pri inicijalizaciji, molimo pokušajte ponovno kasnije.",
 			"worker_timeout": "{type} pretvaraču treba duže nego očekivano da se inicijalizira, molimo još malo pričekajte ili osvježite stranicu.",
 			"audio": "audio",
@@ -126,7 +126,7 @@
 			"status": "status:",
 			"loading": "učitavanje...",
 			"available": "dostupno, commit id {commitId}",
-			"unavailable": "nedostupno (je li je URL točan?)",
+			"unavailable": "nedostupno (Je li URL točan?)",
 			"description": "<code>vertd</code> projekt je serverski omot za FFmpeg. Ovo omogućuje da pretvarate videozapise sa lakoćom VERTovog web sučelja, dok još uvijek možete iskoristiti snagu vašeg GPU da odradi što brže moguće.",    
 			"hosting_info": "Mi držimo javnu instancu za Vašu lakoću, ali je veoma lako hostati na Vašem računalu ili serveru ako znate što radite. Možete preuzeti serverske programe [vertd_link]ovdje[/vertd_link] - Proces namještanja će biti lakši u budućnosti, pa njuškajte malo za nove vijesti!",
 			"instance_url": "URL instance",
@@ -158,7 +158,7 @@
 		"title": "O stranici",
 		"why": {
 			"title": "Zašto baš VERT?",
-			"description": "<b>Pretvarači datoteka su nas uvijek razočarali.</b> Izuzetno su ružni, prepuni reklama, i najvažnije; spori! Odlučili smo riješiti problem jednom i zauvijek praveći alternativu koja riješava sve ove probleme, i više.<br/><br/>Sve datoteke koji nisu videozapisi su pretvoreni direktno na Vašem uređaju; To znači da nema nikakve stanke između slanja i primanja datoteka sa servera, i nikada ne dobijemo šansu gurati nos u vaše datoteke koje pretvarate. <br/><br/>Videozapisi se prenose na naše izuzetno brze RTX 4000 Ada servere. Vaši videozapisi tamo ostano sat vremena ako ih ne pretvorite. Ako ih i pretvorite, videozapis će ostati na serveru na sat vremena, ili dok se ne preuzme. Datoteka će zatim bili obrisana sa našeg servera."
+			"description": "<b>Pretvarači datoteka su nas uvijek razočarali.</b> Izuzetno su ružni, prepuni reklama, i najvažnije; spori! Odlučili smo riješiti problem jednom i zauvijek praveći alternativu koja riješava sve ove probleme, i više.<br/><br/>Sve datoteke koji nisu videozapisi su pretvoreni direktno na Vašem uređaju; To znači da nema nikakve stanke između slanja i primanja datoteka sa servera, i nikada ne dobijemo šansu gurati nos u vaše datoteke koje pretvarate. <br/><br/>Videozapisi se prenose na naše izuzetno brze RTX 4000 Ada servere. Vaši videozapisi tamo ostano sat vremena ako ih ne pretvorite. Ako ih i pretvorite, videozapis će ostati na serveru na sat vremena, ili dok se ne preuzme. Datoteka će zatim biti obrisana sa našeg servera."
 		},
 		"sponsors": {
 			"title": "Sponzori",
@@ -186,7 +186,7 @@
 		},
 		"credits": {
 			"title": "Zasluge",
-			"contact_team": "Ako želite kontaktirati developere, molimo korisite email koji se nalazi u \"Resursi\" odjeljku.",
+			"contact_team": "Ako želite kontaktirati developere, molimo koristite email koji se nalazi u odjeljku \"resursi\".",
 			"notable_contributors": "Značajni suradnici",
 			"notable_description": "Želimo zahvaliti ovim ljudima za njihove ogromne doprinose VERTu.",
 			"github_contributors": "GitHub suradnici",
@@ -212,7 +212,7 @@
 			"magick": "Pogreška sa Magick radnikom, pretvorba slike možda neće raditi kao očekivano.",
 			"ffmpeg": "Greška pri učitavanju ffmpeg, neke značajke možda neće raditi.",
 			"no_audio": "Nije pronađen audio.",
-			"invalid_rate": "Upisan invalidan sample rate: {rate}Hz!"
+			"invalid_rate": "Upisan nevažeći sample rate: {rate}Hz!"
 		}
 	},
 	"jpegify": {
