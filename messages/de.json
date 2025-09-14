@@ -31,7 +31,11 @@
 			"status": {
 				"text": "<b>Status:</b> {status}",
 				"ready": "bereit",
-				"not_ready": "nicht bereit"
+				"not_ready": "nicht bereit",
+				"not_initialized": "nicht initialisiert",
+				"downloading": "wird heruntergeladen...",
+				"initializing": "wird initialisiert...",
+				"unknown": "unbekannter Status"
 			},
 			"supported_formats": "Unterstützte Formate:"
 		},
@@ -70,7 +74,13 @@
 			"cant_convert": "Wir können diese Datei nicht konvertieren.",
 			"vertd_server": "Was machst du da..? Du sollst den vertd-Server ausführen!",
 			"unsupported_format": "Es werden nur Bild-, Video-, Audio- und Dokumentdateien unterstützt.",
-			"vertd_not_found": "Konnte die vertd-Instanz nicht finden, um die Videokonvertierung zu starten. Bist du sicher, dass die Instanz-URL korrekt eingestellt ist?"
+			"vertd_not_found": "Konnte die vertd-Instanz nicht finden, um die Videokonvertierung zu starten. Bist du sicher, dass die Instanz-URL korrekt eingestellt ist?",
+			"worker_downloading": "Der {type}-Konverter wird gerade initialisiert, bitte warte einen Moment.",
+			"worker_error": "Beim Initialisieren des {type}-Konverters ist ein Fehler aufgetreten, bitte versuche es später erneut.",
+			"worker_timeout": "Die Initialisierung des {type}-Konverters dauert länger als erwartet, bitte warte noch einen Moment oder lade die Seite neu.",
+			"audio": "Audio",
+			"doc": "Dokument",
+			"image": "Bild"
 		}
 	},
 	"settings": {
@@ -94,6 +104,16 @@
 			"filename_format": "Dateinamensformat",
 			"filename_description": "Dies bestimmt den Namen der Datei beim Herunterladen, <b>ohne die Dateierweiterung.</b> Du kannst die folgenden Vorlagen in das Format einfügen, die durch die entsprechenden Informationen ersetzt werden: <b>%name%</b> für den ursprünglichen Dateinamen, <b>%extension%</b> für die ursprüngliche Dateierweiterung und <b>%date%</b> für das Datum, an dem die Datei konvertiert wurde.",
 			"placeholder": "VERT_%name%",
+			"default_format": "Standard-Konvertierungsformat",
+			"default_format_description": "Dies ändert das standardmäßig ausgewählte Format, wenn du eine Datei dieses Dateityps hochlädst.",
+			"default_format_image": "Bilder",
+			"default_format_video": "Videos",
+			"default_format_audio": "Audio",
+			"default_format_document": "Dokumente",
+			"metadata": "Datei-Metadaten",
+			"metadata_description": "Dies legt fest, ob Metadaten (EXIF, Song-Infos etc.) der Originaldatei in den konvertierten Dateien erhalten bleiben.",
+			"keep": "Beibehalten",
+			"remove": "Entfernen",
 			"quality": "Konvertierungsqualität",
 			"quality_description": "Dies ändert die Standard-Ausgabequalität der konvertierten Dateien (in ihrer Kategorie). Höhere Werte können zu längeren Konvertierungszeiten und größeren Dateigrößen führen.",
 			"quality_video": "Dies ändert die Standard-Ausgabequalität der konvertierten Videodateien. Höhere Werte können zu längeren Konvertierungszeiten und größeren Dateigrößen führen.",
@@ -189,6 +209,7 @@
 	"workers": {
 		"errors": {
 			"general": "Fehler beim Konvertieren von {file}: {message}",
+			"cancel": "Fehler beim Abbrechen der Konvertierung für {file}: {message}",
 			"magick": "Fehler im Magick-Worker, die Bildkonvertierung funktioniert möglicherweise nicht wie erwartet.",
 			"ffmpeg": "Fehler beim Laden von ffmpeg, einige Funktionen sind möglicherweise nicht verfügbar.",
 			"no_audio": "Kein Audiostream gefunden.",
