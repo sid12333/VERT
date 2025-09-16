@@ -231,16 +231,16 @@ export class MagickConverter extends Converter {
 	public async cancel(input: VertFile): Promise<void> {
 		const worker = this.activeConversions.get(input.id);
 		if (!worker) {
-			log(
+			error(
 				["converters", this.name],
-				`No active conversion found for file ${input.name}`,
+				`no active conversion found for file ${input.name}`,
 			);
 			return;
 		}
 
 		log(
 			["converters", this.name],
-			`Cancelling conversion for file ${input.name}`,
+			`cancelling conversion for file ${input.name}`,
 		);
 
 		worker.terminate();

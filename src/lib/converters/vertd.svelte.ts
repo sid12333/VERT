@@ -1,4 +1,4 @@
-import { log } from "$lib/logger";
+import { error, log } from "$lib/logger";
 import { Settings } from "$lib/sections/settings/index.svelte";
 import { VertFile } from "$lib/types";
 import { Converter, FormatInfo } from "./converter.svelte";
@@ -90,6 +90,21 @@ interface CompletedMessage {
 	};
 }
 
+interface CancelJobMessage {
+	type: "cancelJob";
+	data: {
+		jobId: string;
+		token: string;
+	};
+}
+
+interface JobCancelledMessage {
+	type: "jobCancelled";
+	data: {
+		jobId: string;
+	};
+}
+
 interface FpsProgress {
 	type: "fps";
 	data: number;
@@ -106,6 +121,8 @@ type VertdMessage =
 	| StartJobMessage
 	| ErrorMessage
 	| ProgressMessage
+	| CancelJobMessage
+	| JobCancelledMessage
 	| CompletedMessage;
 
 const progressEstimates = {
@@ -202,6 +219,15 @@ export class VertdConverter extends Converter {
 	public ready = $state(false);
 	public reportsProgress = true;
 
+	private activeConversions = new Map<
+		string,
+		{
+			ws: WebSocket;
+			jobId: string;
+			token: string;
+		}
+	>();
+
 	public supportedFormats = [
 		new FormatInfo("mkv", true, true),
 		new FormatInfo("mp4", true, true),
@@ -253,6 +279,13 @@ export class VertdConverter extends Converter {
 			const ws = new WebSocket(
 				`${protocol}//${apiUrl.replace("http://", "").replace("https://", "")}/api/ws`,
 			);
+
+			this.activeConversions.set(input.id, {
+				ws,
+				jobId: uploadRes.id,
+				token: uploadRes.auth,
+			});
+
 			ws.onopen = () => {
 				const speed = Settings.instance.settings.vertdSpeed;
 				const keepMetadata = Settings.instance.settings.metadata;
@@ -289,6 +322,7 @@ export class VertdConverter extends Converter {
 					case "jobFinished": {
 						this.log("job finished");
 						ws.close();
+						this.activeConversions.delete(input.id);
 						const url = `${apiUrl}/api/download/${msg.data.jobId}/${uploadRes.auth}`;
 						this.log(`downloading from ${url}`);
 						// const res = await fetch(url).then((res) => res.blob());
@@ -297,13 +331,55 @@ export class VertdConverter extends Converter {
 						break;
 					}
 
+					case "jobCancelled": {
+						this.log("job cancelled");
+						ws.close();
+						this.activeConversions.delete(input.id);
+						reject("Conversion cancelled");
+						break;
+					}
+
 					case "error": {
 						this.log(`error: ${msg.data.message}`);
+						this.activeConversions.delete(input.id);
 						reject(msg.data.message);
 					}
 				}
 			};
 		});
+	}
+
+	public async cancel(input: VertFile): Promise<void> {
+		const activeConversion = this.activeConversions.get(input.id);
+		if (!activeConversion) {
+			error(
+				["converters", this.name],
+				`no active conversion found for file ${input.name}`,
+			);
+			return;
+		}
+
+		log(
+			["converters", this.name],
+			`cancelling conversion for file ${input.name}`,
+		);
+
+		const { ws, jobId, token } = activeConversion;
+
+		if (ws.readyState === WebSocket.OPEN) {
+			const cancelMsg: CancelJobMessage = {
+				type: "cancelJob",
+				data: {
+					jobId,
+					token,
+				},
+			};
+			ws.send(JSON.stringify(cancelMsg));
+			this.log("sent cancelJob message");
+		}
+
+		ws.close();
+		this.activeConversions.delete(input.id);
 	}
 
 	public async valid(): Promise<boolean> {

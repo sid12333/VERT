@@ -3,7 +3,7 @@ import { Converter, FormatInfo } from "./converter.svelte";
 import { browser } from "$app/environment";
 import PandocWorker from "$lib/workers/pandoc?worker&url";
 import { addToast } from "$lib/store/ToastProvider";
-import { log } from "$lib/logger";
+import { error, log } from "$lib/logger";
 
 export class PandocConverter extends Converter {
 	public name = "pandoc";
@@ -105,16 +105,16 @@ export class PandocConverter extends Converter {
 	public async cancel(input: VertFile): Promise<void> {
 		const worker = this.activeConversions.get(input.id);
 		if (!worker) {
-			log(
+			error(
 				["converters", this.name],
-				`No active conversion found for file ${input.name}`,
+				`no active conversion found for file ${input.name}`,
 			);
 			return;
 		}
 
 		log(
 			["converters", this.name],
-			`Cancelling conversion for file ${input.name}`,
+			`cancelling conversion for file ${input.name}`,
 		);
 
 		worker.terminate();
