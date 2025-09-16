@@ -5,7 +5,7 @@
 		"convert": "Konvertieren",
 		"settings": "Einstellungen",
 		"about": "Über",
-		"toggle_theme": "Theme wechseln"
+		"toggle_theme": "Farbschema wechseln"
 	},
 	"footer": {
 		"copyright": "© {year} VERT.",
@@ -90,14 +90,14 @@
 		},
 		"appearance": {
 			"title": "Erscheinungsbild",
-			"brightness_theme": "Bildschirmmodus",
+			"brightness_theme": "Farbschema",
 			"brightness_description": "Möchtest du einen sonnigen Blendeffekt oder eine ruhige, einsame Nacht?",
 			"light": "Hell",
 			"dark": "Dunkel",
 			"effect_settings": "Effekteinstellungen",
 			"effect_description": "Möchtest du schicke Effekte oder eine eher statische Erfahrung?",
-			"enable": "Aktivieren",
-			"disable": "Deaktivieren"
+			"enable": "Animiert",
+			"disable": "Statisch"
 		},
 		"conversion": {
 			"title": "Konvertierung",
