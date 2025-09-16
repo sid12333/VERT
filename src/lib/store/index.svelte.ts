@@ -326,7 +326,8 @@ export const availableLocales = {
 	es: "Español",
 	fr: "Français",
 	de: "Deutsch",
-}
+	hr: "Hrvatski",
+};
 
 export function updateLocale(newLocale: string) {
 	log(["locale"], `set to ${newLocale}`);
