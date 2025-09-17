@@ -24,7 +24,7 @@
 				onclick={() => files.convertAll()}
 				class="btn {$effects
 					? ''
-					: '!scale-100'} highlight flex gap-3 max-md:w-full"
+					: '!scale-100'} highlight flex gap-3 max-md:w-full md:max-w-[15.5rem]"
 				disabled={!files.ready}
 			>
 				<RefreshCw size="24" />
@@ -33,7 +33,7 @@
 			<button
 				class="btn {$effects
 					? ''
-					: '!scale-100'} flex gap-3 max-md:w-full"
+					: '!scale-100'} flex gap-3 max-md:w-full md:max-w-[15.5rem]"
 				disabled={!files.ready || !files.results}
 				onclick={() => files.downloadAll()}
 			>
@@ -70,33 +70,37 @@
 		</div>
 		<div class="w-full bg-separator h-0.5 flex md:hidden"></div>
 		<div class="flex items-center gap-2">
-			<p class="whitespace-nowrap text-xl">
+			<p class="whitespace-normal text-xl text-right w-full">
 				{m["convert.panel.set_all_to"]()}
 			</p>
-			<!-- video and audio together still have this dropdown disabled because audio has just ffmpeg (video has vertd & ffmpeg), even tho it can convert between video and audio  -->
-			{#if files.files.length > 0 && files.files.every((f) => JSON.stringify(f.converters) === JSON.stringify(files.files[0].converters))}
-				<FormatDropdown
-					onselect={(r) =>
-						files.files.forEach((f) => {
-							f.to = r;
-							f.result = null;
-						})}
-					{categories}
-					dropdownSize={"large"}
-				/>
-			{:else}
-				<Dropdown options={[m["convert.panel.na"]()]} disabled />
-			{/if}
-		</div>
-	</div>
-	{#if files.files.length > 50}
-		<div class="w-full px-2 flex gap-4 items-center">
-			<div class="flex-shrink-0 -mt-0.5 font-normal text-sm text-muted">
-				{progress}/{length}
-			</div>
-			<div class="flex-grow">
-				<ProgressBar min={0} max={length} {progress} />
+			<div class="w-48 md:max-w-[6.5rem]">
+				<!-- video and audio together still have this dropdown disabled because audio has just ffmpeg (video has vertd & ffmpeg), even tho it can convert between video and audio  -->
+				{#if files.files.length > 0 && files.files.every((f) => JSON.stringify(f.converters) === JSON.stringify(files.files[0].converters))}
+					<FormatDropdown
+						onselect={(r) =>
+							files.files.forEach((f) => {
+								f.to = r;
+								f.result = null;
+							})}
+						{categories}
+						dropdownSize={"large"}
+					/>
+				{:else}
+					<Dropdown options={[m["convert.panel.na"]()]} disabled />
+				{/if}
 			</div>
 		</div>
-	{/if}
-</Panel>
+		{#if files.files.length > 50}
+			<div class="w-full px-2 flex gap-4 items-center">
+				<div
+					class="flex-shrink-0 -mt-0.5 font-normal text-sm text-muted"
+				>
+					{progress}/{length}
+				</div>
+				<div class="flex-grow">
+					<ProgressBar min={0} max={length} {progress} />
+				</div>
+			</div>
+		{/if}
+	</div></Panel
+>
