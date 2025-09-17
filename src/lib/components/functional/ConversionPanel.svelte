@@ -78,10 +78,8 @@
 				<FormatDropdown
 					onselect={(r) =>
 						files.files.forEach((f) => {
-							if (f.from !== r) {
-								f.to = r;
-								f.result = null;
-							}
+							f.to = r;
+							f.result = null;
 						})}
 					{categories}
 					dropdownSize={"large"}
