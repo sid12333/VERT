@@ -109,7 +109,7 @@
 			"unavailable": "unavailable (is the url right?)",
 			"description": "The <code>vertd</code> project is a server wrapper for FFmpeg. This allows you to convert videos through the convenience of VERT's web interface, while still being able to harness the power of your GPU to do it as quickly as possible.",
 			"hosting_info": "We host a public instance for your convenience, but it is quite easy to host your own on your PC or server if you know what you are doing. You can download the server binaries [vertd_link]here[/vertd_link] - the process of setting this up will become easier in the future, so stay tuned!",
-			"instance_url": "Instance URL",
+			"instance": "Instance",
 			"url_placeholder": "Example: http://localhost:24153",
 			"conversion_speed": "Conversion speed",
 			"speed_description": "This describes the tradeoff between speed and quality. Faster speeds will result in lower quality, but will get the job done quicker.",
@@ -120,7 +120,11 @@
 				"medium": "Medium",
 				"fast": "Fast",
 				"ultra_fast": "Ultra Fast"
-			}
+			},
+			"auto_instance": "Auto (recommended)",
+			"eu_instance": "Falkenstein, Germany",
+			"us_instance": "Washington, USA",
+			"custom_instance": "Custom"
 		},
 		"privacy": {
 			"title": "Privacy",

@@ -1,5 +1,6 @@
 import { log } from "$lib/logger";
 import { Settings } from "$lib/sections/settings/index.svelte";
+import { VertdInstance } from "$lib/sections/settings/vertdSettings.svelte";
 import { VertFile } from "$lib/types";
 import { Converter, FormatInfo } from "./converter.svelte";
 
@@ -33,7 +34,7 @@ const vertdFetch = async <U extends keyof RouteMap>(
 	url: U,
 	options: RequestInit,
 ): Promise<RouteMap[U]> => {
-	const domain = Settings.instance.settings.vertdURL;
+	const domain = await VertdInstance.instance.url();
 	const res = await fetch(`${domain}${url}`, options);
 	const text = await res.text();
 	let json: VertdResponse<RouteMap[U]> = null!;
@@ -124,7 +125,7 @@ const progressEstimate = (
 };
 
 const uploadFile = async (file: VertFile): Promise<UploadResponse> => {
-	const apiUrl = Settings.instance.settings.vertdURL;
+	const apiUrl = await VertdInstance.instance.url();
 	const formData = new FormData();
 	formData.append("file", file.file, file.name);
 	const xhr = new XMLHttpRequest();
@@ -244,10 +245,9 @@ export class VertdConverter extends Converter {
 		if (to.startsWith(".")) to = to.slice(1);
 
 		const uploadRes = await uploadFile(input);
-		console.log(uploadRes);
+		const apiUrl = await VertdInstance.instance.url();
 
 		return new Promise((resolve, reject) => {
-			const apiUrl = Settings.instance.settings.vertdURL;
 			const protocol = apiUrl.startsWith("https") ? "wss:" : "ws:";
 			const ws = new WebSocket(
 				`${protocol}//${apiUrl.replace("http://", "").replace("https://", "")}/api/ws`,
@@ -304,7 +304,7 @@ export class VertdConverter extends Converter {
 	}
 
 	public async valid(): Promise<boolean> {
-		if (!Settings.instance.settings.vertdURL) {
+		if (!(await VertdInstance.instance.url())) {
 			return false;
 		}
 

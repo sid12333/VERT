@@ -8,6 +8,7 @@
 	import { vertdLoaded } from "$lib/store/index.svelte";
 	import { m } from "$lib/paraglide/messages";
 	import { link } from "$lib/store/index.svelte";
+	import { VertdInstance, type VertdInner } from "./vertdSettings.svelte";
 
 	let vertdCommit = $state<string | null>(null);
 	let abortController: AbortController | null = null;
@@ -15,33 +16,29 @@
 	const { settings }: { settings: ISettings } = $props();
 
 	$effect(() => {
-		if (settings.vertdURL) {
-			if (abortController) abortController.abort();
-			abortController = new AbortController();
-			const { signal } = abortController;
+		if (abortController) abortController.abort();
+		abortController = new AbortController();
+		const { signal } = abortController;
 
-			vertdCommit = "loading";
-			fetch(`${settings.vertdURL}/api/version`, { signal })
-				.then((res) => {
-					if (!res.ok) throw new Error("bad response");
+		vertdCommit = "loading";
+		VertdInstance.instance
+			.url()
+			.then((u) => fetch(`${u}/api/version`, { signal }))
+			.then((res) => {
+				if (!res.ok) throw new Error("bad response");
+				vertdLoaded.set(false);
+				return res.json();
+			})
+			.then((data) => {
+				vertdCommit = data.data;
+				vertdLoaded.set(true);
+			})
+			.catch((err) => {
+				if (err.name !== "AbortError") {
+					vertdCommit = null;
 					vertdLoaded.set(false);
-					return res.json();
-				})
-				.then((data) => {
-					vertdCommit = data.data;
-					vertdLoaded.set(true);
-				})
-				.catch((err) => {
-					if (err.name !== "AbortError") {
-						vertdCommit = null;
-						vertdLoaded.set(false);
-					}
-				});
-		} else {
-			if (abortController) abortController.abort();
-			vertdCommit = null;
-			vertdLoaded.set(false);
-		}
+				}
+			});
 
 		return () => {
 			if (abortController) abortController.abort();
@@ -66,7 +63,8 @@
 				"!text-muted": vertdCommit === "loading",
 			})}
 		>
-			{m["settings.vertd.status"]()} {vertdCommit
+			{m["settings.vertd.status"]()}
+			{vertdCommit
 				? vertdCommit === "loading"
 					? m["settings.vertd.loading"]()
 					: m["settings.vertd.available"]({ commitId: vertdCommit })
@@ -78,19 +76,74 @@
 					{@html m["settings.vertd.description"]()}
 				</p>
 				<p class="text-sm text-muted font-normal">
-					{@html link("vertd_link", m["settings.vertd.hosting_info"](), GITHUB_URL_VERTD)}
+					{@html link(
+						"vertd_link",
+						m["settings.vertd.hosting_info"](),
+						GITHUB_URL_VERTD,
+					)}
 				</p>
 				<div class="flex flex-col gap-2">
-					<p class="text-base font-bold">{m["settings.vertd.instance_url"]()}</p>
-					<input
-						type="text"
-						placeholder={m["settings.vertd.url_placeholder"]()}
-						bind:value={settings.vertdURL}
+					<p class="text-base font-bold">
+						{m["settings.vertd.instance"]()}
+					</p>
+					<Dropdown
+						options={[
+							m["settings.vertd.auto_instance"](),
+							m["settings.vertd.eu_instance"](),
+							m["settings.vertd.us_instance"](),
+							m["settings.vertd.custom_instance"](),
+						]}
+						onselect={(selected) => {
+							let inner: VertdInner;
+							switch (selected) {
+								case m["settings.vertd.auto_instance"]():
+									inner = { type: "auto" };
+									break;
+								case m["settings.vertd.eu_instance"]():
+									inner = { type: "eu" };
+									break;
+								case m["settings.vertd.us_instance"]():
+									inner = { type: "us" };
+									break;
+								case m["settings.vertd.custom_instance"]():
+									inner = {
+										type: "custom",
+									};
+									break;
+								default:
+									inner = { type: "auto" };
+							}
+							VertdInstance.instance.set(inner);
+						}}
+						selected={(() => {
+							switch (VertdInstance.instance.innerData().type) {
+								case "auto":
+									return m["settings.vertd.auto_instance"]();
+								case "eu":
+									return m["settings.vertd.eu_instance"]();
+								case "us":
+									return m["settings.vertd.us_instance"]();
+								case "custom":
+									return m[
+										"settings.vertd.custom_instance"
+									]();
+							}
+						})()}
+						settingsStyle
 					/>
+					{#if VertdInstance.instance.innerData().type === "custom"}
+						<input
+							type="text"
+							placeholder={m["settings.vertd.url_placeholder"]()}
+							bind:value={settings.vertdURL}
+						/>
+					{/if}
 				</div>
 				<div class="flex flex-col gap-4">
 					<div class="flex flex-col gap-2">
-						<p class="text-base font-bold">{m["settings.vertd.conversion_speed"]()}</p>
+						<p class="text-base font-bold">
+							{m["settings.vertd.conversion_speed"]()}
+						</p>
 						<p class="text-sm text-muted font-normal">
 							{m["settings.vertd.speed_description"]()}
 						</p>
@@ -108,7 +161,9 @@
 						selected={(() => {
 							switch (settings.vertdSpeed) {
 								case "verySlow":
-									return m["settings.vertd.speeds.very_slow"]();
+									return m[
+										"settings.vertd.speeds.very_slow"
+									]();
 								case "slower":
 									return m["settings.vertd.speeds.slower"]();
 								case "slow":
@@ -118,7 +173,9 @@
 								case "fast":
 									return m["settings.vertd.speeds.fast"]();
 								case "ultraFast":
-									return m["settings.vertd.speeds.ultra_fast"]();
+									return m[
+										"settings.vertd.speeds.ultra_fast"
+									]();
 							}
 						})()}
 						onselect={(selected) => {
