@@ -254,6 +254,9 @@ export class VertdConverter extends Converter {
 		new FormatInfo("h264", true, true),
 		new FormatInfo("divx", true, true),
 		new FormatInfo("swf", true, true),
+		new FormatInfo("amv", true, true),
+		new FormatInfo("asf", true, true),
+		new FormatInfo("nut", true, true),
 	];
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
