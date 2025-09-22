@@ -156,10 +156,10 @@ export class MagickConverter extends Converter {
 						() =>
 							reject(
 								new Error(
-									"Worker ready timeout after 5 seconds",
+									"Magick worker ready timeout after 10 seconds",
 								),
 							),
-						5000,
+						10000,
 					),
 				),
 			]);
@@ -178,7 +178,7 @@ export class MagickConverter extends Converter {
 						() =>
 							reject(
 								new Error(
-									"Worker initialization timeout after 30 seconds",
+									"Magick worker initialization timeout after 30 seconds",
 								),
 							),
 						30000,

@@ -47,6 +47,12 @@
 		}
 	},
 	"convert": {
+		"external_warning": {
+			"title": "External server warning",
+			"text": "If you choose to convert into a video format, those files will be uploaded to an external server to be converted. Do you want to continue?",
+			"yes": "Yes",
+			"no": "No"
+		},
 		"panel": {
 			"convert_all": "Convert all",
 			"download_all": "Download all as .zip",

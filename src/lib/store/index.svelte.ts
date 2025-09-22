@@ -7,6 +7,7 @@ import { writable } from "svelte/store";
 import { addDialog } from "./DialogProvider";
 import PQueue from "p-queue";
 import { getLocale, setLocale } from "$lib/paraglide/runtime";
+import { m } from "$lib/paraglide/messages";
 
 class Files {
 	public files = $state<VertFile[]>([]);
@@ -172,11 +173,11 @@ class Files {
 				localStorage.getItem("acceptedExternalWarning") === "true";
 			if (isVideo && !acceptedExternalWarning && !this._warningShown) {
 				this._warningShown = true;
-				const message =
-					"If you choose to convert into a video format, some of your files will be uploaded to an external server to be converted. Do you want to continue?";
+				const title = m["convert.external_warning.title"]();
+				const message = m["convert.external_warning.text"]();
 				const buttons = [
 					{
-						text: "No",
+						text: m["convert.external_warning.no"](),
 						action: () => {
 							this.files = [
 								...this.files.filter(
@@ -190,7 +191,7 @@ class Files {
 						},
 					},
 					{
-						text: "Yes",
+						text: m["convert.external_warning.yes"](),
 						action: () => {
 							localStorage.setItem(
 								"acceptedExternalWarning",
@@ -200,12 +201,7 @@ class Files {
 						},
 					},
 				];
-				addDialog(
-					"External server warning",
-					message,
-					buttons,
-					"warning",
-				);
+				addDialog(title, message, buttons, "warning");
 			}
 		}
 	}
