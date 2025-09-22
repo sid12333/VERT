@@ -4,8 +4,15 @@ on:
   push:
     branches: [ "main" ]
     tags: [ 'v*' ]
+    paths:
+      - 'src/**'
+      - 'static/**'
   pull_request:
     branches: [ "main" ]
+    paths:
+      - 'src/**'
+      - 'static/**'
+  workflow_dispatch:
 
 jobs:
   build-and-push:
