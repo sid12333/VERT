@@ -23,6 +23,7 @@
 	import { page } from "$app/state";
 	import { initStores as initAnimStores } from "$lib/animation/index.js";
 	import { locales, localizeHref } from "$lib/paraglide/runtime";
+	import { VertdInstance } from "$lib/sections/settings/vertdSettings.svelte.js";
 
 	let { children, data } = $props();
 	let enablePlausible = $state(false);
@@ -92,11 +93,12 @@
 
 		Settings.instance.load();
 
-		fetch(`${Settings.instance.settings.vertdURL}/api/version`).then(
-			(res) => {
+		VertdInstance.instance
+			.url()
+			.then((u) => fetch(`${u}/api/version`))
+			.then((res) => {
 				if (res.ok) $vertdLoaded = true;
-			},
-		);
+			});
 
 		return () => {
 			window.removeEventListener("paste", handlePaste);

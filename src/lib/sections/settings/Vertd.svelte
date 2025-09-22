@@ -8,7 +8,7 @@
 	import { vertdLoaded } from "$lib/store/index.svelte";
 	import { m } from "$lib/paraglide/messages";
 	import { link } from "$lib/store/index.svelte";
-	//import { converters } from "$lib/converters";
+	import { VertdInstance, type VertdInner } from "./vertdSettings.svelte";
 
 	let vertdCommit = $state<string | null>(null);
 	let abortController: AbortController | null = null;
@@ -16,37 +16,29 @@
 	const { settings = $bindable() }: { settings: ISettings } = $props();
 
 	$effect(() => {
-		if (settings.vertdURL) {
-			if (abortController) abortController.abort();
-			abortController = new AbortController();
-			const { signal } = abortController;
+		if (abortController) abortController.abort();
+		abortController = new AbortController();
+		const { signal } = abortController;
 
-			vertdCommit = "loading";
-			fetch(`${settings.vertdURL}/api/version`, { signal })
-				.then((res) => {
-					if (!res.ok) throw new Error("bad response");
+		vertdCommit = "loading";
+		VertdInstance.instance
+			.url()
+			.then((u) => fetch(`${u}/api/version`, { signal }))
+			.then((res) => {
+				if (!res.ok) throw new Error("bad response");
+				vertdLoaded.set(false);
+				return res.json();
+			})
+			.then((data) => {
+				vertdCommit = data.data;
+				vertdLoaded.set(true);
+			})
+			.catch((err) => {
+				if (err.name !== "AbortError") {
+					vertdCommit = null;
 					vertdLoaded.set(false);
-					return res.json();
-				})
-				.then((data) => {
-					vertdCommit = data.data;
-					vertdLoaded.set(true);
-				})
-				.catch((err) => {
-					if (err.name !== "AbortError") {
-						vertdCommit = null;
-						vertdLoaded.set(false);
-						// const converter = converters.find((c) => c.name === "vertd");
-						// if (converter) converter.status = "not-ready";
-					}
-				});
-		} else {
-			if (abortController) abortController.abort();
-			vertdCommit = null;
-			vertdLoaded.set(false);
-			// const converter = converters.find((c) => c.name === "vertd");
-			// if (converter) converter.status = "not-ready";
-		}
+				}
+			});
 
 		return () => {
 			if (abortController) abortController.abort();
@@ -92,13 +84,60 @@
 				</p>
 				<div class="flex flex-col gap-2">
 					<p class="text-base font-bold">
-						{m["settings.vertd.instance_url"]()}
+						{m["settings.vertd.instance"]()}
 					</p>
-					<input
-						type="text"
-						placeholder={m["settings.vertd.url_placeholder"]()}
-						bind:value={settings.vertdURL}
+					<Dropdown
+						options={[
+							m["settings.vertd.auto_instance"](),
+							m["settings.vertd.eu_instance"](),
+							m["settings.vertd.us_instance"](),
+							m["settings.vertd.custom_instance"](),
+						]}
+						onselect={(selected) => {
+							let inner: VertdInner;
+							switch (selected) {
+								case m["settings.vertd.auto_instance"]():
+									inner = { type: "auto" };
+									break;
+								case m["settings.vertd.eu_instance"]():
+									inner = { type: "eu" };
+									break;
+								case m["settings.vertd.us_instance"]():
+									inner = { type: "us" };
+									break;
+								case m["settings.vertd.custom_instance"]():
+									inner = {
+										type: "custom",
+									};
+									break;
+								default:
+									inner = { type: "auto" };
+							}
+							VertdInstance.instance.set(inner);
+						}}
+						selected={(() => {
+							switch (VertdInstance.instance.innerData().type) {
+								case "auto":
+									return m["settings.vertd.auto_instance"]();
+								case "eu":
+									return m["settings.vertd.eu_instance"]();
+								case "us":
+									return m["settings.vertd.us_instance"]();
+								case "custom":
+									return m[
+										"settings.vertd.custom_instance"
+									]();
+							}
+						})()}
+						settingsStyle
 					/>
+					{#if VertdInstance.instance.innerData().type === "custom"}
+						<input
+							type="text"
+							placeholder={m["settings.vertd.url_placeholder"]()}
+							bind:value={settings.vertdURL}
+						/>
+					{/if}
 				</div>
 				<div class="flex flex-col gap-4">
 					<div class="flex flex-col gap-2">
