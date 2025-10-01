@@ -62,8 +62,5 @@
 	"trustedDependencies": [
 		"@parcel/watcher",
 		"@swc/core"
-	],
-	"env": {
-		"GITHUB_URL_VERT": "https://github.com/VERT-sh/VERT"
-	}
+	]
 }
