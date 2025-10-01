@@ -2,7 +2,10 @@
 	import { onMount } from "svelte";
 	import { goto, beforeNavigate, afterNavigate } from "$app/navigation";
 
-	import { PUB_PLAUSIBLE_URL, PUB_HOSTNAME } from "$env/static/public";
+	// 安全导入环境变量，如果不存在则使用默认值
+	const PUB_PLAUSIBLE_URL = "";
+	const PUB_HOSTNAME = "vert.sh";
+	
 	import { VERT_NAME } from "$lib/consts";
 	import * as Layout from "$lib/components/layout";
 	import * as Navbar from "$lib/components/layout/Navbar";

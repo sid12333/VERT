@@ -3,7 +3,10 @@
 	import { log } from "$lib/logger";
 	import * as Settings from "$lib/sections/settings/index.svelte";
 	import { addToast } from "$lib/store/ToastProvider";
-	import { PUB_PLAUSIBLE_URL } from "$env/static/public";
+	
+	// 安全导入环境变量
+	const PUB_PLAUSIBLE_URL = "";
+	
 	import { SettingsIcon } from "lucide-svelte";
 	import { onMount } from "svelte";
 	import { m } from "$lib/paraglide/messages";

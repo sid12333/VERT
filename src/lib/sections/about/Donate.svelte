@@ -11,11 +11,10 @@
 
 	import { page } from "$app/state";
 
-	import {
-		PUB_DONATION_URL,
-		PUB_HOSTNAME,
-		PUB_STRIPE_KEY,
-	} from "$env/static/public";
+	// 安全导入环境变量，使用默认值
+	const PUB_DONATION_URL = "";
+	const PUB_HOSTNAME = "vert.sh";
+	const PUB_STRIPE_KEY = "";
 
 	// import { PUB_STRIPE_KEY, PUB_DONATION_API } from "$env/static/public";
 	import { fade } from "$lib/animation";
